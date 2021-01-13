@@ -1,0 +1,84 @@
+
+
+%\setcounter{chapter}{0}
+\chapter{Test features}
+\label{chap:test}
+
+\glsreset{ai}
+\glsreset{dl}
+
+In this work we consider cooperative multi-agent scenarios, in which multiple 
+robots collaborate, and possibly communicate, to achieve a common goal 
+\cite[][]{ismail2018survey}. Let'try this \footnote{this is a footnote}.
+Homogeneous Multi-Agent Systems (MAS) are composed of $N$ interacting 
+agents, which have the same physical structure and observation capabilities, so 
+they can be considered to be interchangeable and cooperate to solve a given 
+task \cite[][]{stone2000multiagent, vsovsic2016inverse}.
+This system is characterised by a state $S$ — which can be decomposed in sets of 
+local states for each agent and the set of possible observations $O$ for each agent 
+— obtained through sensors and the set of possible actions  $A$ for each agent.
+
+\begin{figure}[!htb]
+	\begin{center}
+		\begin{subfigure}[h]{0.49\textwidth}
+			\centering
+			\includegraphics[width=\textwidth]{"contents/images/20210110_172800 - origtest11030(len11030)_fps30_w2"}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[h]{0.49\textwidth}
+			\centering
+			\includegraphics[width=\textwidth]{"contents/images/20210110_172810 - origtest11030(len11030)_fps30_w5"}
+		\end{subfigure}
+	\end{center}
+	\vspace{-0.5cm}
+	\caption[Visualisation of the simulation of the first task.]{Visualisation of the 
+		initial and final configurations obtained simulating the first task.}
+	\label{fig:task1}
+	%	\vspace{-0.5cm}
+\end{figure}
+
+\lipsum[2]
+
+\bigskip
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[width=.55\textwidth]{"contents/images/20210110_172810 - origtest11030(len11030)_fps30_w5"}
+	\caption[Non-holonomic differential drive mobile robot.]{Configuration of a 
+		non-holonomic differential drive mobile robot 
+		\cite[][]{shojaei2011adaptive}.}
+	\label{fig:differentialdrive}
+\end{figure}
+
+\lipsum[2]
+
+\bigskip
+
+\begin{python}
+c_left, c_right = get_received_communication(state)
+
+if N % 2 == 1:  # if the number of robots is odd
+
+# Case 1: no communication received from left
+if c_left == 0:
+if c_right > N // 2:
+# the agent is in the first half of the row, so its colour is blue
+message = c_right - 1
+colour = 1
+elif c_right == N // 2:
+# the agent is the central one, so its colour is blue
+message = c_right + 1
+colour = 1
+\end{python}
+\begin{lstlisting}[frame=none,caption={Protocol used by the manual controller 
+to decide, for each robot, the message to transmit and the colour.}, 
+label=lst:manualtask2]
+\end{lstlisting}
+
+
+\paragraph*{\texttt{Numpy}}
+\lipsum[1]
+
+
+\paragraph*{\texttt{Keras}}
+\lipsum[1]
