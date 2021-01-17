@@ -216,12 +216,14 @@ morecomment=[l]{//s},
 
 
 \begin{acknowledgements}
-%\addcontentsline{toc}{chapter}{Acknowledgements}  % added 
+\addcontentsline{toc}{chapter}{Acknowledgements}  % added 
 \input{contents/acknowledgements.tex}
 \end{acknowledgements}
 \endgroup
 
+\clearpage
 
+%\pdfbookmark{\contentsname}{Contents}
 \tableofcontents 
 \newpage
 
@@ -254,6 +256,11 @@ morecomment=[l]{//s},
 \begingroup
 \let\cleardoublepage\clearpage
 \input{contents/01-introduction}
+\input{contents/02-theory}
+\input{contents/03-system}
+\input{contents/04-design}
+\input{contents/06-implementation}
+\input{contents/08-evaluation}
 \input{contents/10-conclusion}
 \input{contents/test}
 \endgroup

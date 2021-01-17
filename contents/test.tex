@@ -1,11 +1,18 @@
 
 
 %\setcounter{chapter}{0}
-\chapter{Test features}
+\chapter{Latex features}
 \label{chap:test}
 
 \glsreset{ai}
 \glsreset{dl}
+
+\begin{verbatim}
+ACCURACY    10-FOLD CROSS VALIDATION:    0.8290 (std dev 0.005217)
+PRECISION   10-FOLD CROSS VALIDATION:    0.8371 (std dev 0.009706)
+RECALL      10-FOLD CROSS VALIDATION:    0.8176 (std dev 0.008412)
+F1          10-FOLD CROSS VALIDATION:    0.8273 (std dev 0.004608)
+\end{verbatim}
 
 In this work we consider cooperative multi-agent scenarios, in which multiple 
 robots collaborate, and possibly communicate, to achieve a common goal 
@@ -18,21 +25,26 @@ This system is characterised by a state $S$ — which can be decomposed in sets 
 local states for each agent and the set of possible observations $O$ for each agent 
 — obtained through sensors and the set of possible actions  $A$ for each agent.
 
+\begin{itemize}
+	\item prodotti e utenti nella stessa rete, collegati attraverso le recensioni
+	\item rete di soli prodotti, collegati tramite similarità
+	\item rete di soli utenti, collegati tramite similarità
+\end{itemize}
+
 \begin{figure}[!htb]
 	\begin{center}
-		\begin{subfigure}[h]{0.49\textwidth}
+		\begin{subfigure}[h]{0.30\textwidth}
 			\centering
 			\includegraphics[width=\textwidth]{"contents/images/20210110_172800 - origtest11030(len11030)_fps30_w2"}
 		\end{subfigure}
 		\hfill
-		\begin{subfigure}[h]{0.49\textwidth}
+		\begin{subfigure}[h]{0.68\textwidth}
 			\centering
 			\includegraphics[width=\textwidth]{"contents/images/20210110_172810 - origtest11030(len11030)_fps30_w5"}
 		\end{subfigure}
 	\end{center}
 	\vspace{-0.5cm}
-	\caption[Visualisation of the simulation of the first task.]{Visualisation of the 
-		initial and final configurations obtained simulating the first task.}
+	\caption[list of figures caption]{current caption}
 	\label{fig:task1}
 	%	\vspace{-0.5cm}
 \end{figure}
@@ -44,9 +56,7 @@ local states for each agent and the set of possible observations $O$ for each ag
 \begin{figure}[!htb]
 	\centering
 	\includegraphics[width=.55\textwidth]{"contents/images/20210110_172810 - origtest11030(len11030)_fps30_w5"}
-	\caption[Non-holonomic differential drive mobile robot.]{Configuration of a 
-		non-holonomic differential drive mobile robot 
-		\cite[][]{shojaei2011adaptive}.}
+	\caption[list of figures caption]{current caption \cite[][]{shojaei2011adaptive}.}
 	\label{fig:differentialdrive}
 \end{figure}
 
@@ -55,25 +65,61 @@ local states for each agent and the set of possible observations $O$ for each ag
 \bigskip
 
 \begin{python}
-c_left, c_right = get_received_communication(state)
 
-if N % 2 == 1:  # if the number of robots is odd
+def tfdata_generator(files, input_size, batch_size, backgrounds, 
+					 bg_smoothmask, aug_prob=0, noises=[],
+					 prefetch=True, parallelize=True, 
+					 deterministic=False, cache=False, repeat=1):
 
-# Case 1: no communication received from left
-if c_left == 0:
-if c_right > N // 2:
-# the agent is in the first half of the row, so its colour is blue
-message = c_right - 1
-colour = 1
-elif c_right == N // 2:
-# the agent is the central one, so its colour is blue
-message = c_right + 1
-colour = 1
+	map_parallel = tf.data.experimental.AUTOTUNE if parallelize else None
+	backgrounds = tf.convert_to_tensor(backgrounds) # saves time during training
+	noises = tf.convert_to_tensor(noises) # saves time during training
+
+	gen = tf.data.Dataset.from_tensor_slices(files)
+	gen = gen.map(lambda filename: map_parse_input(filename, input_size), map_parallel, deterministic)
+	
+	if cache:
+		gen = gen.cache()
+		if not deterministic: # shuffling would destroy determinism
+			gen = gen.shuffle(len(files), reshuffle_each_iteration=True)
+	
+	gen = gen.map(lambda img, mask, gt: map_replace_background(img, mask, gt, backgrounds, bg_smoothmask), map_parallel, deterministic)
+	gen = gen.map(lambda img, gt: map_augmentation(img, gt, aug_prob, noises), map_parallel, deterministic)
+	gen = gen.map(lambda img, gt: map_preprocessing(img, gt), map_parallel, deterministic)
+	gen = gen.batch(batch_size, drop_remainder=True)
+	gen = gen.repeat(repeat)
+	
+	if prefetch:
+		gen = gen.prefetch(tf.data.experimental.AUTOTUNE)
+	
+	return gen
 \end{python}
+
 \begin{lstlisting}[frame=none,caption={Protocol used by the manual controller 
 to decide, for each robot, the message to transmit and the colour.}, 
 label=lst:manualtask2]
 \end{lstlisting}
+
+
+\begin{table}[H]
+	\caption{Schema originale del dataset}\label{tab:df-schema}
+	\centering
+	\begin{tabular}{|l|l|l|}
+		\hline
+		Campo & Descrizione \\
+		\hline
+		reviewerID & ID utente \\
+		reviewerName & Nome utente \\
+		asin & ID prodotto \\
+		reviewText & Testo della recensione \\
+		summary & Titolo della recensione \\
+		helpful & Utilità della recensione \\
+		overall & Punteggio \\
+		reviewTime & Timestamp in formato string \\
+		unixReviewTime & Timestamp in formato unix \\
+		\hline
+	\end{tabular}
+\end{table}
 
 
 \paragraph*{\texttt{Numpy}}
