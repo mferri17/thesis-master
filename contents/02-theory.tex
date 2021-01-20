@@ -1,20 +1,33 @@
-\chapter{Chapter Title}
-\label{chap:}
+\chapter{Theoretical Foundation}
+\label{chap:theory}
 
-\lipsum[1]
+%\lipsum[1]
 
 
 
 \section{Robotics}
 \label{sec:robotics}
 
-\subsection{Pose}
-\label{subsec:robot-pose}
+%\subsection{Pose}
+%\label{subsec:robot-pose}
+%
+%\subsection{Control Theory}
+%\label{subsec:robot-control}
+
 
 
 
 \section{Machine Learning}
 \label{sec:machine-learning}
+
+%\subsection{Supervised Learning}
+%\label{subsec:supervised-learning}
+%
+%\subsection{Convolutional Neural Networks}
+%\label{subsec:cnn}
+%
+%\subsection{Residual Neural Networks}
+%\label{subsec:resnet}
 
 
 
@@ -22,9 +35,58 @@
 \section{Human-drone Interaction}
 \label{sec:human-drone-interaction}
 
+A good variety of research can be found on human-robot interaction and a lot is yet to come. In the field, drones represent a specific segment due to their ability of freely move in the 3D space, opening the access to new use cases while representing a real challenge for professionals and researchers.
 
-\subsection{ProximityNet}
-\label{subsec:proximitynet}
+In this section we firstly present a general overview on the topic, then we focus on related work by \gls{idsia}.
+
+
+
+\subsection{The State of the Art of Human–Drone Interaction}
+\label{subsec:human-drone-sota}
+
+A recent article, published in Nov 2019 for IEEE Access (\cite{human-drone-sota}), explores literature and state of the art for human-drone interaction. Drones range from small toy-grade remote-controlled aircraft to fully-autonomous systems capable of decision-making through a large variety of sensors. Their usage grew a lot in the last years and it is expected to keep growing, thanks to decreasing costs and powerful features they can provide both for personal, commercial and social usage.
+
+\gls{faa} expects that total drone registrations will increase by more than 60\% between 2018 and 2022 with a particular increment in the commercial sector rather than the hobbyist one, even though the latter still counts the largest number of units. Moreover, \gls{faa} reports that almost half of the drones usage is for aerial photography (48\%), followed by industrial inspection (28\%) and agriculture (17\%). Accordingly to \cite{human-drone-sota}, drones will become ubiquitous to society, and in the next decade they will be extensively used in advertising, shipping, sports, emergency, and many other fields for augmenting human capabilities.
+
+Main concerns about drones today regards safety issues caused by propellers and limited flight times, usually no longer than 30 minutes due to limited battery capacity. Research in the sector of human-drone interaction mainly focus on their control (through gestures, voice or custom interfaces), communication between the user and the drone itself (in terms of acknowledgment and intents), perception of users' safety during flight, and innovative use cases. 
+
+
+
+\subsection{Vision-based Control of a Quadrotor in User Proximity}
+\label{subsec:sota-dario}
+
+Our work is built upon the original master thesis (\cite{mantegazza2018thesis}) and paper (\cite{mantegazza2019visionbased}) \textit{Vision-based Control of a Quadrotor in User Proximity: Mediated vs End-to-End Learning Approaches} from Dario Mantegazza, developed at \gls{idsia} in Lugano. In his thesis, the author proposes a machine learning model for teaching a drone to interact with a person by continuously flying to face the user frontally, towards the direction of the head. The problem is approached as a reactive control procedure and addressed with supervised learning, thus provides an interesting starting point for many other robotics applications. 
+
+The author collect data and test his model on the Parrot Bebop 2, a 500grams drone commonly used for photography and leisure purposes, capable of effective video stabilization. However, the software runs off-board, on a dedicated computer remotely connected through WiFi. 
+
+A considerable amount of flights is recorded for building the training data by programmatically flying the drone in front of a person, controlling it through an omniscient controller which knows both the drone's and user's pose. Images produced by the front-facing camera of the drone are used as input for a custom designed \gls{resnet} architecture to infer the relative user's position \gls{wrt} the drone. Practically, the neural network performs a regression on the four variables that form the user's pose (X, Y, Z, YAW) and learns to predict their values by using spacial information contained into the input images. 
+
+In the paper, the author also makes a comparison between the mediated approach described above and another end-to-end approach that directly learns control signals\footnote{desired pitch, roll, yaw and vertical velocity} for the drone, instead of the user's pose. Both solutions provide similar results, but the former can be adapted to other tasks by simply designing a custom controller, providing a more transparent and analyzable solution.
+
+Even though this kind of problems on human recognition and pose estimation could be faced with more advanced deep learning algorithms, making a simple regression on four variables allows the network to be small, so that the prediction task is light, fast to execute, and possibly portable on low-end devices.
+
+\medskip
+
+Network and dataset defined in \cite{mantegazza2019visionbased} have been used for our entire project, so the original code repository\footnote{\url{https://github.com/idsia-robotics/proximity-quadrotor-learning}} is available for reference. Next chapters constantly make use of this particular model architecture, that will be further explained in section \ref{sec:proximitynet}. 
+
+Having no official name, for enhancing readability, the custom \gls{resnet} architecture proposed by the author will be simply called \textit{ProximityNet}. For a better understanding, also a good descriptive video is available at \url{https://drive.switch.ch/index.php/s/MlEDrsuHcSl5Aw5}.
+
+
+
+\subsection{Embedded Implementation of Visual Controller for Nano-Drones}
+\label{subsec:sota-nicky}
+
+Autonomous navigation is an important and well-known area of research in robotics, which usually requires to accomplish complex and computationally-expensive tasks such as localization, mapping and path planning. Recent studies have started to approach autonomous driving through deep learning and imitation learning\cite{imitation-learning}, where neural networks learn by imitating human behavior in specific tasks. 
+
+\medskip
+
+In 2018, researchers at the UZH University of Zürich have demonstrated that \gls{resnet}s are able to provide satisfactory performance in the field [\cite{Loquercio_2018}]. They developed DroNet, a forked \gls{cnn} that predicts, from a single gray-scale image, a steering angle and a collision probability. In other words, the model learns to steer and avoid obstacles from forward-looking videos recorded by cars and bikes while driving in real contexts. In this case, both the prediction and controller tasks were powered off-drone on a dedicated computer, remotely connected through WiFi. 
+
+A year later, ETH Zürich was able to develop PULP-DroNet, porting the \gls{cnn} on the Crazyflie\footnote{\url{https://www.bitcraze.io/products/crazyflie-2-1/}}, a nano-drone with a size of only 3 $3 \times 3$ centimeters for a weight of 27 grams. They propose a general methodology for deploying on-board deep learning algorithms for  ultra-low-power devices \cite{palossi2019pulpdronetIoTJ}, without any needs of an external laptop to run the software.
+
+\medskip
+
+Inspired by PULP-DroNet, \gls{idsia} adapted its ProximityNet to work on-board the Crazyflie with excellent results \cite{zimmerman2020thesis}. The nano-drone is able to achieve good quantitative and qualitative performance, regardless any problem deriving from working with such low-end devices. Main challenges are represented by low computational power, energy consumption management, and low-fidelity camera with no video stabilization\footnote{Himax HM01B0 camera, able to produce $320 \times 320$ \gls{mp} at 60 FPS. However, frame rate is incredibly reduced during data collection due to platform limitation for image transfer.}.
 
 
 

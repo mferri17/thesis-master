@@ -2,8 +2,13 @@
 \label{chap:system}
 
 \glsreset{idsia}
+\glsreset{wrt}
+\glsreset{mocap}
+\glsreset{mp}
 
-This chapter aims to provide a generic view of our system. First, we briefly describe the existing environment, its main components and how they interact for flying and controlling the drone. Next, we list tools, software and libraries used to achieve the goal of making the drone able to fly in any other environment. %, as explained in the introductive section \ref{sec:objective}.
+This chapter aims to provide a generic view of our system.
+
+First, we briefly describe the existing environment, its main components and how they interact for flying and controlling the drone. Next, we explain network architecture and data used for the machine learning model, able to predict the user's pose given an image. Finally, we list tools, software and libraries to achieve the goal of making the drone able to fly in any other environment. %, as explained in the introductive section \ref{sec:objective}.
 
 
 
@@ -11,7 +16,7 @@ This chapter aims to provide a generic view of our system. First, we briefly des
 \section{Environment}
 \label{sec:hardware}
 
-Since we mainly focus on improving the ProximityNet model described in section \ref{subsec:proximitynet}, we need to know the physical environment in which the original research has been conducted, located at the Swiss AI Lab \gls{idsia} in Lugano.
+Since we mainly focus on improving the ProximityNet model mentioned in section \ref{subsec:sota-dario}, we need to understand the environment in which the original research has been conducted, physically located at the Swiss AI Lab \gls{idsia} in Lugano.
 
 
 
@@ -25,8 +30,7 @@ Since we mainly focus on improving the ProximityNet model described in section \
 	\label{fig:bebop}
 \end{figure}
 
-The entire work is built around the Parrot Bebop Drone 2 (figure \ref{fig:bebop}), a lightweight drone (500 grams) with size of $382 \times 328 \times 89$ millimeters. A 2700 mAh swappable battery gives power to four brushless engines and dual-core processor with quad-core GPU for a maximum flight time of 25 minutes. Connectivity is provided through 2.4 GHz 802.11a/b/n/ac Wi-Fi that enables remote control via mobile app or Parrot Skycontroller (up to a distance of 2km).
-
+The entire work is built around the Parrot Bebop Drone 2 (figure \ref{fig:bebop}), a lightweight drone (500 grams) with a size of $382 \times 328 \times 89$ millimeters. A 2700 mAh swappable battery gives power to four brushless engines and dual-core processor with quad-core GPU for a maximum flight time of 25 minutes. Connectivity is provided through 2.4 GHz 802.11a/b/n/ac Wi-Fi that enables remote control via mobile app or Parrot Skycontroller (up to a distance of 2km).
 
 The drone is equipped with many simultaneous sensor to compute drone's velocities, orientation, altitude, attitude and GPS coordinates to ensure the maximum stability during the whole flight. However, for this project we mainly care about its camera, able to shoot 14 \gls{mp} photos and record Full HD 1080p videos at 30 \gls{fps}. Even though the original \gls{fov} is 180°, raw camera images pass through a software stabilization that produces 16:9 images with a horizontal \gls{fov} of 90°. The 3-axis digital stabilization technique implemented by Parrot is able to compensate for drone's pitch and roll, in order to provide correct-oriented horizontal images and stable videos regardless the drone's movements. Full specifications provided by the official \cite{bebop}.
 
@@ -39,7 +43,7 @@ For tracking drone's movement a \gls{mocap} system is required, able to record 3
 
 \medskip
 
-\gls{idsia} adopt OptiTrack, which is producing real-time \gls{mocap} systems since 1996 and are the today world’s choice for low-latency and high-precision 6 \gls{dof} tracking for ground and aerial robotics both indoor and outdoor. Full documentation is available on the \cite{optitrack}.
+\gls{idsia} adopt OptiTrack, which is producing real-time \gls{mocap} systems since 1996 and are the today world’s choice for low-latency and high-precision 6 \gls{dof} tracking for ground and aerial robotics, both indoor and outdoor. Full documentation is available on the \cite{optitrack}.
 
 
 
@@ -67,7 +71,7 @@ At \gls{idsia}, a dedicated room has been equipped with an OptiTrack \gls{mocap}
 		\begin{subfigure}[h]{0.69\textwidth}
 			\centering
 			\includegraphics[width=1\textwidth]{"contents/images/03-arena"}
-			\caption[]{Drone in front of the cameras with passive markers}
+			\caption[]{Drone with passive markers, from \cite{mantegazza2018thesis}}
 			\label{fig:drone-arena}
 		\end{subfigure}
 	\end{center}
@@ -99,25 +103,182 @@ Inside the arena, the drone is controlled by a \gls{ros} script which relies on 
 
 \medskip
 
-During data collection, both user's and drone's poses are computed by the OptiTrack system by using proper markers placed on the drone and on the person's head, as shown in picture \ref{fig:drone-facing}. The target poses over time, mathematically computed by the script, are accurately synchronized with the video stream from the front-facing camera and saved into \texttt{rosbag} files.
+During data collection, both user's and drone's poses are deduced by the OptiTrack system by using proper markers placed on the drone and on the person's head, as shown in picture \ref{fig:drone-facing}. The target poses over time, mathematically computed by the script, are accurately synchronized with the video stream from the front-facing camera and saved into \texttt{rosbag} files.
 
-These data are used to build the dataset for training a machine learning model, which should be able to infer the target pose by seeing a picture taken by the drone's camera. Figure \ref{fig:drone-demo-2} shows an illustration of the system from a bird-eye view.
-
-\medskip
-
-\begin{figure}[!htb]
+\begin{figure}[!h]
 	\centering
-	\includegraphics[width=0.8\textwidth]{"contents/images/03-drone-facing"}
-	\caption[Passive markers placed on top of drone and user's head]{Passive markers placed on top of drone and user's head}
+	\includegraphics[width=1\textwidth]{"contents/images/03-drone-facing"}
+	\caption[Markers placed on top of drone and user's head]{Markers placed on top of drone and user's head, from \cite{mantegazza2018thesis}}
 	\label{fig:drone-facing}
 \end{figure}
+
+Data collected into the drone arena have been used to build the dataset for training a machine learning model, which should be able to infer the target pose by seeing a picture taken by the drone's camera. Figure \ref{fig:drone-demo-2} shows an illustration of the system from a bird-eye view.
 
 \begin{figure}[!htb]
 	\centering
 	\includegraphics[width=1\textwidth]{"contents/images/03-arena-demo-2"}
-	\caption[Data collection in the drone arena through OptiTrack and video stream]{Data collection in the drone arena through OptiTrack and video stream}
+	\caption[OptiTrack and data collection illustration]{OptiTrack and data collection illustration, from \cite{mantegazza2018thesis}}
 	\label{fig:drone-demo-2}
 \end{figure}
+
+
+
+
+\section{Model}
+\label{sec:proximitynet}
+
+Our entire work is based on the work introduced in section \ref{subsec:sota-dario}, whose basic working and environment has been presented before. This section further inspects dataset composition, network architecture and model performance as declared in \cite{mantegazza2019visionbased}.
+
+
+
+\subsection{Dataset}
+\label{subsec:proximitynet-dataset}
+
+Data have been entirely collected in the dedicated drone arena located at \gls{idsia}. A good dataset should ideally provide images from various scenarios, but such kind of data are not easy to record since the ground truth must be given by a complex and expensive \gls{mocap} system, particularly difficult to be moved and reassembled outdoor.
+
+For building both the training and the testing set, several flight sessions have been recorded using an omniscient controller, driving the drone towards user's pose inferred by the OptiTrack. Dataset contains a total of 13 different people which differs both in physical characteristics and outfit, moving in different ways under various (artificial) light conditions. Many objects are present on the background of recorded images, and some experiments involve more than one person in front of the drone\footnote{anyway, the drone always had to follow the nearest user (properly equipped with OptiTrack markers)}. In total, 45 minutes of usable videos were used to compose the dataset, which counts about 63'000 and 11'000 frames respectively for training and testing.
+
+A complete overview of images present in the training set is shown in figure \ref{fig:proximitynet-dataset-overview}. Please notice that a few frames in the dataset are affected by digital artifact, mainly caused by connection issues during video recording (figure \ref{fig:proximitynet-dataset-glitch}); also, there are frames in which no person is present at all, because of particular movements sequences during which the drone actually lose the user (figure \ref{fig:proximitynet-dataset-missing}).
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[width=0.4\textwidth]{"contents/images/03-data-glitch"}
+	\caption[A frame with digital artifact caused by connection issues]{A frame with digital artifact caused by connection issues}
+	\label{fig:proximitynet-dataset-glitch}
+\end{figure}
+
+\clearpage
+\vspace*{5ex}
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=1\textwidth]{"contents/images/03-data-overview"}
+	\caption[A complete overview of images in the training set]{A complete overview of images in the training set}
+	\label{fig:proximitynet-dataset-overview}
+\end{figure}
+\clearpage
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=1\textwidth]{"contents/images/03-data-missing"}
+\caption[A movements sequence which led to images with no person presents]{A movements sequence which led to images with no person presents}
+\label{fig:proximitynet-dataset-missing}
+\end{figure}
+
+The ground truth is represented by the four variables, associated with each captured image, that explain the user's pose \gls{wrt} the drone. Their interpretation is shown here, together with their distribution in the training set (figure \ref{fig:proximitynet-dataset-distribution-regr}).
+
+\begin{itemize}
+	\item \texttt{X}, stays for the distance of the user from the drone and affects the pitch (acceleration along the X axis); if the user is at the correct distance in front of the drone, this variable will be equal to 1.5
+	\item \texttt{Y}, represents the horizontal alignment of the user in front of the drone and affects the roll (acceleration along the Y axis); if the user is horizontally centered in front of the drone, this variable will be equal to 0
+	\item \texttt{Z}, represents the vertical alignment of the user in front of the drone and affects the velocity along the Z axis; if the user is vertically centered in front of the drone, this variable will be equal to 0
+	\item \texttt{W}, represents the angle created between head's pointing direction and drone position, is influenced by head orientation and affects the yaw (angular velocity around the Z axis); if the user is perfectly facing the drone, this variable will be equal to 0
+\end{itemize}
+
+From the variables distribution shown in figure \ref{fig:proximitynet-dataset-distribution-regr} we notice that, most of the time, the user is somehow centered in the image, which is an effect caused by the flight controller based on known poses. The variation of the variables is affected by the user's movements in space, the more sudden they are, the greater the deviation.
+
+\begin{figure}[!h]
+	\begin{center}
+		\begin{subfigure}[h]{0.24\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/distributions/x-regr"}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[h]{0.24\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/distributions/y-regr"}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[h]{0.24\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/distributions/z-regr"}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[h]{0.24\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/distributions/w-regr"}
+		\end{subfigure}
+	\end{center}
+	\vspace{-0.5cm}
+	\caption[Target variables distribution for the regression task]{Target variables distribution for the regression task}
+	\label{fig:proximitynet-dataset-distribution-regr}
+\end{figure}
+
+
+
+\subsection{Architecture}
+\label{subsec:proximitynet-architecture}
+
+\glsreset{cnn}
+\glsreset{resnet}
+
+As perfectly suited for working with images, proposed network resembles a \gls{cnn} which has been later improved by the author for being a \gls{resnet}. The network is composed by a total of 1'332'484 trainable parameters, accepts a single $60 \times 108$ pixels image in input, and outputs 4 regression variables which corresponds to the user's pose coordinates.
+
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=0.4\textwidth]{"contents/images/03-proximitynet-1A"}
+	\caption[Schematic ProximityNet architecture]{Schematic ProximityNet architecture, from \cite{mantegazza2019visionbased}}
+	\label{fig:proximitynet-architecture-1}
+\end{figure}
+
+Figure \ref{fig:proximitynet-architecture-1} provides an illustration of the architecture, while a complete list of all layers is available in figures \ref{fig:proximitynet-architecture-3a} and \ref{fig:proximitynet-architecture-3a} of the appendix \ref{chap:extra-figures}. Each \gls{resnet} block is provided with batch normalization, ReLU activations (for info, \cite{act-relu}) are used for all layers except for the output neurons, which are associated with a linear activation function (for info, \cite{act-linear}). 
+
+
+
+\subsection{Performance}
+\label{subsec:proximitynet-performance}
+
+In the original paper, ProximityNet is trained using the \gls{mae} loss function with the \gls{adam} optimizer (for into, \cite{kingma2014adam}) and a base learning rate of 0.001, progressively reduced on validation loss plateaus that last more than 5 epochs. A maximum of 200 epochs are run in total, but with an early stopping policy with a patience of 10 epochs on the validation loss. 
+
+Performance are evaluated both quantitatively and qualitatively, which are both carried out on the end-to-end model rather than the mediated one here considered. However, as explained in section \ref{subsec:sota-dario}, both obtains similar results so we can consider following details to be valid also for the mediated approach.
+
+\medskip 
+
+For quantitative evaluation, the chosen metric is \gls{r2}\footnote{\gls{r2} interpretation will be explained in the evaluation chapter \ref{chap:evaluation}}, which has an interval of $[-\inf, 1]$ where 1 represents the optimality. 
+
+The author also conducts an experiment about the minimum cardinality of the dataset for obtaining acceptable performance. Results are available in figure \ref{fig:proximitynet-r2}, directly taken from the paper. As shown, decent performance requires at least 5'000 samples and keep improving as their number increases.
+
+Specifically, predictions seem more accurate for variables Z and W with a \gls{r2} score of 0.82 and 0.88, respectively. Different the findings for X and Y which only reach a \gls{r2} of 0.59 and 0.57, respectively.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[width=1\textwidth]{"contents/images/03-proximitynet-r2"}
+	\caption[ProximityNet \gls{r2} results from \cite{mantegazza2019visionbased}]{ProximityNet \gls{r2} results from \cite{mantegazza2019visionbased}}
+	\label{fig:proximitynet-r2}
+\end{figure}
+
+\medskip
+
+The previous considerations on the variables are confirmed by the qualitative evaluation, obtained by comparing ground truth and predictions during a short simulation. Figure \ref{fig:proximitynet-gt-pred}\footnote{A1, A2 and A3 in the chart stands for different models, but they achieve same results anyway} shows that X and Y predictions are considerably worse than results achieved by Z and W, when compared with the ground truth.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[width=0.75\textwidth]{"contents/images/03-proximitynet-gt-pred"}
+	\caption[ProximityNet qualitative GT vs prediction results from \cite{mantegazza2019visionbased}]{ProximityNet qualitative GT vs prediction results from \cite{mantegazza2019visionbased}}
+	\label{fig:proximitynet-gt-pred}
+\end{figure}
+
+
+
+\subsection{Generalization}
+\label{subsec:proximitynet-generalization}
+
+Even though the ProximityNet achieved quite good performance on the test set, its behavior must be proven on the real drone to certify the model usability.
+
+\cite{mantegazza2019visionbased} reports experiments conducted inside the arena by flying the drone without the \gls{mocap} system, only relying on the learned model for computing user's pose. The outcome is incredibly good, with the drone actually performing its task without many issues. Figure \ref{fig:proximitynet-trajectories} presents trajectories followed by the drone during five consecutive runs (with two different models) in which the quadrotor had to face a user initially rotated by 90 degrees. Although the paths are sometimes different from what designed by the omniscient controller (the ground truth), they are still reasonable and flying capabilities in the arena seem very promising.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[width=0.75\textwidth]{"contents/images/03-proximitynet-gt-pred"}
+	\caption[ProximityNet trajectories, from \cite{mantegazza2019visionbased}, for positioning in front of the user initially rotated by 90 degrees]{ProximityNet trajectories, from \cite{mantegazza2019visionbased}, for positioning in front of the user initially rotated by 90 degrees}
+	\label{fig:proximitynet-trajectories}
+\end{figure}
+
+\medskip
+
+Finally, we consider model performance in unknown environments, possibly outdoor. The official paper does not talk about the topic, but direct contacts with the author suggested that flying performance outside of the drone arena were not consistent with model behavior inside the environment it already knows. Accordingly to this finding, it seems that the model is not able to generalize the task when outside of the arena.
+
+\bigskip
+
+The goal of our work is to explore ways of improvement, which aim to generalize the model to make it able to theoretically predict the user's pose in any other unknown scenario. Next chapters firstly try to understand main issues and limitation of the model, then provide a possible solution.
 
 
 
@@ -125,7 +286,7 @@ These data are used to build the dataset for training a machine learning model, 
 \section{Development}
 \label{sec:software}
 
-This section presents tools and software used to conduct our research for improving the existing system from a machine learning point of view, according to the objective of the thesis.
+Finally, this section presents tools and software used to conduct our research for improving the existing system from a machine learning point of view, according to the objective of the thesis.
 
 
 
@@ -134,7 +295,7 @@ This section presents tools and software used to conduct our research for improv
 
 The entire source code is written in Python 3. First experiments were carried out with Jupyter Notebooks via Google Colab on a GPU-accelerated runtime, while the final code is provided as classic Python scripts to be executable on a custom machine.
 
-For debugging a Windows 10 laptop equipped with an NVIDIA GeForce GTX 950M graphic card has been used, while actual training has been performed on a dedicated Ubuntu 18.04 workstation available at \gls{idsia} mounting four NVIDIA GeForce RTX 2080 Ti (still used for single-GPU computing, not simultaneously).
+For debugging a Windows 10 laptop equipped with an NVIDIA GeForce GTX 950M graphic card has been used, while actual training has been performed on a dedicated Ubuntu 18.04 workstation available at \gls{idsia} mounting four NVIDIA GeForce RTX 2080 Ti \footnote{multiple available GPUs are used for single-GPU computing, not simultaneously}.
 
 
 

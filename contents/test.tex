@@ -14,17 +14,6 @@ RECALL      10-FOLD CROSS VALIDATION:    0.8176 (std dev 0.008412)
 F1          10-FOLD CROSS VALIDATION:    0.8273 (std dev 0.004608)
 \end{verbatim}
 
-In this work we consider cooperative multi-agent scenarios, in which multiple 
-robots collaborate, and possibly communicate, to achieve a common goal 
-\cite[][]{ismail2018survey}. Let'try this \footnote{this is a footnote}.
-Homogeneous Multi-Agent Systems (MAS) are composed of $N$ interacting 
-agents, which have the same physical structure and observation capabilities, so 
-they can be considered to be interchangeable and cooperate to solve a given 
-task \cite[][]{stone2000multiagent, vsovsic2016inverse}.
-This system is characterised by a state $S$ — which can be decomposed in sets of 
-local states for each agent and the set of possible observations $O$ for each agent 
-— obtained through sensors and the set of possible actions  $A$ for each agent.
-
 \begin{itemize}
 	\item prodotti e utenti nella stessa rete, collegati attraverso le recensioni
 	\item rete di soli prodotti, collegati tramite similarità
@@ -49,15 +38,11 @@ local states for each agent and the set of possible observations $O$ for each ag
 	%	\vspace{-0.5cm}
 \end{figure}
 
-\lipsum[2]
-
-\bigskip
-
 \begin{figure}[!htb]
-	\centering
-	\includegraphics[width=.55\textwidth]{"contents/images/20210110_172810 - origtest11030(len11030)_fps30_w5"}
-	\caption[list of figures caption]{current caption \cite[][]{shojaei2011adaptive}.}
-	\label{fig:differentialdrive}
+\centering
+\includegraphics[width=.55\textwidth]{"contents/images/20210110_172810 - origtest11030(len11030)_fps30_w5"}
+\caption[list of figures caption]{current caption \cite[][]{shojaei2011adaptive}.}
+\label{fig:differentialdrive}
 \end{figure}
 
 \lipsum[2]
@@ -65,7 +50,6 @@ local states for each agent and the set of possible observations $O$ for each ag
 \bigskip
 
 \begin{python}
-
 def tfdata_generator(files, input_size, batch_size, backgrounds, 
 					 bg_smoothmask, aug_prob=0, noises=[],
 					 prefetch=True, parallelize=True, 
@@ -77,22 +61,6 @@ def tfdata_generator(files, input_size, batch_size, backgrounds,
 
 	gen = tf.data.Dataset.from_tensor_slices(files)
 	gen = gen.map(lambda filename: map_parse_input(filename, input_size), map_parallel, deterministic)
-	
-	if cache:
-		gen = gen.cache()
-		if not deterministic: # shuffling would destroy determinism
-			gen = gen.shuffle(len(files), reshuffle_each_iteration=True)
-	
-	gen = gen.map(lambda img, mask, gt: map_replace_background(img, mask, gt, backgrounds, bg_smoothmask), map_parallel, deterministic)
-	gen = gen.map(lambda img, gt: map_augmentation(img, gt, aug_prob, noises), map_parallel, deterministic)
-	gen = gen.map(lambda img, gt: map_preprocessing(img, gt), map_parallel, deterministic)
-	gen = gen.batch(batch_size, drop_remainder=True)
-	gen = gen.repeat(repeat)
-	
-	if prefetch:
-		gen = gen.prefetch(tf.data.experimental.AUTOTUNE)
-	
-	return gen
 \end{python}
 
 \begin{lstlisting}[frame=none,caption={Protocol used by the manual controller 
@@ -111,20 +79,14 @@ label=lst:manualtask2]
 		reviewerID & ID utente \\
 		reviewerName & Nome utente \\
 		asin & ID prodotto \\
-		reviewText & Testo della recensione \\
-		summary & Titolo della recensione \\
-		helpful & Utilità della recensione \\
-		overall & Punteggio \\
-		reviewTime & Timestamp in formato string \\
-		unixReviewTime & Timestamp in formato unix \\
 		\hline
 	\end{tabular}
 \end{table}
 
 
 \paragraph*{\texttt{Numpy}}
-\lipsum[1]
+Good library
 
 
 \paragraph*{\texttt{Keras}}
-\lipsum[1]
+Very good for ML

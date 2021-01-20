@@ -3,7 +3,9 @@
 \usepackage[utf8]{inputenc} 
 \usepackage[T1]{fontenc}
 \usepackage{textcomp}
+
 \usepackage{lipsum}
+\usepackage{afterpage}
 
 \usepackage[font=small,labelfont=bf]{caption}
 \usepackage{float}
@@ -173,7 +175,7 @@ morecomment=[l]{//s},
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-\title{Interpretation of neural networks and \\ advanced image augmentation for visual end-to-end control of drones} %compulsory
+\title{Interpretation of neural networks and \\ advanced image augmentation for visual control of drones in human proximity} %compulsory
 %\specialization{Dependable Distributed Systems}%optional
 %\subtitle{Subtitle: Reinventing the World} %optional 
 
@@ -278,8 +280,12 @@ morecomment=[l]{//s},
 %\endgroup
 
 \begingroup
-\chapter{List of Acronyms}
-\label{chp:acronyms}
+\input{contents/extra-figures}
+\endgroup
+
+\begingroup
+\chapter{Acronyms}
+\label{chap:acronyms}
 \let\clearpage\relax
 %\glsaddall  % comment to hide unused acronyms
 \vspace*{-120pt}
