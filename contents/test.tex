@@ -14,41 +14,6 @@ RECALL      10-FOLD CROSS VALIDATION:    0.8176 (std dev 0.008412)
 F1          10-FOLD CROSS VALIDATION:    0.8273 (std dev 0.004608)
 \end{verbatim}
 
-\begin{itemize}
-	\item prodotti e utenti nella stessa rete, collegati attraverso le recensioni
-	\item rete di soli prodotti, collegati tramite similarità
-	\item rete di soli utenti, collegati tramite similarità
-\end{itemize}
-
-\begin{figure}[!htb]
-	\begin{center}
-		\begin{subfigure}[h]{0.30\textwidth}
-			\centering
-			\includegraphics[width=\textwidth]{"contents/images/20210110_172800 - origtest11030(len11030)_fps30_w2"}
-		\end{subfigure}
-		\hfill
-		\begin{subfigure}[h]{0.68\textwidth}
-			\centering
-			\includegraphics[width=\textwidth]{"contents/images/20210110_172810 - origtest11030(len11030)_fps30_w5"}
-		\end{subfigure}
-	\end{center}
-	\vspace{-0.5cm}
-	\caption[list of figures caption]{current caption}
-	\label{fig:task1}
-	%	\vspace{-0.5cm}
-\end{figure}
-
-\begin{figure}[!htb]
-\centering
-\includegraphics[width=.55\textwidth]{"contents/images/20210110_172810 - origtest11030(len11030)_fps30_w5"}
-\caption[list of figures caption]{current caption \cite[][]{shojaei2011adaptive}.}
-\label{fig:differentialdrive}
-\end{figure}
-
-\lipsum[2]
-
-\bigskip
-
 \begin{python}
 def tfdata_generator(files, input_size, batch_size, backgrounds, 
 					 bg_smoothmask, aug_prob=0, noises=[],
@@ -63,11 +28,9 @@ def tfdata_generator(files, input_size, batch_size, backgrounds,
 	gen = gen.map(lambda filename: map_parse_input(filename, input_size), map_parallel, deterministic)
 \end{python}
 
-\begin{lstlisting}[frame=none,caption={Protocol used by the manual controller 
-to decide, for each robot, the message to transmit and the colour.}, 
-label=lst:manualtask2]
+\begin{lstlisting}[frame=none,caption={Listing description}, 
+label=lst:label-name]
 \end{lstlisting}
-
 
 \begin{table}[H]
 	\caption{Schema originale del dataset}\label{tab:df-schema}
@@ -82,11 +45,3 @@ label=lst:manualtask2]
 		\hline
 	\end{tabular}
 \end{table}
-
-
-\paragraph*{\texttt{Numpy}}
-Good library
-
-
-\paragraph*{\texttt{Keras}}
-Very good for ML

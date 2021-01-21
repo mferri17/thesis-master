@@ -61,7 +61,7 @@ The author collect data and test his model on the Parrot Bebop 2, a 500grams dro
 
 A considerable amount of flights is recorded for building the training data by programmatically flying the drone in front of a person, controlling it through an omniscient controller which knows both the drone's and user's pose. Images produced by the front-facing camera of the drone are used as input for a custom designed \gls{resnet} architecture to infer the relative user's position \gls{wrt} the drone. Practically, the neural network performs a regression on the four variables that form the user's pose (X, Y, Z, YAW) and learns to predict their values by using spacial information contained into the input images. 
 
-In the paper, the author also makes a comparison between the mediated approach described above and another end-to-end approach that directly learns control signals\footnote{desired pitch, roll, yaw and vertical velocity} for the drone, instead of the user's pose. Both solutions provide similar results, but the former can be adapted to other tasks by simply designing a custom controller, providing a more transparent and analyzable solution.
+In the paper, the author also makes a comparison between the mediated approach described above and another end-to-end approach that directly learns control signals\footnote{desired pitch, roll, yaw and vertical velocity} for the drone, instead of the user's pose. Another experiments also considers a learned controller. All the solutions provide similar results, but the former can be adapted to other tasks by simply designing a custom controller, providing a more transparent and analyzable solution\footnote{take a look at image \ref{fig:proximitynet-architecture-paper3approaches} for details about models architectures designed for the three approaches}.
 
 Even though this kind of problems on human recognition and pose estimation could be faced with more advanced deep learning algorithms, making a simple regression on four variables allows the network to be small, so that the prediction task is light, fast to execute, and possibly portable on low-end devices.
 
@@ -73,14 +73,14 @@ Having no official name, for enhancing readability, the custom \gls{resnet} arch
 
 
 
-\subsection{Embedded Implementation of Visual Controller for Nano-Drones}
+\subsection{Embedded Implementation of Controller for Nano-Drones}
 \label{subsec:sota-nicky}
 
 Autonomous navigation is an important and well-known area of research in robotics, which usually requires to accomplish complex and computationally-expensive tasks such as localization, mapping and path planning. Recent studies have started to approach autonomous driving through deep learning and imitation learning\cite{imitation-learning}, where neural networks learn by imitating human behavior in specific tasks. 
 
 \medskip
 
-In 2018, researchers at the UZH University of Zürich have demonstrated that \gls{resnet}s are able to provide satisfactory performance in the field [\cite{Loquercio_2018}]. They developed DroNet, a forked \gls{cnn} that predicts, from a single gray-scale image, a steering angle and a collision probability. In other words, the model learns to steer and avoid obstacles from forward-looking videos recorded by cars and bikes while driving in real contexts. In this case, both the prediction and controller tasks were powered off-drone on a dedicated computer, remotely connected through WiFi. 
+In 2018, researchers at the UZH University of Zürich have demonstrated that \gls{resnet}s are able to provide satisfactory performance in the field (\cite{Loquercio_2018}). They developed DroNet, a forked \gls{cnn} that predicts, from a single gray-scale image, a steering angle and a collision probability. In other words, the model learns to steer and avoid obstacles from forward-looking videos recorded by cars and bikes while driving in real contexts. In this case, both the prediction and controller tasks were powered off-drone on a dedicated computer, remotely connected through WiFi. 
 
 A year later, ETH Zürich was able to develop PULP-DroNet, porting the \gls{cnn} on the Crazyflie\footnote{\url{https://www.bitcraze.io/products/crazyflie-2-1/}}, a nano-drone with a size of only 3 $3 \times 3$ centimeters for a weight of 27 grams. They propose a general methodology for deploying on-board deep learning algorithms for  ultra-low-power devices \cite{palossi2019pulpdronetIoTJ}, without any needs of an external laptop to run the software.
 
@@ -93,6 +93,55 @@ Inspired by PULP-DroNet, \gls{idsia} adapted its ProximityNet to work on-board t
 
 \section{Network Interpretability}
 \label{sec:network-interpretability}
+
+\glsreset{ml}
+\glsreset{nn}
+
+Deep \gls{nn}s learn abstract representations for finding a logical mapping between their input and output, determined by well-defined mathematical computations which involve the input itself and the progressively learned network parameters. Inspired by biological brains, this approach seems to be incredibly effective on a huge variety of tasks.
+
+Unlike other \gls{ml} techniques, \gls{nn} are known to produce "black-box" models, particularly hard to understand even from domain experts. Their reasoning and comprehension is intrinsic in the network parameters, which are nothing but numbers.
+
+\medskip 
+
+However, when working with real-world problems, it is extremely important to be able to explain what a \gls{ml} model is actually understanding. This is crucial for building trust in algorithms and to be sure there are no undesirable biases in the models, which could raise serious problems especially in critical fields such as medicine and law.
+
+\gls{xai} is the field of study which tries to make \gls{ml} results, and their underlying basis for decision-making, properly understandable to humans (\cite{xai-wiki}). 
+
+\medskip 
+
+Regarding \gls{xai} for \gls{cnn}s, researchers has developed many techniques for understanding what a \gls{nn}s actually care of when producing an output based on an input image. Main efforts regard feature visualization and attribution, but recent advanced studies also shown how these methods can be used altogether (\cite{olah2018the}).
+
+
+
+\subsection{Feature Visualization}
+
+
+
+
+
+\subsection{Spatial Attribution}
+
+\subsubsection{CAM}
+
+\subsubsection{GradCAM}
+\label{subsec:gradcam-theory}
+
+\cite{Selvaraju_2019}
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[width=0.75\textwidth]{"contents/images/gradcam/02-gradcam-schema"}
+	\caption[\gls{gradcam} schematic functioning]{\gls{gradcam} schematic functioning (\cite{Selvaraju_2019})}
+	\label{fig:gradcam-schema}
+\end{figure}
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=0.75\textwidth]{"contents/images/gradcam/02-gradcam-catdog"}
+\caption[\gls{gradcam} example on dog-cat classification]{\gls{gradcam} example on dog-cat classification (\cite{Selvaraju_2019})}
+\label{fig:gradcam-catdog}
+\end{figure}
+
 
 
 

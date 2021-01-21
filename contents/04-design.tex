@@ -1,7 +1,11 @@
-\chapter{Initial Experiments \& Design}
+\chapter{Experiments \& Solution Design}
 \label{chap:design}
 
-\lipsum[1]
+\glsreset{ai}
+\glsreset{nn}
+\glsreset{cnn}
+
+This chapter describes interpretation of the existing model for highlighting main issues behind the lack of its generalization capabilities. Then, we propose a solution and present initial experiments on its feasibility.
 
 
 
@@ -9,23 +13,440 @@
 \section{Model Interpretation}
 \label{sec:model-interpretration}
 
-\subsection{Regression to Classification}
+\glsreset{nn}
+
+Convolutional Neural Networks (CNN) are known to be suited for computer vision, because of their ability to gain spacial-related insights from images. Anyway, just like for any other \gls{nn}, \gls{cnn}s are "black-box" and their internal behavior is particularly difficult for humans to understand.
+
+In section \ref{subsec:proximitynet-generalization}, we discussed about insufficient experimental results obtained by ProximityNet in predicting the user's pose in an unknown environment, thus outside of the drone arena. To find a solution to this problem, we firstly need to understand what the model is actually learning.
+
+
+
+\subsection{Applying GradCAM}
 \label{subsec:gradcam-apply}
 
-\subsection{Loss Functions}
-\label{subsec:gradcam-loss}
+\glsreset{gradcam}
 
-\subsection{Visual Results}
+Among network interpretability techniques introduced in section \ref{sec:network-interpretability}, we choose \gls{gradcam} because it is indeed the most understandable way of visualizing what a model is actually seeing.
+
+As explained in section \ref{subsec:gradcam-theory}, \gls{gradcam} is able to effectively visualize the most important parts of an input image which are responsible for predicting a certain output\footnote{for an easy understandable \gls{gradcam} example, please refer to the figure \ref{fig:gradcam-catdog} which regards a simple dogs VS cats classifier}.
+
+
+
+\subsection{Regression to Classification}
+\label{subsec:gradcam-regrtoclass}
+
+\gls{gradcam} is designed to be applied on classification tasks, rather than regression ones. Even though a porting of the algorithm for regression has been published and called Regression Activation Map (\cite{wang2019diabetic})\footnote{open-source code available at \url{https://github.com/cauchyturing/kaggle_diabetic_RAM}}, it appears to be an isolated case since the research in the field it is not developed yet. For this reason and only for network interpretation, we decide to transform our problem to a classification task.
+
+Since the ground truth is composed of four variables with specific domains. Figure \ref{fig:proximitynet-dataset-distribution-regr} in the previous chapter shows variables distribution, from which we can see that all variables in the dataset mainly lie on their "center" value, because the user is mostly centered into the image. We decide to split continuous values in 3 different classes, which account for values smaller, around and higher than the "center". We call these buckets respectively \texttt{low}, \texttt{medium}, and \texttt{high}.
+
+\begin{itemize}
+	\item \texttt{X} values are splitted at $1.4$ and $1.6$
+	\item \texttt{Y} values are splitted at $-0.15$ and $+0.15$
+	\item \texttt{Z} values are splitted at $-0.05$ and $+0.05$
+	\item \texttt{W} values are splitted at $-0.20$ and $+0.20$
+\end{itemize}
+
+So, for example, \texttt{X} values greater than $1.6$ will be classified as \texttt{high}, while \texttt{Z} values between $-0.05$ and $+0.05$ will be classified as \texttt{medium}. These specific intervals have been manually defined for obtaining a good class distribution over the training set (figure \ref{fig:proximitynet-dataset-distribution-class}). Please notice that this class partition is fundamental for understanding some \gls{gradcam} visualizations later.
+
+\begin{figure}[!h]
+	\begin{center}
+		\begin{subfigure}[h]{0.24\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/distributions/x-class"}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[h]{0.24\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/distributions/y-class"}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[h]{0.24\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/distributions/z-class"}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[h]{0.24\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/distributions/w-class"}
+		\end{subfigure}
+	\end{center}
+	\vspace{-0.5cm}
+	\caption[Target variables distribution for the classification task]{Target variables distribution for the classification task}
+	\label{fig:proximitynet-dataset-distribution-class}
+\end{figure}
+
+
+
+\subsection{Re-training}
+\label{subsec:gradcam-retrain}
+
+Accordingly to the new ground truth, we define a new model architecture by replacing regression outputs with classification ones. 
+%Early layers of a \gls{cnn} focus on learning simple features, such as edges and textures, while later convolutional layers usually recognize parts or complete objects. For this reason, we perform a model re-training by freezing most of the layers, learning new model parameters from just from the very last convolutional layer.
+We perform a re-training on the new model, by using the \texttt{categorical\_crossentropy} loss and the \texttt{accuracy} metric, both suited for multi-class models. We use the \gls{adam} optimizer and a base learning rate of $0.001$, progressively reduced on validation loss plateaus. 
+
+Results are shown in figure \ref{fig:gradcam-retrain-simple}, which after 30 epochs shows a loss slighty smaller than 1, both for training and validation, and accuracy over the 80\% for all variables. These values are not ideal for gaining some sort of conclusion, but have instead been used for comparing different training experiments with the new classification model.
+
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=1\textwidth]{"contents/images/04-metrics-class-simple"}
+	\caption[\gls{gradcam}: loss and accuracy of the new classification model]{\gls{gradcam}: loss and accuracy of the new classification model}
+	\label{fig:gradcam-retrain-simple}
+\end{figure}
+
+
+
+\subsection{Framework}
+\label{subsec:gradcam-framework}
+
+For practically applying \gls{gradcam} to the Keras trained model, we use the open-source \texttt{tf-keras-vis} available on GitHub\footnote{\url{https://github.com/keisen/tf-keras-vis}} by \cite{tf-keras-vis}, porting for TensorFlow 2.0+ of the most famous \texttt{keras-vis} by \cite{keras-vis}.
+
+Finding the right library for this purpose has not been easy, since research is still on-going and most of available resources are for TensorFlow 1 only. The most famous and powerful is \texttt{Lucid}\footnote{\url{https://github.com/tensorflow/lucid}}, from the official TensorFlow team.
+
+
+\subsection{Reading charts}
+\label{subsec:gradcam-reading}
+
+A proper understanding of this section requires a thorough ability on reading the following charts. Basic knowledge on how the related library works, would also be helpful\footnote{Tutorial:\url{https://github.com/keisen/tf-keras-vis/blob/8f83773520069367902becc0a668dda90ab76349/examples/attentions.ipynb}}.
+
+\gls{gradcam} application requires to specify the class for which we want to compute the activation mapping, which in our case would be one of the 3 introduced in section \ref{subsec:gradcam-regrtoclass}: \texttt{low}, \texttt{medium} or \texttt{high}. 
+
+When working on standard classification problems, things are pretty easy: if we classify animals, we indicate \gls{gradcam} a specific animal class (e.g., \texttt{lion}) and the algorithm will provide an heatmap which overlay the portion of the image which is mainly associated with that animal (e.g., hopefully, the lion will be highlighted if it is present in the image).
+
+\medskip
+
+However, our \gls{ml} does not look like a standard classification problem, instead it has been adapted from regression. Classes only serve as categorical values for actual numerical ones, and does not exists a specific portion of the input images which can be associated to one of the three classes in particular. In other words, considering the class \texttt{low}, we do not expect its related heatmap to be different from the one generated for the class \texttt{high}: our discriminator is always the person, and its position in the image.
+
+Moreover, ProximityNet predicts four different variables, then also the classification model will have multiple outputs. This further introduces another difficulty on reading \gls{gradcam} results, since we expect - once again - that heatmaps will only highlight the person in the image, regardless the inspected variable.
+
+Finally, in some cases the network predicts the right class (coherent with the \gls{gt}), while in other cases the outputs are incorrect. When examining wrong predictions, both the predicted and actual class could be taken into consideration for understanding what is going wrong with the model.
+
+Of course, this assumption can be wrong, as the model could actually use other parts of the images (e.g., objects in the background) for actually determining classes to predict. However, this would be an undesired behavior since we expect that a correctly working \gls{nn} will only care about the person, and nothing else.
+
+\bigskip
+
+Figure \ref{fig:gradcam-example-1} displays a typical full example on \gls{gradcam} application for each variable (\texttt{X, Y, Z, W}) and each class (\texttt{low, medium, high}). Heatmaps are not easy to interpret due to a large variety of parameters to consider. As a guideline, for each variable you could only consider the column which corresponds to the actual (or predicted) class.
+
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=1\textwidth]{"contents/images/gradcam/04-gradcam-example-1"}
+	\caption[\gls{gradcam}: example of application for each variable and class]{\gls{gradcam}: example of application for each variable and class}
+	\label{fig:gradcam-example-1}
+\end{figure}
+
+\gls{gt} and predicted values are available in the right-most parentesis, as "GT" and "PR" respectively. Rows define variables, while columns stand for the classes. It is clearly visible how no specific correlation is available between variables, classes and computed predictions.
+
+The last column is available as an average result of all classes, obtained by calling \gls{gradcam} without specifying a particular class to consider. The same reasoning can be also applied for variables, so that we are able to obtain also single meaningful images which represent \gls{gradcam} global average, for every variable and class at once (figure \ref{fig:gradcam-example-2}).
+
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=0.5\textwidth]{"contents/images/gradcam/04-gradcam-example-2"}
+	\caption[\gls{gradcam}: example of application on a global average]{\gls{gradcam}: example of application on a global average}
+	\label{fig:gradcam-example-2}
+\end{figure}
+
+
+
+\subsection{Results}
 \label{subsec:gradcam-results}
 
-\subsection{Proposed Approach}
+As already shown in figure \ref{fig:gradcam-example-1}, it seems the network is not only considering the person in the frame for computing its output, but instead relies on the whole image with particular attention on some spots.
+
+From previous section, we understand that reasoning with \gls{gradcam} heatmaps is not trivial, and separating visualization by variables and classes is not totally convenient when we can simply plot the global average \gls{gradcam} instead. For simplicity, this section will only focus on single-image results, while full \gls{gradcam} visualizations are available in the appendix \ref{sec:extra-gradcam} for further inspection.
+
+\subsubsection*{Reasonable detections}
+
+First of all, figure \ref{fig:gradcam-ok} displays examples of correctly working scenarios, in which the person is correctly detected from \gls{gradcam}. Three cases are observed during our studies: most of the times, the entire user is highlighted by \gls{gradcam}, while sometimes just the body or the head get the major attention.
+
+\begin{figure}[!h]
+	\begin{center}
+		\begin{subfigure}[h]{0.24\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/gradcam/gradcam-ok-1"}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[h]{0.24\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/gradcam/gradcam-ok-2"}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[h]{0.24\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/gradcam/gradcam-ok-3"}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[h]{0.24\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/gradcam/gradcam-ok-4"}
+		\end{subfigure}
+	\end{center}
+	\vspace{-0.5cm}
+	\caption[\gls{gradcam}: Correctly detected people]{\gls{gradcam}: Correctly detected people}
+	\label{fig:gradcam-ok}
+\end{figure}
+
+Such precise results are not the standard. In many cases, heatmaps are unstable, going in and out of the target person. The two frame sequences below fairly describe the usual behavior of the model seen by \gls{gradcam} (figures \ref{fig:gradcam-seq-dario} and \ref{fig:gradcam-seq-beard}).
+
+\begin{figure}[!h]
+	\begin{center}
+		\begin{subfigure}[h]{0.24\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/gradcam/gradcam-dario-1"}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[h]{0.24\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/gradcam/gradcam-dario-2"}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[h]{0.24\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/gradcam/gradcam-dario-3"}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[h]{0.24\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/gradcam/gradcam-dario-4"}
+		\end{subfigure}
+	\end{center}
+	\vspace{-0.5cm}
+	\caption[\gls{gradcam}: Sequence transitioning from wrong to correct detections]{\gls{gradcam}: Sequence transitioning from wrong to correct detections}
+	\label{fig:gradcam-seq-dario}
+\end{figure}
+
+\begin{figure}[!h]
+	\begin{center}
+		\begin{subfigure}[h]{0.24\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/gradcam/gradcam-beard-01"}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[h]{0.24\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/gradcam/gradcam-beard-02"}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[h]{0.24\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/gradcam/gradcam-beard-03"}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[h]{0.24\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/gradcam/gradcam-beard-04"}
+		\end{subfigure}
+		\vfill
+		\begin{subfigure}[h]{0.24\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/gradcam/gradcam-beard-05"}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[h]{0.24\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/gradcam/gradcam-beard-06"}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[h]{0.24\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/gradcam/gradcam-beard-07"}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[h]{0.24\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/gradcam/gradcam-beard-08"}
+		\end{subfigure}
+		\vfill
+		\begin{subfigure}[h]{0.24\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/gradcam/gradcam-beard-09"}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[h]{0.24\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/gradcam/gradcam-beard-10"}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[h]{0.24\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/gradcam/gradcam-beard-11"}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[h]{0.24\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/gradcam/gradcam-beard-12"}
+		\end{subfigure}
+	\end{center}
+	\vspace{-0.5cm}
+	\caption[\gls{gradcam}: Sequence of unstable detections in and out of the person]{\gls{gradcam}: Sequence of unstable detections in and out of the person}
+	\label{fig:gradcam-seq-beard}
+\end{figure}
+
+\subsubsection*{Problematic detections}
+
+Examples presented above mostly reflect the model expected behavior. However, our network interpretation also reveals a lot of flaws in the prediction task. \gls{gradcam} exhibits several situations in which the model output is affected by recurrent elements in the dataset.
+
+\begin{itemize}
+	\item Objects in the background are prone to be considered important (figure \ref{fig:gradcam-background})
+	\item Curtains seem often particularly attractive (figure \ref{fig:gradcam-curtains})
+	\item Many parts of the room can easily distract the model, such as borders and baseboards or even blank spots on the walls (figure \ref{fig:gradcam-random})
+	\item When dealing with multiple people in front of the camera, sometimes not only the nearest person is considered (figure \ref{fig:gradcam-double})
+	\item Artificial glitches are sometimes ignored, sometimes distractive (figure \ref{fig:gradcam-glitch})
+\end{itemize}
+
+\begin{figure}[!h]
+	\begin{center}
+		\begin{subfigure}[h]{0.24\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/gradcam/gradcam-background-1"}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[h]{0.24\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/gradcam/gradcam-background-2"}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[h]{0.24\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/gradcam/gradcam-background-3"}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[h]{0.24\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/gradcam/gradcam-background-4"}
+		\end{subfigure}
+	\end{center}
+	\vspace{-0.5cm}
+	\caption[\gls{gradcam}: Objects in the background detected]{\gls{gradcam}: Objects in the background detected}
+	\label{fig:gradcam-background}
+\end{figure}
+
+\begin{figure}[!h]
+	\begin{center}
+		\begin{subfigure}[h]{0.24\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/gradcam/gradcam-curtains-1"}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[h]{0.24\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/gradcam/gradcam-curtains-2"}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[h]{0.24\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/gradcam/gradcam-curtains-3"}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[h]{0.24\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/gradcam/gradcam-curtains-4"}
+		\end{subfigure}
+	\end{center}
+	\vspace{-0.5cm}
+	\caption[\gls{gradcam}: Curtains often distract the model]{\gls{gradcam}: Curtains often distract the model}
+	\label{fig:gradcam-curtains}
+\end{figure}
+
+\begin{figure}[!h]
+	\begin{center}
+		\begin{subfigure}[h]{0.24\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/gradcam/gradcam-random-1"}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[h]{0.24\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/gradcam/gradcam-random-2"}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[h]{0.24\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/gradcam/gradcam-random-3"}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[h]{0.24\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/gradcam/gradcam-random-4"}
+		\end{subfigure}
+	\end{center}
+	\vspace{-0.5cm}
+	\caption[\gls{gradcam}: Model get easily distracted by various elements]{\gls{gradcam}: Model get easily distracted by various elements}
+	\label{fig:gradcam-random}
+\end{figure}
+
+\begin{figure}[!h]
+	\begin{center}
+		\begin{subfigure}[h]{0.24\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/gradcam/gradcam-double-1"}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[h]{0.24\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/gradcam/gradcam-double-2"}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[h]{0.24\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/gradcam/gradcam-double-3"}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[h]{0.24\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/gradcam/gradcam-double-4"}
+		\end{subfigure}
+	\end{center}
+	\vspace{-0.5cm}
+	\caption[\gls{gradcam}: Detections when two people are present in the image]{\gls{gradcam}: Detections when two people are present in the image}
+	\label{fig:gradcam-double}
+\end{figure}
+
+\begin{figure}[!h]
+	\begin{center}
+		\begin{subfigure}[h]{0.24\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/gradcam/gradcam-glitch-1"}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[h]{0.24\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/gradcam/gradcam-glitch-2"}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[h]{0.24\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/gradcam/gradcam-glitch-3"}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[h]{0.24\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/gradcam/gradcam-glitch-4"}
+		\end{subfigure}
+	\end{center}
+	\vspace{-0.5cm}
+	\caption[\gls{gradcam}: Model reactions to artificial glitches]{\gls{gradcam}: Model reactions to artificial glitches}
+	\label{fig:gradcam-glitch}
+\end{figure}
+
+
+
+\subsection{Summary}
 \label{subsec:proposed-approach}
+
+Reported results demonstrate that the model is not robust enough to only focus on the user facing the drone's camera. Instead, various portions of the input images appear to be taken into consideration when the model makes predictions: many distractors are coming from the background.
+
+In light of this, we can reasonably assume that the \gls{resnet} model has undesirably learned some details about the drone arena in which the dataset has been collected. This is most likely the reason why the model is unable to control the drone outside of that environment, as already mentioned in section \ref{subsec:proximitynet-generalization}.
+
+\bigskip
+
+We conclude that the model is not capable of generalization. Since we have demonstrated that the main cause of the problem is the drone arena, then we try to remove the room from the equation. We propose a solution which consists of just keeping the person in the images, masking out the background to be randomly replaced with something else. Next section explores various algorithms for creating a mask of a person from an image.
 
 
 
 
 \section{Person Masking}
 \label{sec:masking}
+
+- Green screen
 
 \subsection{Canny Edge Detection}
 \label{subsec:masking-canny}

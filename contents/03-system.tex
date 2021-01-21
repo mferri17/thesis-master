@@ -71,7 +71,7 @@ At \gls{idsia}, a dedicated room has been equipped with an OptiTrack \gls{mocap}
 		\begin{subfigure}[h]{0.69\textwidth}
 			\centering
 			\includegraphics[width=1\textwidth]{"contents/images/03-arena"}
-			\caption[]{Drone with passive markers, from \cite{mantegazza2018thesis}}
+			\caption[]{Drone with passive markers (\cite{mantegazza2018thesis})}
 			\label{fig:drone-arena}
 		\end{subfigure}
 	\end{center}
@@ -108,7 +108,7 @@ During data collection, both user's and drone's poses are deduced by the OptiTra
 \begin{figure}[!h]
 	\centering
 	\includegraphics[width=1\textwidth]{"contents/images/03-drone-facing"}
-	\caption[Markers placed on top of drone and user's head]{Markers placed on top of drone and user's head, from \cite{mantegazza2018thesis}}
+	\caption[Markers placed on top of drone and user's head]{Markers placed on top of drone and user's head (\cite{mantegazza2018thesis})}
 	\label{fig:drone-facing}
 \end{figure}
 
@@ -117,7 +117,7 @@ Data collected into the drone arena have been used to build the dataset for trai
 \begin{figure}[!htb]
 	\centering
 	\includegraphics[width=1\textwidth]{"contents/images/03-arena-demo-2"}
-	\caption[OptiTrack and data collection illustration]{OptiTrack and data collection illustration, from \cite{mantegazza2018thesis}}
+	\caption[OptiTrack and data collection illustration]{OptiTrack and data collection illustration (\cite{mantegazza2018thesis})}
 	\label{fig:drone-demo-2}
 \end{figure}
 
@@ -215,11 +215,11 @@ As perfectly suited for working with images, proposed network resembles a \gls{c
 \begin{figure}[!h]
 	\centering
 	\includegraphics[width=0.4\textwidth]{"contents/images/03-proximitynet-1A"}
-	\caption[Schematic ProximityNet architecture]{Schematic ProximityNet architecture, from \cite{mantegazza2019visionbased}}
+	\caption[Schematic ProximityNet architecture]{Schematic ProximityNet architecture (\cite{mantegazza2019visionbased})}
 	\label{fig:proximitynet-architecture-1}
 \end{figure}
 
-Figure \ref{fig:proximitynet-architecture-1} provides an illustration of the architecture, while a complete list of all layers is available in figures \ref{fig:proximitynet-architecture-3a} and \ref{fig:proximitynet-architecture-3a} of the appendix \ref{chap:extra-figures}. Each \gls{resnet} block is provided with batch normalization, ReLU activations (for info, \cite{act-relu}) are used for all layers except for the output neurons, which are associated with a linear activation function (for info, \cite{act-linear}). 
+Figure \ref{fig:proximitynet-architecture-1} provides an illustration of the architecture, while a complete list of all layers is available in figures \ref{fig:proximitynet-architecture-3a} and \ref{fig:proximitynet-architecture-3a} of the appendix \ref{sec:extra-proximitynet}. Each \gls{resnet} block is provided with batch normalization, ReLU activations (for info, \cite{act-relu}) are used for all layers except for the output neurons, which are associated with a linear activation function (for info, \cite{act-linear}). 
 
 
 
@@ -240,7 +240,7 @@ Specifically, predictions seem more accurate for variables Z and W with a \gls{r
 
 \begin{figure}[!htb]
 	\centering
-	\includegraphics[width=1\textwidth]{"contents/images/03-proximitynet-r2"}
+	\includegraphics[width=0.8\textwidth]{"contents/images/03-proximitynet-r2"}
 	\caption[ProximityNet \gls{r2} results from \cite{mantegazza2019visionbased}]{ProximityNet \gls{r2} results from \cite{mantegazza2019visionbased}}
 	\label{fig:proximitynet-r2}
 \end{figure}
@@ -251,8 +251,8 @@ The previous considerations on the variables are confirmed by the qualitative ev
 
 \begin{figure}[!htb]
 	\centering
-	\includegraphics[width=0.75\textwidth]{"contents/images/03-proximitynet-gt-pred"}
-	\caption[ProximityNet qualitative GT vs prediction results from \cite{mantegazza2019visionbased}]{ProximityNet qualitative GT vs prediction results from \cite{mantegazza2019visionbased}}
+	\includegraphics[width=0.8\textwidth]{"contents/images/03-proximitynet-gt-pred-2"}
+	\caption[ProximityNet GT vs prediction results from \cite{mantegazza2019visionbased}]{ProximityNen GT vs prediction results from \cite{mantegazza2019visionbased}}
 	\label{fig:proximitynet-gt-pred}
 \end{figure}
 
@@ -267,14 +267,14 @@ Even though the ProximityNet achieved quite good performance on the test set, it
 
 \begin{figure}[!htb]
 	\centering
-	\includegraphics[width=0.75\textwidth]{"contents/images/03-proximitynet-gt-pred"}
-	\caption[ProximityNet trajectories, from \cite{mantegazza2019visionbased}, for positioning in front of the user initially rotated by 90 degrees]{ProximityNet trajectories, from \cite{mantegazza2019visionbased}, for positioning in front of the user initially rotated by 90 degrees}
+	\includegraphics[width=0.8\textwidth]{"contents/images/03-proximitynet-trajectories"}
+	\caption[ProximityNet trajectories (\cite{mantegazza2019visionbased}) for positioning in front of the user initially rotated by 90 degrees]{ProximityNet trajectories (\cite{mantegazza2019visionbased}) for positioning in front of the user initially rotated by 90 degrees}
 	\label{fig:proximitynet-trajectories}
 \end{figure}
 
 \medskip
 
-Finally, we consider model performance in unknown environments, possibly outdoor. The official paper does not talk about the topic, but direct contacts with the author suggested that flying performance outside of the drone arena were not consistent with model behavior inside the environment it already knows. Accordingly to this finding, it seems that the model is not able to generalize the task when outside of the arena.
+Finally, we consider model performance in unknown environments, possibly outdoor. The official paper does not talk about the topic, but direct contacts with the author suggested that flying performance outside of the drone arena were not consistent with usual model behavior. Accordingly to this, it seems that the model is not able to generalize the task when outside of the environment it already knows.
 
 \bigskip
 
@@ -295,18 +295,18 @@ Finally, this section presents tools and software used to conduct our research f
 
 The entire source code is written in Python 3. First experiments were carried out with Jupyter Notebooks via Google Colab on a GPU-accelerated runtime, while the final code is provided as classic Python scripts to be executable on a custom machine.
 
-For debugging a Windows 10 laptop equipped with an NVIDIA GeForce GTX 950M graphic card has been used, while actual training has been performed on a dedicated Ubuntu 18.04 workstation available at \gls{idsia} mounting four NVIDIA GeForce RTX 2080 Ti \footnote{multiple available GPUs are used for single-GPU computing, not simultaneously}.
+For debugging, we use a Windows 10 laptop equipped with an NVIDIA GeForce GTX 950M graphic card, while actual training is performed on a dedicated Ubuntu 18.04 workstation available at \gls{idsia} mounting four NVIDIA GeForce RTX 2080 Ti \footnote{multiple available GPUs are used for single-GPU computing, not simultaneously}.
 
 
 
 \subsection{Frameworks}
 \label{subsec:frameworks}
 
-The original work from \cite{mantegazza2019visionbased} is written in Python and based on TensorFlow 1 and Keras. These libraries have been kept, but our project uses their updated versions for ease of use. Other intensively used frameworks are listed below.
+The original work from \cite{mantegazza2019visionbased} is written in Python and based on TensorFlow 1 and Keras. These libraries have been kept, but our project uses their updated versions for ease of use. Other main frameworks are listed below.
 
 
 \paragraph*{\texttt{Numpy}}
-Largely used in the whole project for computation on arrays. Numpy is the fundamental package for scientific computing in Python. It is a Python library that provides a multidimensional array object, various derived objects (such as masked arrays and matrices), and an assortment of routines for fast operations on arrays. 
+Largely used in the whole project for computation on arrays. Numpy is the fundamental package for scientific computing in Python, that provides a multidimensional array object, various derived objects (such as masked arrays and matrices), and an assortment of routines for fast operations on arrays. 
 
 \paragraph*{\texttt{Pickle}}
 Mainly used for saving and restoring Numpy arrays. The pickle module implements binary protocols for serializing and de-serializing a Python object structure. 
@@ -315,7 +315,7 @@ Mainly used for saving and restoring Numpy arrays. The pickle module implements 
 First choice for building charts, visualize images or any kind of figure. Matplotlib is a comprehensive library for creating static, animated, and interactive visualizations in Python. Its \texttt{pyplot} module is inspired by MATLAB.
 
 \paragraph*{\texttt{OpenCV}}
-Mainly used for efficient image and video manipulation together with Matplotlib. OpenCV is an open-source library that includes several hundreds of computer vision algorithms.
+Mainly used for efficient image/video manipulation and visualization, together with Matplotlib. OpenCV is an open-source library that includes several hundreds of computer vision algorithms.
 
 \paragraph*{\texttt{TensorFlow 2}}
 All the project strongly relies on TensorFlow (TF) from start to end: network interpretation, person masking, training and quantitative evaluation. Created by the Google Brain team, TensorFlow is an open source library for numerical computation and large-scale machine learning. It can be used across a range of tasks but has a particular focus on training and inference of deep neural networks. In version 2, it introduces a lot of comforts for easier development with a less steep learning curve.
@@ -324,16 +324,16 @@ All the project strongly relies on TensorFlow (TF) from start to end: network in
 Used for defining the network architecture, training and evaluating the model. Keras is the high-level API of TensorFlow 2: an approchable, highly-productive interface for solving machine learning problems, with a focus on modern deep learning. It provides essential abstractions and building blocks for developing and shipping machine learning solutions with high iteration velocity.
 
 \paragraph*{\texttt{TensorBoard}}
-Used with TensorFlow to precisely profile data generator performance for optimizing training time. TensorBoard is a tool for providing the measurements and visualizations needed during the machine learning workflow. It enables tracking experiment metrics, visualizing the model graph, and much more.
+Used with TensorFlow to precisely profile data generator performance for optimizing training time on the GPU. TensorBoard is a tool for providing the measurements and visualizations needed during the machine learning workflow. It enables tracking experiment metrics, visualizing the model graph, and much more.
 
 \paragraph*{\texttt{Sklearn}}
-Only used for automatically compute some evaluation metrics, Sklearn is a simple and efficient tools for predictive data analysis reusable in various contexts built on NumPy, SciPy, and Matplotlib.
+Only used for automatically computing some evaluation metrics, Sklearn is a simple and efficient tools for predictive data analysis reusable in various contexts built on NumPy, SciPy, and Matplotlib.
 
 \paragraph*{\texttt{tf-keras-vis}}
-Used for applying GradCAM and other interpretability techniques. Open-source library for network interpretation, available on GitHub thanks to \cite{tf-keras-vis}. Derived from the original keras-vis (\cite{keras-vis}) high-level toolkit for visualizing and debugging your trained keras neural net models.
+Used for applying GradCAM and other interpretability techniques. Open-source library for network interpretation, available on GitHub thanks to \cite{tf-keras-vis}. Derived from the original keras-vis (\cite{keras-vis}) high-level toolkit for visualizing and debugging trained Keras neural network models.
 
 \paragraph*{\texttt{akTwelve Mask\_RCNN}}
-Used for human detection and segmentation in background replacement. Open-source implementation of Mask R-CNN on Python 3, Keras, and TensorFlow available on GitHub thanks to \cite{MaskRCNN_akTwelve}. The model generates bounding boxes and segmentation masks for each instance of an object in the image. It's based on Feature Pyramid Network (FPN) and a ResNet101 backbone.
+Used for human detection and segmentation in background replacement. Open-source implementation of Mask R-CNN on Python 3, Keras, and TensorFlow available on GitHub thanks to \cite{MaskRCNN_akTwelve}. The model generates bounding boxes, segmentation masks and categorization labels for each instance of an object in the image.
 
 
 

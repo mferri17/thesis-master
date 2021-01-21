@@ -1,18 +1,87 @@
 
 \chapter{Extra Figures}
 \label{chap:extra-figures}
-\let\clearpage\relax
+%\let\clearpage\relax
 
-\begin{figure}[!htb]
+Here a bunch of other images not inserted in the main chapters, in order to keep some section shorter and enhance general readability. Following figures are not crucial for the understanding of our work, but they add minor details.
+
+
+
+
+\section{ProximityNet}
+\label{sec:extra-proximitynet}
+
+\begin{figure}[!h]
 	\centering
-	\includegraphics[width=1\textwidth]{"contents/images/03-proximitynet-3A"}
+	\includegraphics[width=0.99\textwidth]{"contents/images/03-proximitynet-1"}
+	\caption[Models by \cite{mantegazza2019visionbased}: mediated, end-to-end, learned controlled]{Models by \cite{mantegazza2019visionbased}: mediated, end-to-end, learned controlled}
+	\label{fig:proximitynet-architecture-paper3approaches}
+\end{figure}
+
+Please note that following architecture is for classification purposes presented in section \ref{subsec:gradcam-regrtoclass}. Standard model outputs have shapes \texttt{(?, 1)} instead.
+
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=0.9\textwidth]{"contents/images/03-proximitynet-3A"}
 	\caption[ProximityNet complete architecture (part 1)]{ProximityNet complete architecture (part 1, from input to layer 18)}
 	\label{fig:proximitynet-architecture-3a}
 \end{figure}
 
-\begin{figure}[!htb]
+\begin{figure}[!h]
 	\centering
-	\includegraphics[width=1\textwidth]{"contents/images/03-proximitynet-3B"}
+	\includegraphics[width=0.9\textwidth]{"contents/images/03-proximitynet-3B"}
 	\caption[ProximityNet complete architecture (part 2, from layer 18 to outputs)]{ProximityNet complete architecture (part 2, from layer 18 to outputs)}
 	\label{fig:proximitynet-architecture-3b}
+\end{figure}
+
+\clearpage
+
+
+
+
+\section{\gls{gradcam}}
+\label{sec:extra-gradcam}
+
+This sections reports \gls{gradcam} applications appropriately divided into variables and classes, in contrast with the single-image approach followed in section \ref{subsec:gradcam-results}.
+
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=0.8\textwidth]{"contents/images/gradcam/apx-gradcam-1"}
+	\caption[]{Full \gls{gradcam}: two people in the frame}
+	\label{fig:apx-gradcam-1}
+\end{figure}
+
+\begin{figure}[!h]
+\centering
+\includegraphics[width=0.8\textwidth]{"contents/images/gradcam/apx-gradcam-2"}
+\caption[]{Full \gls{gradcam}: two people in the frame}
+\label{fig:apx-gradcam-2}
+\end{figure}
+
+\begin{figure}[!h]
+\centering
+\includegraphics[width=0.8\textwidth]{"contents/images/gradcam/apx-gradcam-3"}
+\caption[]{Full \gls{gradcam}: model is attracted by curtains}
+\label{fig:apx-gradcam-3}
+\end{figure}
+
+\begin{figure}[!h]
+\centering
+\includegraphics[width=0.8\textwidth]{"contents/images/gradcam/apx-gradcam-4"}
+\caption[]{Full \gls{gradcam}: model is attracted by curtains}
+\label{fig:apx-gradcam-4}
+\end{figure}
+
+\begin{figure}[!h]
+\centering
+\includegraphics[width=0.8\textwidth]{"contents/images/gradcam/apx-gradcam-5"}
+\caption[]{Full \gls{gradcam}: model is attracted by background objects}
+\label{fig:apx-gradcam-5}
+\end{figure}
+
+\begin{figure}[!h]
+\centering
+\includegraphics[width=0.8\textwidth]{"contents/images/gradcam/apx-gradcam-6"}
+\caption[]{Full \gls{gradcam}: model is attracted by background objects}
+\label{fig:apx-gradcam-6}
 \end{figure}
