@@ -8,7 +8,7 @@
 
 This chapter aims to provide a generic view of our system.
 
-First, we briefly describe the existing environment, its main components and how they interact for flying and controlling the drone. Next, we explain network architecture and data used for the machine learning model, able to predict the user's pose given an image. Finally, we list tools, software and libraries to achieve the goal of making the drone able to fly in any other environment. %, as explained in the introductive section \ref{sec:objective}.
+First, we briefly describe the existing environment, its main components, and how they interact for flying and controlling the drone. Next, we explain network architecture and data used for the machine learning model, able to predict the user's pose given an image. Finally, we list tools, software, and libraries to achieve the goal of making the drone able to fly in any other environment. %, as explained in the introductive section \ref{sec:objective}.
 
 
 
@@ -16,7 +16,7 @@ First, we briefly describe the existing environment, its main components and how
 \section{Environment}
 \label{sec:hardware}
 
-Since we mainly focus on improving the ProximityNet model mentioned in section \ref{subsec:sota-dario}, we need to understand the environment in which the original research has been conducted, physically located at the Swiss AI Lab \gls{idsia} in Lugano.
+Since we mainly focus on improving the ProximityNet model mentioned in section \ref{subsec:sota-dario}, we need to deeply understand the environment in which the original research has been conducted, physically located at the Swiss AI Lab \gls{idsia} in Lugano.
 
 
 
@@ -30,20 +30,20 @@ Since we mainly focus on improving the ProximityNet model mentioned in section \
 	\label{fig:bebop}
 \end{figure}
 
-The entire work is built around the Parrot Bebop Drone 2 (figure \ref{fig:bebop}), a lightweight drone (500 grams) with a size of $382 \times 328 \times 89$ millimeters. A 2700 mAh swappable battery gives power to four brushless engines and dual-core processor with quad-core GPU for a maximum flight time of 25 minutes. Connectivity is provided through 2.4 GHz 802.11a/b/n/ac Wi-Fi that enables remote control via mobile app or Parrot Skycontroller (up to a distance of 2km).
+The entire work is built around the Parrot Bebop Drone 2 (figure \ref{fig:bebop}), a lightweight drone (500 grams) with a size of $382 \times 328 \times 89$ millimeters. A 2700 mAh swappable battery gives power to four brushless engines and a dual-core processor with a quad-core GPU, for a maximum flight time of 25 minutes. Connectivity is provided through 2.4 GHz 802.11a/b/n/ac Wi-Fi that enables remote control via mobile app or Parrot Skycontroller (up to a distance of 2km).
 
-The drone is equipped with many simultaneous sensor to compute drone's velocities, orientation, altitude, attitude and GPS coordinates to ensure the maximum stability during the whole flight. However, for this project we mainly care about its camera, able to shoot 14 \gls{mp} photos and record Full HD 1080p videos at 30 \gls{fps}. Even though the original \gls{fov} is 180°, raw camera images pass through a software stabilization that produces 16:9 images with a horizontal \gls{fov} of 90°. The 3-axis digital stabilization technique implemented by Parrot is able to compensate for drone's pitch and roll, in order to provide correct-oriented horizontal images and stable videos regardless the drone's movements. Full specifications provided by the official \cite{bebop}.
+The drone is equipped with many simultaneous sensors to compute velocities, orientation, altitude, attitude, and GPS coordinates to ensure maximum stability during the whole flight. However, for this project, we mainly care about its camera, able to shoot 14 \gls{mp} photos and record Full HD 1080p videos at 30 \gls{fps}. Even though the original \gls{fov} is 180°, raw camera images pass through a software stabilization that produces 16:9 images with a horizontal \gls{fov} of 90°. The 3-axis digital stabilization technique implemented by Parrot is able to compensate for the drone's pitch and roll, in order to provide correct-oriented horizontal images and stable videos regardless of the drone's movements. Full specifications provided by the official \cite{bebop}.
 
   
 
 \subsection{OptiTrack}
 \label{subsec:optitrack}
 
-For tracking drone's movement a \gls{mocap} system is required, able to record 3D coordinate of objects and people in space. The technique is widely use for motion tracking in a large variety of fields such as film making and animation, virtual reality, sport, medicine and even military. A common way to implement a \gls{mocap} systems is by using special cameras placed around the area to be tracked, able to collect optical signals from passive\footnote{a passive marker reflect light} or active markers\footnote{an active marker emits its own light} inside the area.
+For tracking drone's movement, a \gls{mocap} system is required, able to record 3D coordinate of objects and people in space. The technique is widely used for motion tracking in a large variety of fields such as film making and animation, virtual reality, sport, medicine, and even military. A common way to implement a \gls{mocap} systems is by using special cameras placed around the area to be tracked, able to collect optical signals from passive\footnote{a passive marker reflect light} or active markers\footnote{an active marker emits its own light} inside the area.
 
 \medskip
 
-\gls{idsia} adopt OptiTrack, which is producing real-time \gls{mocap} systems since 1996 and are the today world’s choice for low-latency and high-precision 6 \gls{dof} tracking for ground and aerial robotics, both indoor and outdoor. Full documentation is available on the \cite{optitrack}.
+\gls{idsia} adopt OptiTrack, which is producing real-time \gls{mocap} systems since 1996 and are today world’s choice for low-latency and high-precision 6 \gls{dof} tracking for ground and aerial robotics, both indoor and outdoor. Full documentation is available on the \cite{optitrack}.
 
 
 
@@ -84,7 +84,7 @@ At \gls{idsia}, a dedicated room has been equipped with an OptiTrack \gls{mocap}
 \subsection{Robot Operating System (ROS)}
 \label{subsec:ROS}
 
-\gls{ros} is an open-source robotics middleware suite of software libraries and tools for building distributed and modular robot applications. It provides hardware astraction and orchestration, implementation of commonly used functionality, message-passing between processes, and package management. \gls{ros} organizes its components in graph architecture composed by nodes which communicates via a publish/subscribe mechanism, supporting a wide variety of robots also used for education. The main client library is available in C++, Python and Lisp.
+\gls{ros} is an open-source robotics middleware suite of software libraries and tools for building distributed and modular robot applications. It provides hardware abstraction and orchestration, implementation of commonly-used functionality, message-passing between processes, and package management. \gls{ros} organizes its components in a graph architecture composed of nodes that communicates via a publish/subscribe mechanism, supporting a wide variety of robots also used for education. The main client library is available in C++, Python, and Lisp.
 
 Some of the most important \gls{ros} features include Standard Message Definitions, Robot Geometry and Description, Remote Procedure Calls, Diagnostics, Pose Estimation, Localization, Mapping, and Navigation. It also provides additional tools, such as \cite{rviz} (3D visualization of robots and various types of sensor data) and \cite{Gazebo} (3D indoor and outdoor multi-robot simulator, complete with dynamic and kinematic physics, and a pluggable physics engine).
 
@@ -103,7 +103,7 @@ Inside the arena, the drone is controlled by a \gls{ros} script which relies on 
 
 \medskip
 
-During data collection, both user's and drone's poses are deduced by the OptiTrack system by using proper markers placed on the drone and on the person's head, as shown in picture \ref{fig:drone-facing}. The target poses over time, mathematically computed by the script, are accurately synchronized with the video stream from the front-facing camera and saved into \texttt{rosbag} files.
+During data collection, both user's and drone's poses are deduced by the OptiTrack system by using proper markers placed on the drone and on the person's head, as shown in picture \ref{fig:drone-facing}. The target poses over time, mathematically computed by the script, are accurately synchronized with the video stream coming from the front-facing camera, and saved into \texttt{rosbag} files.
 
 \begin{figure}[!h]
 	\centering
@@ -127,18 +127,18 @@ Data collected into the drone arena have been used to build the dataset for trai
 \section{Model}
 \label{sec:proximitynet}
 
-Our entire work is based on the work introduced in section \ref{subsec:sota-dario}, whose basic working and environment has been presented before. This section further inspects dataset composition, network architecture and model performance as declared in \cite{mantegazza2019visionbased}.
+Our entire work is based on the work introduced in section \ref{subsec:sota-dario}, whose basic working and environment have been presented before. This section further inspects dataset composition, network architecture and model performance as declared in \cite{mantegazza2019visionbased}.
 
 
 
 \subsection{Dataset}
 \label{subsec:proximitynet-dataset}
 
-Data have been entirely collected in the dedicated drone arena located at \gls{idsia}. A good dataset should ideally provide images from various scenarios, but such kind of data are not easy to record since the ground truth must be given by a complex and expensive \gls{mocap} system, particularly difficult to be moved and reassembled outdoor.
+Data have been entirely collected in the dedicated drone arena located at \gls{idsia}. A good dataset should ideally provide images from various scenarios, but such kind of data is not easy to record since the ground truth must be given by a complex and expensive \gls{mocap} system, particularly difficult to be moved and reassembled outdoor.
 
-For building both the training and the testing set, several flight sessions have been recorded using an omniscient controller, driving the drone towards user's pose inferred by the OptiTrack. Dataset contains a total of 13 different people which differs both in physical characteristics and outfit, moving in different ways under various (artificial) light conditions. Many objects are present on the background of recorded images, and some experiments involve more than one person in front of the drone\footnote{anyway, the drone always had to follow the nearest user (properly equipped with OptiTrack markers)}. In total, 45 minutes of usable videos were used to compose the dataset, which counts about 63'000 and 11'000 frames respectively for training and testing.
+For building both the training and the testing set, several flight sessions have been recorded using an omniscient controller, driving the drone towards the user's pose inferred by the OptiTrack. The dataset contains a total of 13 different people which differs both in physical characteristics and outfit, moving in different ways under various (artificial) light conditions. Many objects are present in the background of recorded images, and some experiments involve more than one person in front of the drone\footnote{anyway, the drone always had to follow the nearest user (properly equipped with OptiTrack markers)}. In total, 45 minutes of usable videos were used to compose the dataset, which counts about 63'000 and 11'000 frames respectively for training and testing sets.
 
-A complete overview of images present in the training set is shown in figure \ref{fig:proximitynet-dataset-overview}. Please notice that a few frames in the dataset are affected by digital artifact, mainly caused by connection issues during video recording (figure \ref{fig:proximitynet-dataset-glitch}); also, there are frames in which no person is present at all, because of particular movements sequences during which the drone actually lose the user (figure \ref{fig:proximitynet-dataset-missing}).
+A complete overview of images present in the training set is shown in figure \ref{fig:proximitynet-dataset-overview}. Please notice that a few frames in the dataset are affected by digital artifacts, mainly caused by connection issues during video recording (figure \ref{fig:proximitynet-dataset-glitch}); also, there are frames in which no person is present at all, because of particular movements sequences during which the drone actually lose the user (figure \ref{fig:proximitynet-dataset-missing}).
 
 \begin{figure}[!htb]
 	\centering
@@ -164,16 +164,16 @@ A complete overview of images present in the training set is shown in figure \re
 \label{fig:proximitynet-dataset-missing}
 \end{figure}
 
-The ground truth is represented by the four variables, associated with each captured image, that explain the user's pose \gls{wrt} the drone. Their interpretation is shown here, together with their distribution in the training set (figure \ref{fig:proximitynet-dataset-distribution-regr}).
+The ground truth is represented by the four variables, associated with each captured image, that explain the user's pose \gls{wrt} the drone. Their interpretation is described here:
 
 \begin{itemize}
-	\item \texttt{X}, stays for the distance of the user from the drone and affects the pitch (acceleration along the X axis); if the user is at the correct distance in front of the drone, this variable will be equal to 1.5
-	\item \texttt{Y}, represents the horizontal alignment of the user in front of the drone and affects the roll (acceleration along the Y axis); if the user is horizontally centered in front of the drone, this variable will be equal to 0
-	\item \texttt{Z}, represents the vertical alignment of the user in front of the drone and affects the velocity along the Z axis; if the user is vertically centered in front of the drone, this variable will be equal to 0
-	\item \texttt{W}, represents the angle created between head's pointing direction and drone position, is influenced by head orientation and affects the yaw (angular velocity around the Z axis); if the user is perfectly facing the drone, this variable will be equal to 0
+	\item \texttt{X}, stays for the distance of the user from the drone and affects the pitch (acceleration along the X-axis); if the user is at the correct distance in front of the drone, this variable will be equal to 1.5
+	\item \texttt{Y}, represents the horizontal alignment of the user in front of the drone and affects the roll (acceleration along the Y-axis); if the user is horizontally centered in front of the drone, this variable will be equal to 0
+	\item \texttt{Z}, represents the vertical alignment of the user in front of the drone and affects the velocity along the Z-axis; if the user is vertically centered in front of the drone, this variable will be equal to 0
+	\item \texttt{W}, represents the angle created between head's pointing direction and drone position, is influenced by head orientation, and affects the yaw (angular velocity around the Z-axis); if the user is perfectly facing the drone, this variable will be equal to 0
 \end{itemize}
 
-From the variables distribution shown in figure \ref{fig:proximitynet-dataset-distribution-regr} we notice that, most of the time, the user is somehow centered in the image, which is an effect caused by the flight controller based on known poses. The variation of the variables is affected by the user's movements in space, the more sudden they are, the greater the deviation.
+From the distribution of the variables in the training set, shown in figure \ref{fig:proximitynet-dataset-distribution-regr}, we notice that most of the time the user is somehow centered in the image, which is an effect caused by the \gls{ros} controller based on known poses. The variation of the variables is affected by the user's movements in space, the more sudden they are, the greater the deviation.
 
 \begin{figure}[!h]
 	\begin{center}
@@ -210,7 +210,7 @@ From the variables distribution shown in figure \ref{fig:proximitynet-dataset-di
 \glsreset{cnn}
 \glsreset{resnet}
 
-As perfectly suited for working with images, proposed network resembles a \gls{cnn} which has been later improved by the author for being a \gls{resnet}. The network is composed by a total of 1'332'484 trainable parameters, accepts a single $60 \times 108$ pixels image in input, and outputs 4 regression variables which corresponds to the user's pose coordinates.
+As perfectly suited for working with images, the proposed network is a \gls{cnn} later improved by the author for being a \gls{resnet}. The network is composed of a total of 1'332'484 trainable parameters, accepts a single $60 \times 108$ pixels image in input, and outputs 4 regression variables that correspond to the user's pose coordinates.
 
 \begin{figure}[!h]
 	\centering
@@ -226,9 +226,9 @@ Figure \ref{fig:proximitynet-architecture-1} provides an illustration of the arc
 \subsection{Performance}
 \label{subsec:proximitynet-performance}
 
-In the original paper, ProximityNet is trained using the \gls{mae} loss function with the \gls{adam} optimizer (for into, \cite{kingma2014adam}) and a base learning rate of 0.001, progressively reduced on validation loss plateaus that last more than 5 epochs. A maximum of 200 epochs are run in total, but with an early stopping policy with a patience of 10 epochs on the validation loss. 
+In the original paper, ProximityNet is trained using the \gls{mae} loss function with the \gls{adam} optimizer (for info, \cite{kingma2014adam}) and a base learning rate of 0.001, progressively reduced on validation loss plateaus that last more than 5 epochs. A maximum of 200 epochs are run in total, but with an early stopping policy with patience of 10 epochs on the validation loss. 
 
-Performance are evaluated both quantitatively and qualitatively, which are both carried out on the end-to-end model rather than the mediated one here considered. However, as explained in section \ref{subsec:sota-dario}, both obtains similar results so we can consider following details to be valid also for the mediated approach.
+Performance is evaluated both quantitatively and qualitatively on the end-to-end model, rather than the mediated one considered for our work. However, as explained in section \ref{subsec:sota-dario}, both approaches obtain similar results so we can consider the following details to be valid also for the mediated approach.
 
 \medskip 
 
@@ -247,7 +247,7 @@ Specifically, predictions seem more accurate for variables Z and W with a \gls{r
 
 \medskip
 
-The previous considerations on the variables are confirmed by the qualitative evaluation, obtained by comparing ground truth and predictions during a short simulation. Figure \ref{fig:proximitynet-gt-pred}\footnote{A1, A2 and A3 in the chart stands for different models, but they achieve same results anyway} shows that X and Y predictions are considerably worse than results achieved by Z and W, when compared with the ground truth.
+The previous considerations on the variables are confirmed by the qualitative evaluation, obtained by comparing ground truth and predictions during a short simulation. Figure \ref{fig:proximitynet-gt-pred}\footnote{A1, A2 and A3 in the chart stands for different models, but they anyway achieve almost the same results} shows that X and Y predictions are considerably worse than results achieved by Z and W when compared with the ground truth.
 
 \begin{figure}[!htb]
 	\centering
@@ -263,7 +263,7 @@ The previous considerations on the variables are confirmed by the qualitative ev
 
 Even though the ProximityNet achieved quite good performance on the test set, its behavior must be proven on the real drone to certify the model usability.
 
-\cite{mantegazza2019visionbased} reports experiments conducted inside the arena by flying the drone without the \gls{mocap} system, only relying on the learned model for computing user's pose. The outcome is incredibly good, with the drone actually performing its task without many issues. Figure \ref{fig:proximitynet-trajectories} presents trajectories followed by the drone during five consecutive runs (with two different models) in which the quadrotor had to face a user initially rotated by 90 degrees. Although the paths are sometimes different from what designed by the omniscient controller (the ground truth), they are still reasonable and flying capabilities in the arena seem very promising.
+\cite{mantegazza2019visionbased} reports experiments conducted inside the arena by flying the drone without the \gls{mocap} system, only relying on the learned model for computing the user's pose. The outcome is incredibly good, with the drone actually performing its task without any issues. Figure \ref{fig:proximitynet-trajectories} presents trajectories followed by the drone during five consecutive trials (with two different models) in which the quadrotor has to face a user initially rotated by 90 degrees. Although the paths are sometimes different from what designed by the omniscient controller (the ground truth), they are still reasonable and flying capabilities in the arena seem very promising.
 
 \begin{figure}[!htb]
 	\centering
@@ -274,11 +274,11 @@ Even though the ProximityNet achieved quite good performance on the test set, it
 
 \medskip
 
-Finally, we consider model performance in unknown environments, possibly outdoor. The official paper does not talk about the topic, but direct contacts with the author suggested that flying performance outside of the drone arena were not consistent with usual model behavior. Accordingly to this, it seems that the model is not able to generalize the task when outside of the environment it already knows.
+Finally, we consider model performance in unknown environments, possibly outdoor. The official paper does not talk about the topic but during a direct discussion with the author, we discover that flying performance outside of the drone arena was not consistent with usual model behavior. Accordingly to this, it seems that the model is not able to generalize the task when outside of the environment it already knows.
 
 \bigskip
 
-The goal of our work is to explore ways of improvement, which aim to generalize the model to make it able to theoretically predict the user's pose in any other unknown scenario. Next chapters firstly try to understand main issues and limitation of the model, then provide a possible solution.
+The goal of our work is to explore ways of improvement, which aim to generalize the model to make it able to theoretically predict the user's pose in any other unknown scenario. The next chapters firstly try to understand the main issues and limitations of the model, then provide a possible solution for the generalization problem.
 
 
 
@@ -302,7 +302,7 @@ For debugging, we use a Windows 10 laptop equipped with an NVIDIA GeForce GTX 95
 \subsection{Frameworks}
 \label{subsec:frameworks}
 
-The original work from \cite{mantegazza2019visionbased} is written in Python and based on TensorFlow 1 and Keras. These libraries have been kept, but our project uses their updated versions for ease of use. Other main frameworks are listed below.
+The original work from \cite{mantegazza2019visionbased} is written in Python and based on TensorFlow 1 and Keras. These libraries have been kept, but our project uses their updated versions for ease of use. The other main frameworks are listed below.
 
 
 \paragraph*{\texttt{Numpy}}
@@ -312,28 +312,28 @@ Largely used in the whole project for computation on arrays. Numpy is the fundam
 Mainly used for saving and restoring Numpy arrays. The pickle module implements binary protocols for serializing and de-serializing a Python object structure. 
 
 \paragraph*{\texttt{Matplotlib}}
-First choice for building charts, visualize images or any kind of figure. Matplotlib is a comprehensive library for creating static, animated, and interactive visualizations in Python. Its \texttt{pyplot} module is inspired by MATLAB.
+The first choice for building charts, visualize images or any kind of figure. Matplotlib is a comprehensive library for creating static, animated, and interactive visualizations in Python. Its \texttt{pyplot} module is inspired by MATLAB.
 
 \paragraph*{\texttt{OpenCV}}
 Mainly used for efficient image/video manipulation and visualization, together with Matplotlib. OpenCV is an open-source library that includes several hundreds of computer vision algorithms.
 
 \paragraph*{\texttt{TensorFlow 2}}
-All the project strongly relies on TensorFlow (TF) from start to end: network interpretation, person masking, training and quantitative evaluation. Created by the Google Brain team, TensorFlow is an open source library for numerical computation and large-scale machine learning. It can be used across a range of tasks but has a particular focus on training and inference of deep neural networks. In version 2, it introduces a lot of comforts for easier development with a less steep learning curve.
+All the project strongly relies on TensorFlow (TF) from start to end: network interpretation, person masking, training, and quantitative evaluation. Created by the Google Brain team, TensorFlow is an open-source library for numerical computation and large-scale machine learning. It can be used across a range of tasks but has a particular focus on training and inference of deep neural networks. In version 2, it introduces a lot of comforts for easier development with a less steep learning curve.
 
 \paragraph*{\texttt{Keras}}
-Used for defining the network architecture, training and evaluating the model. Keras is the high-level API of TensorFlow 2: an approchable, highly-productive interface for solving machine learning problems, with a focus on modern deep learning. It provides essential abstractions and building blocks for developing and shipping machine learning solutions with high iteration velocity.
+Used for defining the network architecture, training, and evaluating the model. Keras is the high-level API of TensorFlow 2: an approachable, highly-productive interface for solving machine learning problems, with a focus on modern deep learning. It provides essential abstractions and building blocks for developing and shipping machine learning solutions with high iteration velocity.
 
 \paragraph*{\texttt{TensorBoard}}
 Used with TensorFlow to precisely profile data generator performance for optimizing training time on the GPU. TensorBoard is a tool for providing the measurements and visualizations needed during the machine learning workflow. It enables tracking experiment metrics, visualizing the model graph, and much more.
 
 \paragraph*{\texttt{Sklearn}}
-Only used for automatically computing some evaluation metrics, Sklearn is a simple and efficient tools for predictive data analysis reusable in various contexts built on NumPy, SciPy, and Matplotlib.
+Only used for automatically computing some evaluation metrics, Sklearn is a simple and efficient tool for predictive data analysis reusable in various contexts built on NumPy, SciPy, and Matplotlib.
 
 \paragraph*{\texttt{tf-keras-vis}}
 Used for applying GradCAM and other interpretability techniques. Open-source library for network interpretation, available on GitHub thanks to \cite{tf-keras-vis}. Derived from the original keras-vis (\cite{keras-vis}) high-level toolkit for visualizing and debugging trained Keras neural network models.
 
 \paragraph*{\texttt{akTwelve Mask\_RCNN}}
-Used for human detection and segmentation in background replacement. Open-source implementation of Mask R-CNN on Python 3, Keras, and TensorFlow 2 available on GitHub thanks to \cite{MaskRCNN_akTwelve}. The model generates bounding boxes, segmentation masks and categorization labels for each instance of an object in the image.
+Used for human detection and segmentation in background replacement. An open-source implementation of Mask R-CNN on Python 3, Keras, and TensorFlow 2 is available on GitHub thanks to \cite{MaskRCNN_akTwelve}. The model generates bounding boxes, segmentation masks, and categorization labels for each instance of an object in the image.
 
 
 
