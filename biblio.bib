@@ -82,6 +82,7 @@
 	year={2020},
 }
 
+
 @online{xai-wiki,
 	author={{Wikipedia}},
 	title={\gls{xai}},
@@ -96,6 +97,15 @@
 	year = {2018},
 	note = {https://distill.pub/2018/building-blocks},
 	doi = {10.23915/distill.00010}
+}
+
+@article{olah2017feature,
+	author = {Olah, Chris and Mordvintsev, Alexander and Schubert, Ludwig},
+	title = {Feature Visualization},
+	journal = {Distill},
+	year = {2017},
+	note = {https://distill.pub/2017/feature-visualization},
+	doi = {10.23915/distill.00007}
 }
 
 @article{Selvaraju_2019,
@@ -113,6 +123,13 @@
 	pages={336–359}
 }
 
+@online{gradcam_medium,
+	author={Mohamed Chetoui},
+	title={Explanation of Gradient-weighted Class Activation Mapping},
+	url={https://medium.com/@mohamedchetoui/grad-cam-gradient-weighted-class-activation-mapping-ffd72742243a},
+	year={2019}
+}
+
 @misc{wang2019diabetic,
 	title={Diabetic Retinopathy Detection via Deep Convolutional Networks for Discriminative Localization and Visual Explanation}, 
 	author={Zhiguang Wang and Jianbo Yang},
@@ -120,6 +137,116 @@
 	eprint={1703.10757},
 	archivePrefix={arXiv},
 	primaryClass={cs.CV}
+}
+
+
+
+@misc{mehta2019active,
+	title={Active Domain Randomization}, 
+	author={Bhairav Mehta and Manfred Diaz and Florian Golemo and Christopher J. Pal and Liam Paull},
+	year={2019},
+	eprint={1904.04762},
+	archivePrefix={arXiv},
+	primaryClass={cs.LG}
+}
+
+@article{weng2019DR,
+	title   = {Domain Randomization for Sim2Real Transfer},
+	author  = {Weng Lilian},
+	journal = {lilianweng.github.io/lil-log},
+	year    = {2019},
+	url     = {http://lilianweng.github.io/lil-log/2019/05/04/domain-randomization.html}
+}
+
+@online{weng2019DR_explanation,
+	author={Weng Lilian},
+	title={Paper explanation: Domain Randomization for Sim2Real Transfer},
+	url={https://lilianweng.github.io/lil-log/2019/05/05/domain-randomization.html},
+	year={2019}
+}
+
+@article{imitation_learning_survey,
+	author = {Hussein, Ahmed and Gaber, Mohamed Medhat and Elyan, Eyad and Jayne, Chrisina},
+	title = {Imitation learning: a survey of learning methods.},
+	issn = {0360-0300},
+	journal = {ACM computing surveys},
+	publisher = {Association for Computing Machinery},
+	url = {http://hdl.handle.net/10059/2298},
+	year = {2017},
+}
+
+@article{imitation_learning_3d_navigation,
+	author = {Hussein, Ahmed and Elyan, Eyad and Gaber, Mohamed and Jayne, Chrisina},
+	year = {2018},
+	month = {04},
+	title = {Deep imitation learning for 3D navigation tasks},
+	journal = {Neural Computing and Applications},
+	doi = {10.1007/s00521-017-3241-z}
+}
+
+@misc{tobin2017domain,
+	author={Josh Tobin and Rachel Fong and Alex Ray and Jonas Schneider and Wojciech Zaremba and Pieter Abbeel},
+	title={Domain Randomization for Transferring Deep Neural Networks from Simulation to the Real World}, 
+	year={2017},
+	eprint={1703.06907},
+	archivePrefix={arXiv},
+	primaryClass={cs.RO}
+}
+
+
+@misc{yue2019domain,
+	title={Domain Randomization and Pyramid Consistency: Simulation-to-Real Generalization without Accessing Target Domain Data}, 
+	author={Xiangyu Yue and Yang Zhang and Sicheng Zhao and Alberto Sangiovanni-Vincentelli and Kurt Keutzer and Boqing Gong},
+	year={2019},
+	eprint={1909.00889},
+	archivePrefix={arXiv},
+	primaryClass={cs.CV}
+}
+
+@article{Takahashi_2020,
+	title={Data Augmentation Using Random Image Cropping and Patching for Deep CNNs},
+	volume={30},
+	ISSN={1558-2205},
+	url={http://dx.doi.org/10.1109/TCSVT.2019.2935128},
+	DOI={10.1109/tcsvt.2019.2935128},
+	number={9},
+	journal={IEEE Transactions on Circuits and Systems for Video Technology},
+	publisher={Institute of Electrical and Electronics Engineers (IEEE)},
+	author={Takahashi, Ryo and Matsubara, Takashi and Uehara, Kuniaki},
+	year={2020},
+	month={Sep},
+	pages={2917–2931}
+}
+
+@misc{he2018mask,
+	title={Mask R-CNN}, 
+	author={Kaiming He and Georgia Gkioxari and Piotr Dollár and Ross Girshick},
+	year={2018},
+	eprint={1703.06870},
+	archivePrefix={arXiv},
+	primaryClass={cs.CV}
+}
+
+@misc{wu2019detectron2,
+	author =       {Yuxin Wu and Alexander Kirillov and Francisco Massa and
+	Wan-Yen Lo and Ross Girshick},
+	title =        {Detectron2},
+	howpublished = {\url{https://github.com/facebookresearch/detectron2}},
+	year =         {2019}
+}
+
+@online{maskrcnn_explanation,
+	author={Ajay Arasanipalai},
+	title={State of the art deep learning: an introduction to Mask R-CNN},
+	url={https://medium.com/free-code-camp/mask-r-cnn-explained-7f82bec890e3},
+	year={2018}
+}
+
+@online{maskrcnn_arcgis,
+	author={{ArcGIS}},
+	title={How MaskRCNN Works?},
+	url={https://developers.arcgis.com/python/guide/how-maskrcnn-works/},
+	year={2021}
 }
 
 
@@ -198,13 +325,12 @@
 }
 
 @misc{MaskRCNN_matterport,
-	author = {Waleed Abdulla},
-	title = {Mask R-CNN for Object Detection and Segmentation},
-	year = {2019},
-	publisher = {GitHub},
-	journal = {GitHub repository},
-	howpublished = {\url{https://github.com/matterport/Mask_RCNN}},
-	commit = {3deaec5d902d16e1daf56b62d5971d428dc920bc}
+	author={Waleed Abdulla},
+	title={Mask R-CNN for object detection and instance segmentation on Keras and TensorFlow},
+	year={2017},
+	publisher={Github},
+	journal={GitHub repository},
+	howpublished={\url{https://github.com/matterport/Mask_RCNN}},
 }
 
 @misc{MaskRCNN_akTwelve,
@@ -215,4 +341,11 @@
 	journal = {GitHub repository},
 	howpublished = {\url{https://github.com/akTwelve/Mask_RCNN}},
 	commit = {d9f01dcd83b1e90e5ea0b4b6d5ba753770e114ac}
+}
+
+
+@online{opencv_grabcut,
+	author={{OpenCV Documentation}},
+	title={Interactive Foreground Extraction using GrabCut Algorithm},
+	url={https://docs.opencv.org/4.1.2/d8/d83/tutorial_py_grabcut.html},
 }

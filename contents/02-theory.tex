@@ -111,37 +111,34 @@ However, when working with real-world problems, it is extremely important to be 
 
 Regarding \gls{xai} for \gls{cnn}s, researchers has developed many techniques for understanding what a \gls{nn}s actually care of when producing an output based on an input image. Main efforts regard feature visualization and attribution, but recent advanced studies also shown how these methods can be used altogether (\cite{olah2018the}).
 
+This section briefly explain these two major areas for \gls{cnn} interpretability, with a particular focus on spacial attribution, the chosen methodology for our work.
+
 
 
 \subsection{Feature Visualization}
 
+Sources: \cite{olah2017feature}
 
 
 
-
-\subsection{Spatial Attribution}
-
-\subsubsection{CAM}
-
-\subsubsection{GradCAM}
+\subsection{Spatial Attribution with GradCAM}
 \label{subsec:gradcam-theory}
 
-\cite{Selvaraju_2019}
+Sources: \cite{Selvaraju_2019}, \cite{gradcam_medium}
 
 \begin{figure}[!htb]
 	\centering
-	\includegraphics[width=0.75\textwidth]{"contents/images/gradcam/02-gradcam-schema"}
+	\includegraphics[width=0.9\textwidth]{"contents/images/gradcam/02-gradcam-schema"}
 	\caption[\gls{gradcam} schematic functioning]{\gls{gradcam} schematic functioning (\cite{Selvaraju_2019})}
 	\label{fig:gradcam-schema}
 \end{figure}
 
 \begin{figure}[!htb]
 \centering
-\includegraphics[width=0.75\textwidth]{"contents/images/gradcam/02-gradcam-catdog"}
+\includegraphics[width=0.9\textwidth]{"contents/images/gradcam/02-gradcam-catdog"}
 \caption[\gls{gradcam} example on dog-cat classification]{\gls{gradcam} example on dog-cat classification (\cite{Selvaraju_2019})}
 \label{fig:gradcam-catdog}
 \end{figure}
-
 
 
 
@@ -150,6 +147,46 @@ Regarding \gls{xai} for \gls{cnn}s, researchers has developed many techniques fo
 \label{sec:network-generalization}
 
 
+
+\subsection{Data Augmentation}
+\label{subsec:data-augmentation}
+
+
+
+\subsection{Domain Randomization}
+\label{subsec:domain-randomization}
+
+\textbf{TODO}
+
+Summary from \cite{mehta2019active}
+
+See \cite{weng2019DR_explanation}
+ 
+"Domain randomization is a popular technique for improving domain transfer, often used in a zero-shot setting when the target domain is unknown or cannot easily be used for training. In this work, we empirically examine the effects of domain randomization on agent generalization. Our experiments show that domain randomization may lead to suboptimal, high-variance policies, which we attribute to the uniform sampling of environment parameters."
+
+
+\subsubsection{Virtual Simulation}
+\label{subsec:virtual-simulation}
+
+Imitation learning through simulation is recently becoming an interesting and successful approach for both reinforcement learning (\cite{imitation_learning_survey} and \cite{imitation_learning_3d_navigation}) object recognition (\cite{tobin2017domain}, \cite{weng2019DR}).
+
+Robot and environment can be replicated through a dedicated simulator such as Gazebo\footnote{\url{http://gazebosim.org/}}, often used in robotics with \gls{ros}\footnote{\url{https://www.ros.org/}} due to its straightforward integration, or even with general-purpose graphic engines. Unreal Engine\footnote{\url{https://www.unrealengine.com/en-US/}} Unity\footnote{\url{https://unity.com/}} are well-known simulators designed for game-development, but recently used for \gls{vr} and \gls{ar} applications. They give developers unlimited possibilities, carefully supported by solid physics engines and active communities.
+
+\medskip
+
+Given the difficulty of collecting data for our task, exploring the possibility of simulating the entire scenario in a 3D virtual-world is intriguing, especially to replace the need of a complex \gls{mocap} system. Integrating odometry support, drone and people can be thoroughly modeled to act as in the real-world, with similar movements and sensing capabilities, in order to collect the data very efficiently. Virtual simulation gives both the opportunity of reproducing real indoor/outdoor scenes, but also randomizing the background with artificially generated textures.
+
+Even though the approach appears to obtain sub-optimal results, a complete and adaptable implementation requires a lot of effort, yet unlocking a huge number of possibilities. Considering the amount of fine details to consider and issues that can arise during the development of such simulators, we opt instead to work with an easier generalization pipeline that mostly concerns machine learning only.
+
+
+\subsubsection{Background Replacement with Mask R-CNN}
+\label{subsec:sota-maskrcnn}
+
+\textbf{TODO}
+
+Previous works on images: \cite{yue2019domain}, \cite{Takahashi_2020}
+
+MaskRCNN: \cite{he2018mask}, \cite{maskrcnn_explanation}, \cite{maskrcnn_arcgis}
 
 
 

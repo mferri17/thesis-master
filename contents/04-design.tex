@@ -434,11 +434,7 @@ Examples presented above mostly reflect the model expected behavior. However, ou
 
 Reported results demonstrate that the model is not robust enough to only focus on the user facing the drone's camera. Instead, various portions of the input images appear to be taken into consideration when the model makes predictions: many distractors are coming from the background.
 
-In light of this, we can reasonably assume that the \gls{resnet} model has undesirably learned some details about the drone arena in which the dataset has been collected. This is most likely the reason why the model is unable to control the drone outside of that environment, as already mentioned in section \ref{subsec:proximitynet-generalization}.
-
-\bigskip
-
-We conclude that the model is not capable of generalization. Since we have demonstrated that the main cause of the problem is the drone arena, then we try to remove the room from the equation. We propose a solution which consists of just keeping the person in the images, masking out the background to be randomly replaced with something else. Next section explores various algorithms for creating a mask of a person from an image.
+In light of this, we can reasonably assume that the \gls{resnet} model has undesirably learned some details about the drone arena in which the dataset has been collected. This is most likely the reason why the model is unable to control the drone outside of that environment, as discussed in section \ref{subsec:proximitynet-generalization}.
 
 
 
@@ -446,22 +442,352 @@ We conclude that the model is not capable of generalization. Since we have demon
 \section{Person Masking}
 \label{sec:masking}
 
-- Green screen
+From \gls{gradcam} results in the previous section, we conclude that the model is not capable of generalization. We have demonstrated that the main cause of the problem is inherent in the drone arena, thus we want to remove the room from the equation. We propose a solution which consists of performing advanced data augmentation by just keeping the person in the images, masking out the background to be randomly replaced with something else.
 
-\subsection{Canny Edge Detection}
+This section explores various algorithms and experiments for creating the mask of a person in an image, that ended with the final adoption of Mask R-CNN. This algorithm is used for image augmentation in the next chapters.
+
+\medskip
+
+Before going deep into the tests with the available dataset, we discuss an alternative for achieving a similar result with different methodology.
+
+\subsubsection*{Chroma key}
+
+A known approach for implementing background replacement is the chroma key. Widely used in entertainment, it is a technique which makes use of colors in images and videos for splitting between actual content and background. Usually, chroma key is achieved through a blue or green screen placed behind the subject, making sure that such color is not present in the foreground image. Then, a post-production software takes care of creating the appropriate mask which separates the two parts and enables background replacement.
+
+Although this techniques is particularly popular in many fields, placing several green screens into the drone arena is not the easiest task since it requires a lot of material and physical work to setup the proper environment, with possible issues related to the room composition or its illumination.
+
+An experiment in this direction has been conducted years ago, with a portion of the arena walls covered by a green screen. Masking results were actually satisfying, but the limitations of such a small green screen are huge both in terms of user's movements and background coverage. In fact, figure \ref{fig:greenscreen} displays the setup, which reveals a lot of classic background still appearing in the images.
+
+In addition, even with the capability of building a well-designed chroma key environment, the solution would be highly dependent on the geographical location of the setup. On the contrary, software-only approaches would be much more portable and reusable with any other motion capture system in the world.
+
+\begin{figure}[!h]
+	\begin{center}
+		\begin{subfigure}[h]{0.24\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/04-greenscreen-1"}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[h]{0.24\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/04-greenscreen-2"}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[h]{0.24\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/04-greenscreen-3"}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[h]{0.24\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/04-greenscreen-4"}
+		\end{subfigure}
+	\end{center}
+	\vspace{-0.5cm}
+	\caption[Experimental green screen setup in the drone arena]{Experimental green screen setup in the drone arena}
+	\label{fig:greenscreen}
+\end{figure}
+
+
+
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=1\textwidth]{"contents/images/04-1canny-overview"}
+	\caption[Canny edge detection overview on the training set]{Canny edge detection overview on the training set}
+	\label{fig:canny-overview}
+\end{figure}
+
+\subsection{Canny}
 \label{subsec:masking-canny}
+
+First experiments are based on a classic computer vision technique called Canny Edge Detection. A custom algorithm\footnote{adapted from \url{https://stackoverflow.com/a/29314286/10866825}} applies the related function from OpenCV\footnote{\url{https://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_imgproc/py_canny/py_canny.html}} to find the edges inside the image, which are then used for also finding the contours. Only the biggest contour is taken into consideration for building a mask around the subject in the image.
+
+\medskip
+
+A core aspect of the Canny function for finding appropriate contours is the choice of its parameters \texttt{minVal} and \texttt{maxVal}, used for distinguishing between \textit{sure-edges}, \textit{probable-edges} and \textit{no-edges}. Several experiments have been made with different values, but no combination of the two parameters is optimal on our dataset.
+
+Figure \ref{fig:canny-overview} shows what happens with \texttt{minVal} and \texttt{maxVal} respectively set to 100 and 400. Most of the time the person is well detected, while other times it completely disappears or even results in a fatal error (red frames). Room baseboard (line between the floor and the wall) is often still present in the image, while many samples keep too much background.
+
+\medskip
+
+\begin{figure}[!h]
+	\begin{center}
+		\begin{subfigure}[h]{1\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/04-1canny-enhance-1"}
+		\end{subfigure}
+		\vfill
+		\begin{subfigure}[h]{1\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/04-1canny-enhance-2"}
+		\end{subfigure}
+		\vfill
+		\begin{subfigure}[h]{1\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/04-1canny-enhance-3"}
+		\end{subfigure}
+	\end{center}
+	\vspace{-0.5cm}
+	\caption[Canny edge enhanced algorithm demonstration]{Canny edge enhanced algorithm demonstration}
+	\label{fig:canny-enanhced}
+\end{figure}
+
+In some cases, it even happens that the body of the person is present in the image but its face disappears. For mitigating this problem, an enhanced version of the algorithm has been considered, designed to keep the face the body in the resulting image, assuming their positions are known. Figure \ref{fig:canny-enanhced} illustrates the problem and demonstrates that results obtained from the enhanced version are still not acceptable, since we are not able to appropriately mask the background away.
+
+
 
 \subsection{Grabcut}
 \label{subsec:masking-grabcut}
 
-\subsection{YOLO}
+Given the Canny Edge Detection limits in removing the background from the images, the GrabCut algorithm has been tried. It operates using the subject position in the image and some statistical inference for labeling each pixel of the image as background or foreground. It works with the following algorithm (\cite{opencv_grabcut}):
+
+\begin{itemize}
+	\item User inputs the rectangle. Everything outside this rectangle will be taken as sure background. Everything inside the rectangle is unknown. Similarly any user input specifying foreground and background are considered as hard-labelling which won't change in the process.
+	\item Computer does an initial labelling depending on the data we gave. It labels the foreground and background pixels (or it hard-labels).
+	\item From now on, a \gls{gmm} is used to model the foreground and background.
+	\item Depending on the data we gave, \gls{gmm} learns and creates a new pixel distribution. That is, the unknown pixels are labelled either \textit{probable-foreground} or \textit{probable-background} depending on their relation with other hard-labelled pixels in terms of color statistics (like clustering).
+	\item A graph is built from this pixel distribution. Nodes in the graphs are pixels. Additional two nodes are added, Source node and Sink node. Every foreground pixel is connected to the Source node and every background pixel is connected to the Sink node.
+	\item The weights of edges connecting pixels to source or end nodes are defined by the probability of a pixel being foreground or background. The weights between the pixels are defined by the edge information or pixel similarity. If there is a large difference in pixel color, the edge between them will get a low weight.
+	\item Then a mincut algorithm is used to segment the graph. It cuts the graph into two, separating the source node and the sink node with minimum cost function. The cost function is the sum of all weights of the edges that are cut. After the cut, all the pixels connected to the Source node become foreground and those connected to the Sink node become background.
+	\item The process is continued until the classification converges.
+\end{itemize}
+
+
+OpenCV GrabCut function\footnote{\url{https://docs.opencv.org/4.1.2/d7/d1b/group__imgproc__misc.html\#ga909c1dda50efcbeaa3ce126be862b37f}} has two initialization modalities. You can only pass the rectangle, as described in the algorithm, or a mask of the image in which you specify whether a certain pixel is \textit{sure-background}, \textit{probable-background}, \textit{probable-foreground} or \textit{sure-foreground}. These classes\footnote{\url{https://docs.opencv.org/master/d7/d1b/group__imgproc__misc.html\#gad43d3e4208d3cf025d8304156b02ba38}} are also used by the library during the algorithm itself. 
+
+\medskip
+
+Both the approaches require a previous knowledge about the subject position in the image. For now, let’s analyze both by manually inserting this information for the example images. Later on, we will also consider an algorithm for automatic human detection.
+
+
+\subsubsection{Rectangle initialization}
+\label{subsec:masking-grabcut-rect}
+
+This approach requires that a rectangle, entirely containing the subject, is given in input to the function (figure \ref{fig:grabcut-rect-explain-1}). GrabCut proceeds as follows. Area inside the rectangle is marked as \textit{probable-background} (green), while the pixels outside are \textit{sure-background} (blue). As the algorithm keeps going, it finds pixels inside the rectangle which can be foreground, marking them as \textit{probable-foreground} (yellow) (figure \ref{fig:grabcut-rect-explain-2}). Later, we binarize and smooth the mask (figure \ref{fig:grabcut-rect-explain-3}) for finally removing the background from the original image.
+
+\begin{figure}[!h]
+	\begin{center}
+		\begin{subfigure}[h]{0.32\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/04-2grabcut-1rect-steps-1"}
+			\caption[]{Initialization}
+			\label{fig:grabcut-rect-explain-1}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[h]{0.32\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/04-2grabcut-1rect-steps-2"}
+			\caption[]{Pixel classes}
+			\label{fig:grabcut-rect-explain-2}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[h]{0.32\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/04-2grabcut-1rect-steps-3"}
+			\caption[]{Final mask}
+			\label{fig:grabcut-rect-explain-3}
+		\end{subfigure}
+	\end{center}
+	\vspace{-0.5cm}
+	\caption[Grabcut algorithm explained: rectangle initialization]{Grabcut algorithm explained: rectangle initialization}
+	\label{fig:grabcut-rect-explain}
+\end{figure}
+
+Performance obtained by the algorithm are available in figure \ref{grabcut-rect-example}. Results seem better than the ones produced by Canny Edge Detection. However, it happens that the face or the entire person is filtered out of the image.
+
+\begin{figure}[!h]
+	\begin{center}
+		\begin{subfigure}[h]{1\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/04-2grabcut-1rect-example-1"}
+		\end{subfigure}
+		\vfill
+		\begin{subfigure}[h]{1\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/04-2grabcut-1rect-example-2"}
+		\end{subfigure}
+	\end{center}
+	\vspace{-0.5cm}
+	\caption[Grabcut demonstration: rectangle initialization]{Grabcut demonstration: rectangle initialization}
+	\label{fig:grabcut-rect-example}
+\end{figure}
+
+
+\subsubsection{Mask initialization}
+\label{subsec:masking-grabcut-mask}
+
+In order to improve the previous technique we try mask initialization, which allows us to initially classify the pixels in the image as we prefer. This time, we do consider the pose information for telling GrabCut we already know that some part of the image is \textit{sure-foreground}: face and part of the body.
+
+Let's now consider an example of image for which previous solution was completely missing the person in the result, regardless the well-initialized rectangle.
+In figure \ref{fig:}, we notice manually assigned \textit{sure-foreground} pixels in blue, while GrabCut inferred \textit{probable-foreground} in yellow and \textit{probable-background} in green. Results are undoubtedly better, but we notice that the left-most background has been kept in the final image, while we could easily identify it as \textit{sure-background} using the person pose we assume as known, like before.
+
+
+\begin{figure}[!h]
+	\begin{center}
+		\begin{subfigure}[h]{0.24\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/04-2grabcut-2mask-steps-1"}
+			\caption[]{Initialization}
+			\label{fig:grabcut-mask-explain-1}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[h]{0.24\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/04-2grabcut-2mask-steps-2"}
+			\caption[]{Pixel classes}
+			\label{fig:grabcut-mask-explain-2}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[h]{0.24\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/04-2grabcut-2mask-steps-3"}
+			\caption[]{Final mask}
+			\label{fig:grabcut-mask-explain-3}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[h]{0.24\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/04-2grabcut-2mask-steps-4"}
+			\caption[]{Result}
+			\label{fig:grabcut-mask-explain-4}
+		\end{subfigure}
+		\hfill
+	\end{center}
+	\vspace{-0.5cm}
+	\caption[Grabcut algorithm explained: mask initialization]{Grabcut algorithm explained: mask initialization}
+	\label{fig:grabcut-mask-explain}
+\end{figure}
+
+
+\subsubsection{Hybrid initialization}
+\label{subsec:masking-grabcut-hybrid}
+
+We finally try a mixed approach between rectangle and mask initialization, both specifying person and face positions in the image. It allows us to initially set sure-background, probable-background and sure-foreground pixels. Only probable-foreground pixels have to be found by the GrabCut algorithm. 
+
+In figure \ref{fig:grabcut-hybrid-explain} the usual explanation. Please notice that \textit{sure-background} is dark blue, \textit{probable-background} is green, \textit{probable-foreground} is yellow and \textit{sure-foreground} is light blue. 
+Image \ref{fig:grabcut-hybrid-example} shows results of hybrid initialization applied to the same samples introduced in the figure \ref{fig:grabcut-rect-example}. Performance are sub-optimal, as they present excellent segmentation capabilities.
+
+\begin{figure}[!h]
+	\begin{center}
+		\begin{subfigure}[h]{0.24\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/04-2grabcut-3hybrid-steps-1"}
+			\caption[]{Initialization}
+			\label{fig:grabcut-hybrid-explain-1}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[h]{0.24\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/04-2grabcut-3hybrid-steps-2"}
+			\caption[]{Pixel classes}
+			\label{fig:grabcut-hybrid-explain-2}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[h]{0.24\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/04-2grabcut-3hybrid-steps-3"}
+			\caption[]{Final mask}
+			\label{fig:grabcut-hybrid-explain-3}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[h]{0.24\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/04-2grabcut-3hybrid-steps-4"}
+			\caption[]{Result}
+			\label{fig:grabcut-hybrid-explain-4}
+		\end{subfigure}
+		\hfill
+	\end{center}
+	\vspace{-0.5cm}
+	\caption[Grabcut algorithm explained: hybrid initialization]{Grabcut algorithm explained: hybrid initialization}
+	\label{fig:grabcut-hybrid-explain}
+\end{figure}
+
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=1\textwidth]{"contents/images/04-2grabcut-3hybrid-final"}
+	\caption[Grabcut demonstration: hybrid initialization]{Grabcut demonstration: hybrid initialization}
+	\label{fig:grabcut-hybrid-example}
+\end{figure}
+
+
+\subsubsection{Automatic Human Detection}
 \label{subsec:masking-yolo}
 
-\subsection{Face \& Head Detection}
-\label{subsec:masking-facehead}
+Now that we have a promising background removal algorithm, to let it work we need to infer person and face position from the image. \gls{gt} data is not sufficiently precise for providing such information, so we try other state-of-the-art object detection techniques.
+
+For properly using hybrid initialization, which demonstrated to be the most precise solution, we need two information: the bounding boxes associated with both the entire person and its head. For this reason, distinct detectors are necessary.
+
+We adopt YOLO\footnote{\url{https://pjreddie.com/darknet/yolo/}} for object detection, through the \texttt{cvlib} library that implements a YOLOv3 model trained on the COCO\footnote{\url{https://cocodataset.org/}} dataset, capable of detecting 80 common objects in context. Underneath, it uses the OpenCV dnn module\footnote{\url{https://docs.opencv.org/master/d2/d58/tutorial_table_of_content_dnn.html}}.
+
+A demo is shown in figure \ref{fig:yolo}, where we notice that YOLO overall provides quite good results. However, in 19-20\% of the cases, it does not detect any object in the image, mostly probably because of their low resolution.
+
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=1\textwidth]{"contents/images/04-3yolo"}
+	\caption[YOLO demonstration]{YOLO demonstration}
+	\label{fig:yolo}
+\end{figure}
+
+\medskip
+
+For enabling mask initialization, also the face position is needed. We firstly try to heuristically infer its position based on the bounding box of the entire person provided by YOLO. Even though the majority of samples is compliant with this heuristic, a non-ignorable percentage of samples is not compatible. For this reason, we also try some head detectors\footnote{\url{https://github.com/AVAuco/ssd_head_keras}}, miserably failing in their task due to the small size of our images.
+
+While searching for a solution compatible with such low-fidelity images, we find an all-in-one solution, presented in the next section, that immediately became our choice for its surprising results.
+
+
 
 \subsection{Mask R-CNN}
 \label{subsec:masking-maskrcnn}
+
+Mask R-CNN (\cite{he2018mask}) is a state of the art deep learning framework for object detection and instance segmentation, whose technical details have been illustrated in section \ref{subsec:sota-maskrcnn}. Originally developed by Facebook researchers in PyTorch\footnote{\url{https://pytorch.org/}}, now available in the \texttt{Detectron2}\footnote{\url{https://github.com/facebookresearch/detectron2}} package (\cite{wu2019detectron2}), the algorithm has been ported to TensorFlow 1 (\cite{MaskRCNN_matterport}) and later adapted for TensorFlow 2 by \cite{MaskRCNN_akTwelve}\footnote{\url{https://github.com/akTwelve/Mask_RCNN}}. The latter has been used for applying Mask R-CNN on our dataset images.
+
+\medskip
+
+Results are incredibly precise and the method undoubtedly outperform any other previously experimented, as it is able to provide both human detection and segmentation at once. Figure \ref{fig:maskrcnn-dario} below presents how Mask R-CNN easily detects people in our video frames, regardless their low resolution and any light condition or person position. In many cases, but not always, multiple people or objects in the background are correctly detected, even if they are very small.
+
+For our purposes, we are just interested in the actual user facing the drone, which is the person closest to the camera, thus usually the biggest one over all people found by Mask R-CNN. Bounding boxes (not shown in picture) and labels associated with each object instance are used to identify the correct mask (i.e., the one corresponding to the user), which is later used during training.
+
+\begin{figure}[!h]
+	\begin{center}
+		\begin{subfigure}[h]{0.32\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/04-maskrcnn-train-1"}
+		\end{subfigure}
+		\begin{subfigure}[h]{0.32\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/04-maskrcnn-train-2"}
+		\end{subfigure}
+		\begin{subfigure}[h]{0.32\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/04-maskrcnn-train-3"}
+		\end{subfigure}
+		\vfill
+		\begin{subfigure}[h]{0.32\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/04-maskrcnn-train-4"}
+		\end{subfigure}
+		\begin{subfigure}[h]{0.32\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/04-maskrcnn-train-5"}
+		\end{subfigure}
+		\begin{subfigure}[h]{0.32\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/04-maskrcnn-train-6"}
+		\end{subfigure}
+	\end{center}
+	\vspace{-0.5cm}
+	\caption[Mask R-CNN applied to our training set]{Mask R-CNN applied to our training set}
+	\label{fig:maskrcnn-dario}
+\end{figure}
+
+This high-level of accuracy in detection and segmentation comes with an extremely high computing power requirement\footnote{accordingly to the original paper, Mask R-CNN can only run at 5 \gls{fps}}. For reference, running Mask R-CNN on the test set - composed by about 11'000 images - requires a total computing time\footnote{we observe, using the \texttt{time} command for IPython, the following CPU times: user 35min, sys 20min, total 55min; and Wall time: 1h 4min} of approximately 55 minutes on Google Colab with a GPU runtime\footnote{equipped with NVIDIA® T4 GPU}.
+
+Because of this, the inference on the images must be done offline. The training procedure will only receive, together with each input image, the previously computed user's mask.
+
+
+
+
+
 
 
 
