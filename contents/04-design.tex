@@ -5,103 +5,57 @@
 \glsreset{nn}
 \glsreset{cnn}
 
-This chapter explores the issues of the existing model, highlights the main issues behind the lack of its generalization capabilities, proposes a solution, and presents initial experiments on its feasibility.
+This chapter explores the issues of the existing model, proposes a solution, and presents initial experiments on its feasibility.
 
 
 
 
-\section{Problem Description}
-\label{sec:frontalnet}
+\section{Problem Summary}
+\label{sec:frontalnet-generalization}
 
-Our entire work is based on the work introduced in section \ref{subsec:sota-dario}, whose basic functioning, environment, and dataset have been presented before. This section further inspects model performance as declared in \cite{mantegazza2019visionbased}.
-
-
-
-\subsection{Performance}
-\label{subsec:frontalnet-performance}
-
-In the original paper, FrontalNet is trained using the \gls{mae} loss function with the \gls{adam} optimizer (for info, \cite{kingma2014adam}) and a base learning rate of 0.001, progressively reduced on validation loss plateaus that last more than 5 epochs. A maximum of 200 epochs are run in total, but with an early stopping policy with patience of 10 epochs on the validation loss. 
-
-Performance is evaluated both quantitatively and qualitatively on the end-to-end model, rather than the mediated one considered for our work. However, as explained in section \ref{subsec:sota-dario}, both approaches obtain similar results so we can consider the following details to be valid also for the mediated approach.
-
-\medskip 
-
-\glsreset{r2}
-For quantitative evaluation, the chosen metric is \gls{r2}\footnote{\gls{r2} interpretation will be explained in the evaluation chapter \ref{chap:evaluation}}, which has an interval of $[-\inf, 1]$ where 1 represents the optimality. 
-
-The author also conducts an experiment about the minimum cardinality of the dataset for obtaining acceptable performance. Results are available in figure \ref{fig:frontalnet-r2}, directly taken from the paper. As shown, decent performance requires at least 5'000 samples and keep improving as their number increases.
-
-Specifically, predictions seem more accurate for variables Z and W with a \gls{r2} score of 0.82 and 0.88, respectively. Different the findings for X and Y which only reach a \gls{r2} of 0.59 and 0.57, respectively.
-
-\begin{figure}[!htb]
-	\centering
-	\includegraphics[width=0.8\textwidth]{"contents/images/03-frontalnet-r2"}
-	\caption[FrontalNet \gls{r2} results (\cite{mantegazza2019visionbased})]{FrontalNet \gls{r2} results (\cite{mantegazza2019visionbased}). A1, A2 and A3 in the chart stands for different models, but they anyway achieve almost the same results.}
-	\label{fig:frontalnet-r2}
-\end{figure}
+In section \ref{subsec:sota-dario}, we introduce the original paper we are working on and present its architecture and basic performance. Chapter \ref{chap:system} illustrates the main components for controlling the drone and the dataset used to train the machine learning model, as declared in \cite{mantegazza2019visionbased}.
 
 \medskip
 
-The previous considerations on the variables are confirmed by the qualitative evaluation, obtained by comparing ground truth and predictions during a short simulation. Figure \ref{fig:frontalnet-gt-pred} shows that X and Y predictions are considerably worse than results achieved by Z and W when compared with the ground truth.
+FrontalNet achieved quite good performance on the test set, as explained in section \ref{subsec:frontalnet-performance}. However, its behavior must be proven on the real drone to certify the model usability. \cite{mantegazza2019visionbased} reports experiments conducted inside the arena by flying the drone without the \gls{mocap} system, only relying on the learned model for computing the user's pose. The outcome is incredibly good, with the drone actually performing its task without any issues\footnote{see figure \ref{fig:frontalnet-trajectories} in the appendix for further details}.
 
-\begin{figure}[!htb]
-	\centering
-	\includegraphics[width=0.8\textwidth]{"contents/images/03-frontalnet-gt-pred-2"}
-	\caption[FrontalNet GT vs prediction results (\cite{mantegazza2019visionbased})]{FrontalNet GT vs prediction results (\cite{mantegazza2019visionbased})}
-	\label{fig:frontalnet-gt-pred}
-\end{figure}
-
-
-
-\subsection{Generalization}
-\label{subsec:frontalnet-generalization}
-
-Even though the FrontalNet achieved quite good performance on the test set, its behavior must be proven on the real drone to certify the model usability.
-
-\cite{mantegazza2019visionbased} reports experiments conducted inside the arena by flying the drone without the \gls{mocap} system, only relying on the learned model for computing the user's pose. The outcome is incredibly good, with the drone actually performing its task without any issues. Figure \ref{fig:frontalnet-trajectories} presents trajectories followed by the drone during five consecutive trials (with two different models) in which the quadrotor has to face a user initially rotated by 90 degrees. Although the paths are sometimes different from what designed by the omniscient controller (the ground truth), they are still reasonable and flying capabilities in the arena seem very promising.
-
-\begin{figure}[!htb]
-	\centering
-	\includegraphics[width=0.8\textwidth]{"contents/images/03-frontalnet-trajectories"}
-	\caption[FrontalNet trajectories for positioning in front of the user initially rotated by 90 degrees (\cite{mantegazza2019visionbased})]{FrontalNet trajectories for positioning in front of the user initially rotated by 90 degrees (\cite{mantegazza2019visionbased})}
-	\label{fig:frontalnet-trajectories}
-\end{figure}
+Finally, we consider model performance in unknown environments, possibly outdoor. The official paper does not talk about the topic but during a direct discussion with the author, we discovered that flying performance outside of the drone arena was not consistent with usual model behavior. The drone was not able to follow the user and its movements were unexplainable. We conclude that the model is not able to generalize the task when outside of the environment it already knows.
 
 \medskip
-
-Finally, we consider model performance in unknown environments, possibly outdoor. The official paper does not talk about the topic but during a direct discussion with the author, we discovered that flying performance outside of the drone arena was not consistent with usual model behavior. We conclude that the model is not able to generalize the task when outside of the environment it already knows.
 
 Our goal is to explore ways of improvement, to generalize the model and make it able to theoretically predict the user's pose in any other unknown scenario. The next sections firstly try to understand the main issues and limitations of the model, then provide a possible solution for the generalization problem.
 
 
 
 
-\section{Model Interpretation}
+\section{Model Interpretation with Grad-CAM}
 \label{sec:model-interpretration}
 
 \glsreset{nn}
-
-Convolutional Neural Networks (CNN) are known to be suited for computer vision, because of their ability to gain spacial-related insights from images. Anyway, just like for any other \gls{nn}, \gls{cnn}s are "black-box" thus their internal behavior is particularly challenging for humans to understand.
-
-In section \ref{subsec:frontalnet-generalization}, we discussed insufficient experimental results obtained by FrontalNet in predicting the user's pose in an unknown environment, thus outside of the drone arena. To find a solution to this problem, we first need to understand what the model is actually learning.
-
-
-
-\subsection{Applying GradCAM}
-\label{subsec:gradcam-apply}
-
 \glsreset{gradcam}
 
-Among network interpretability tecnhiques introduced in section \ref{sec:network-interpretability}, we choose \gls{gradcam}. The algorithm is indeed the most understandable way of visualizing what a model is actually seeing.
+In the previous section, we discussed insufficient experimental results obtained by FrontalNet in predicting the user's pose in an unknown environment (i.e., outside of the drone arena). This section highlights the main issues behind the lack of its generalization capabilities, by understanding what the model is actually learning.
+
+\medskip
+
+Convolutional Neural Networks (CNN) are suited for computer vision thanks to their ability to gain spacial-related insights from images. Anyway, just like for any other \gls{nn}, \gls{cnn}s are "black-box". This means that their internal behavior is particularly challenging for humans to understand.
+
+Among network interpretability tecnhiques introduced in section \ref{sec:network-interpretability}, we choose \gls{gradcam}. The algorithm is indeed the most understandable way of visualizing what a \gls{cnn} is actually seeing.
 
 As explained in section \ref{subsec:gradcam-theory}, \gls{gradcam} is able to effectively visualize the most important parts of an input image which are actually responsible for predicting a certain output\footnote{for an easy understandable \gls{gradcam} example, please refer to the figure \ref{fig:gradcam-catdog} which regards a simple dogs VS cats classifier}.
+
+\medskip
+
+Research in the field is still on-going and most of the available resources are for TensorFlow 1. The most powerful and famous library for network interpretability is \texttt{Lucid}\footnote{\url{https://github.com/tensorflow/lucid}}, from the official TensorFlow team, but it is not easily applicable to Keras models.
+
+Then, we use the open-source library \texttt{tf-keras-vis} by \cite{tf-keras-vis}, porting for TensorFlow 2.0+ of \texttt{keras-vis} by \cite{keras-vis}.
 
 
 
 \subsection{Regression to Classification}
 \label{subsec:gradcam-regrtoclass}
 
-\gls{gradcam} is designed to be applied on classification tasks, rather than regression ones. Even though a porting of the algorithm for regression has been published (Regression Activation Map, \cite{wang2019diabetic}), it appears to be an isolated case, since the research in the field it is not developed yet. For this reason and only for network interpretation, we decide to transform our problem into a classification task.
+\gls{gradcam} is designed to be applied on classification tasks, rather than regression ones. Even though a porting of the algorithm for regression has been published (Regression Activation Map, \cite{wang2019diabetic}), it appears to be an isolated case, since the research in the field it is not developed yet. For this reason, and for network interpretation only, we decide to transform our problem into a classification task.
 
 The ground truth is composed of four variables with specific domains, and figure \ref{fig:frontalnet-dataset-distribution-regr} in the previous chapter shows their distribution. Every variable has a particular "center" value, which is obtained when the user is somehow centered in the image. We decide to split continuous values into 3 different classes, which account for values smaller, around, and higher than the "center". We call these buckets respectively \texttt{low}, \texttt{medium}, and \texttt{high}.
 
@@ -159,14 +113,6 @@ Results are shown in figure \ref{fig:gradcam-retrain-simple}, which after 30 epo
 	\label{fig:gradcam-retrain-simple}
 \end{figure}
 
-
-
-\subsection{Framework}
-\label{subsec:gradcam-framework}
-
-For practically applying \gls{gradcam} to the Keras trained model, we use the open-source \texttt{tf-keras-vis} available on GitHub\footnote{\url{https://github.com/keisen/tf-keras-vis}} by \cite{tf-keras-vis}, porting for TensorFlow 2.0+ of the most famous \texttt{keras-vis} by \cite{keras-vis}.
-
-Finding the right library for this purpose has not been easy, since research is still on-going and most of the available resources are for TensorFlow 1 only. The most famous and powerful is \texttt{Lucid}\footnote{\url{https://github.com/tensorflow/lucid}}, from the official TensorFlow team.
 
 
 \subsection{Reading charts}
@@ -498,7 +444,7 @@ The examples presented above mostly reflect the model expected behavior. However
 \subsection{Summary}
 \label{subsec:proposed-approach}
 
-Reported results demonstrate that the model is not robust enough to only focus on the user who is actually facing the drone's camera. Instead, various portions of the input images appear to be taken into consideration when the model makes predictions: many distractors are coming from the background.
+Reported results demonstrate that the model is not robust enough to only focus on the user who is actually facing the drone's camera. Instead, various portions of the input images appear to be taken into consideration when the model makes its predictions: many distractors are coming from the background.
 
 In light of this, we can reasonably assume that the \gls{resnet} model has undesirably learned some details about the drone arena in which the dataset has been collected. This is most likely the reason why the model is unable to control the drone outside of that environment, as discussed in section \ref{subsec:frontalnet-generalization}.
 
@@ -517,7 +463,7 @@ This section explores various algorithms and experiments for creating the mask o
 \subsection{Canny}
 \label{subsec:masking-canny}
 
-The first experiments are based on a classic computer vision technique called Canny Edge Detection. A custom algorithm\footnote{adapted from \url{https://stackoverflow.com/a/29314286/10866825}} applies the related function from OpenCV\footnote{\url{https://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_imgproc/py_canny/py_canny.html}} to find the edges inside the image, which are then used for also finding the contours. Only the biggest contour is taken into consideration for building a mask around the subject in the image.
+The first experiments are based on a classic computer vision technique called Canny Edge Detection. A custom algorithm\footnote{adapted from \url{https://stackoverflow.com/a/29314286/10866825}} applies the related function from OpenCV\cite{opencv_canny} to find the edges inside the image, which are then used for also finding the contours. Only the biggest contour is taken into consideration for building a mask around the subject in the image.
 
 \medskip
 
@@ -563,7 +509,7 @@ In some cases, it even happens that the body of the person is present in the ima
 \subsection{Grabcut}
 \label{subsec:masking-grabcut}
 
-Given the Canny Edge Detection limits in removing the background from the images, the GrabCut algorithm has been tried. It operates using the subject position in the image and some statistical inference for labeling each pixel of the image as background or foreground. It works with the following algorithm (\cite{opencv_grabcut}):
+Given the Canny Edge Detection limits, the GrabCut algorithm has been tried. It operates using the subject position in the image and some statistical inference for labeling each pixel of the image as background or foreground. It works with the following algorithm (\cite{opencv_grabcut}):
 
 \begin{itemize}
 	\item User inputs the rectangle. Everything outside this rectangle will be taken as sure background. Everything inside the rectangle is unknown. Similarly, any user input specifying foreground and background are considered as hard-labeling which won't change in the process.
@@ -581,7 +527,7 @@ OpenCV GrabCut function\footnote{\url{https://docs.opencv.org/4.1.2/d7/d1b/group
 
 \medskip
 
-Both approaches require previous knowledge about the subject position in the image. For now, let’s analyze both by manually providing this information for the example images. Later on, we will also consider an algorithm for automatic human detection.
+Both approaches require previous knowledge about the subject position in the image. For now, let’s manually provide this information for the example images. Later on, we will consider an algorithm for automatic human detection.
 
 
 \subsubsection{Rectangle initialization}
@@ -643,7 +589,7 @@ Performance obtained by the algorithm is available in figure \ref{fig:grabcut-re
 In order to improve the previous technique, we try mask initialization, which allows us to initially classify the pixels in the image as we prefer. This time, we do consider the pose information for telling GrabCut we already know that some part of the image is \textit{sure-foreground}: face and part of the body.
 
 Let's now consider an example of an image for which the previous solution was completely missing the person in the result, despite the well-initialized rectangle.
-In figure \ref{fig:}, we notice manually assigned \textit{sure-foreground} pixels in blue, while GrabCut inferred \textit{probable-foreground} in yellow and \textit{probable-background} in green. Results are undoubtedly better, but we notice that the left-most background has been kept in the final image, while we could easily identify it as \textit{sure-background} using the person pose we assume as known, like before.
+In figure \ref{fig:grabcut-mask-explain}, we notice manually assigned \textit{sure-foreground} pixels in blue, while GrabCut inferred \textit{probable-foreground} in yellow and \textit{probable-background} in green. Results are undoubtedly better, but we notice that the left-most background has been kept in the final image, while we could easily identify it as \textit{sure-background} using the person pose we assume as known, like in the previous rectangle initialization.
 
 \begin{figure}[!h]
 	\begin{center}
@@ -687,8 +633,8 @@ In figure \ref{fig:}, we notice manually assigned \textit{sure-foreground} pixel
 
 We finally try a mixed approach between rectangle and mask initializations, by specifying both the person and face positions in the image. It allows us to initially set sure-background, probable-background, and sure-foreground pixels. Only probable-foreground pixels have to be found by the GrabCut algorithm. 
 
-In figure \ref{fig:grabcut-hybrid-explain} the usual explanation. Please notice that \textit{sure-background} is dark blue, \textit{probable-background} is green, \textit{probable-foreground} is yellow and \textit{sure-foreground} is light blue. 
-Image \ref{fig:grabcut-hybrid-example} shows results of hybrid initialization applied to the same samples introduced in the figure \ref{fig:grabcut-rect-example}. Performance is sub-optimal, as they present excellent segmentation capabilities.
+In figure \ref{fig:grabcut-hybrid-explain} the usual explanation. Here, \textit{sure-background} is dark blue, \textit{probable-background} is green, \textit{probable-foreground} is yellow and \textit{sure-foreground} is light blue. 
+Image \ref{fig:grabcut-hybrid-example} shows results of hybrid initialization applied to the same samples introduced in the figure \ref{fig:grabcut-rect-example}. Results are sub-optimal, with excellent segmentation.
 
 \begin{figure}[!h]
 	\begin{center}
@@ -737,33 +683,36 @@ Image \ref{fig:grabcut-hybrid-example} shows results of hybrid initialization ap
 \subsubsection{Automatic Human Detection}
 \label{subsec:masking-yolo}
 
-Now that we have a promising background removal algorithm, to let it work we need to infer person and face position from the image. \gls{gt} data is not sufficiently precise for providing such information, so we try other state-of-the-art object detection techniques.
+Now that we have a promising background removal algorithm, to let it work we need to infer person and face position from the image. \gls{gt} data is not sufficiently precise for providing such information, so we try other state-of-the-art object detection techniques. For properly using hybrid initialization, which demonstrated to be the most precise solution, we need two pieces of information: the bounding boxes associated with both the entire person and its head. For this reason, distinct detectors are necessary.
 
-For properly using hybrid initialization, which demonstrated to be the most precise solution, we need two pieces of information: the bounding boxes associated with both the entire person and its head. For this reason, distinct detectors are necessary.
+\medskip
 
-We adopt YOLO\footnote{\url{https://pjreddie.com/darknet/yolo/}} for object detection, through the \texttt{cvlib} library that implements a YOLOv3 model trained on the COCO\footnote{\url{https://cocodataset.org/}} dataset, capable of detecting 80 common objects in context. Underneath, it uses the OpenCV dnn module\footnote{\url{https://docs.opencv.org/master/d2/d58/tutorial_table_of_content_dnn.html}}.
+We adopt YOLO (\cite{redmon2016look}) for human detection, through the \texttt{cvlib}\footnote{\url{https://www.cvlib.net/}} library that implements a YOLOv3 model trained on the Microsoft COCO dataset (\cite{lin2015microsoft}), capable of detecting 80 common objects in context. Underneath, it uses the OpenCV dnn module\footnote{\url{https://docs.opencv.org/master/d2/d58/tutorial_table_of_content_dnn.html}}.
 
-A demo is shown in figure \ref{fig:yolo}, where we notice that YOLO overall provides quite good results. However, in 19-20\% of the cases, it does not detect any object in the image, most probably because of their low resolution.
+A demo on our dataset is shown in figure \ref{fig:yolo}, where we notice that YOLO overall provides quite good results. However, in 10-20\% of the cases, it does not detect any object in the image, most probably because of their low resolution.
 
 \begin{figure}[!h]
 	\centering
 	\includegraphics[width=1\textwidth]{"contents/images/04-3yolo"}
-	\caption[YOLO demonstration]{YOLO demonstration}
+	\caption[YOLO demonstration, which shows failures for 2 images]{YOLO demonstration, which shows failures for 2 images}
 	\label{fig:yolo}
 \end{figure}
 
 \medskip
 
-For enabling mask initialization, also the face position is needed. We firstly try to heuristically infer its position based on the bounding box of the entire person provided by YOLO. Even though the majority of samples are compliant with this heuristic, a non-ignorable percentage of samples is not compatible. For this reason, we also try some head detectors\footnote{\url{https://github.com/AVAuco/ssd_head_keras}}, miserably failing in their task due to the small size of our images.
+For enabling mask initialization, also the face position is needed. We firstly try to heuristically infer its position based on the bounding box of the entire person provided by YOLO. The majority of samples are compliant with this heuristic, but a non-ignorable percentage of samples is not compatible. For this reason, we also try an open-source head detector\footnote{\url{https://github.com/AVAuco/ssd_head_keras}}, miserably failing in its task due to the small size of our images.
+
+\bigskip
 
 While searching for a solution compatible with such low-fidelity images, we find an all-in-one solution, presented in the next section, that immediately became our choice for its surprising results.
 
 
 
+\clearpage
 \subsection{Mask R-CNN}
 \label{subsec:masking-maskrcnn}
 
-Mask R-CNN (\cite{he2018mask}) is a state of the art deep learning framework for object detection and instance segmentation, whose technical details have been illustrated in section \ref{subsec:sota-maskrcnn}. Originally developed by Facebook researchers in PyTorch\footnote{\url{https://pytorch.org/}}, now available in the \texttt{Detectron2}\footnote{\url{https://github.com/facebookresearch/detectron2}} package (\cite{wu2019detectron2}), the algorithm has been ported to TensorFlow 1 (\cite{MaskRCNN_matterport}) and later adapted for TensorFlow 2 by \cite{MaskRCNN_akTwelve}\footnote{\url{https://github.com/akTwelve/Mask_RCNN}}. The latter has been used for applying Mask R-CNN on our dataset images.
+Mask R-CNN (\cite{he2018mask}) is a state of the art deep learning framework for object detection and instance segmentation, whose technical details have been illustrated in section \ref{subsec:sota-maskrcnn}. Originally developed by Facebook researchers in PyTorch\cite{pytorch}, now available in the \texttt{Detectron2} package (\cite{wu2019detectron2}), the algorithm has been ported to TensorFlow 1 (\cite{MaskRCNN_matterport}) and later adapted for TensorFlow 2 by \cite{MaskRCNN_akTwelve}\footnote{\url{https://github.com/akTwelve/Mask_RCNN}}. The latter has been used for applying Mask R-CNN on our dataset images.
 
 \medskip
 
@@ -802,9 +751,9 @@ Results are incredibly precise and the method undoubtedly outperforms any other 
 	\label{fig:maskrcnn-dario}
 \end{figure}
 
-This high-level of accuracy in detection and segmentation comes with an extremely high computing power requirement\footnote{accordingly to the original paper, Mask R-CNN can only run at 5 \gls{fps}}. For reference, running Mask R-CNN on the test set - composed of about 11'000 images - requires a total computing time\footnote{we observe, using the \texttt{time} command for IPython, the following CPU times: user 35min, sys 20min, total 55min; and Wall time: 1h 4min} of approximately 55 minutes on Google Colab with a GPU runtime\footnote{equipped with NVIDIA® T4 GPU}.
+This high-level of accuracy in detection and segmentation comes with an extremely high computing power requirement\footnote{accordingly to the original paper, Mask R-CNN can only run at 5 \gls{fps}}. For reference, running Mask R-CNN on the test set - composed of about 11'000 images - requires a total computing time\footnote{we observe, using the \texttt{time} command for IPython, the following CPU times: user 35min, sys 20min, total 55min; and Wall time: 1h 4min} of approximately 55 minutes on Google Colab with a GPU runtime\footnote{equipped with NVIDIA T4 GPU}.
 
-Because of this, the inference on the images must be done offline. The training procedure will only receive, together with each input image, the previously computed user's mask.
+Because of this, the inference on the images must be done offline. The training procedure will only receive, together with each input image, the previously computed user's mask. This will be used to perform background replacement.
 
 
 
