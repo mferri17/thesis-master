@@ -442,11 +442,11 @@ The examples presented above mostly reflect the model expected behavior. However
 
 
 \subsection{Summary}
-\label{subsec:proposed-approach}
+\label{subsec:gradcam-summary}
 
 Reported results demonstrate that the model is not robust enough to only focus on the user who is actually facing the drone's camera. Instead, various portions of the input images appear to be taken into consideration when the model makes its predictions: many distractors are coming from the background.
 
-In light of this, we can reasonably assume that the \gls{resnet} model has undesirably learned some details about the drone arena in which the dataset has been collected. This is most likely the reason why the model is unable to control the drone outside of that environment, as discussed in section \ref{subsec:frontalnet-generalization}.
+In light of this, we can reasonably assume that the \gls{resnet} model has undesirably learned some details about the drone arena in which the dataset has been collected. This is most likely the reason why the model is unable to control the drone outside of that environment, as discussed in section \ref{sec:frontalnet-generalization}.
 
 
 

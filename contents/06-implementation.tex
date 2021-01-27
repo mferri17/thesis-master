@@ -1,19 +1,56 @@
 \chapter{Model Implementation}
 \label{chap:implementation}
 
-%\lipsum[1]
+In this chapter, we explain how the proposed solution has been implemented. We rely on the FrontalNet model, described in section \ref{subsec:frontalnet-architecture}. Our main contribution concerns the way the dataset is treated and processed. 
+
+The chapter is composed as follows:
+\begin{itemize}
+	\item Sections \ref{sec:implementation-bgreplace} and \ref{sec:implementation-imgaug} focus on the implementation of our generalization strategy.
+	\item Section \ref{sec:model-variants} provides an overview of our different model alternatives, that will be considered for comparison and evaluation in chapter \ref{chap:evaluation}.
+	\item Sections \ref{sec:implementation-generator} and \ref{sec:implementation-training} describe the training procedure, with a particular focus on time performance.
+\end{itemize}
+
+
 
 
 \section{Background Replacement}
 \label{sec:implementation-bgreplace}
 
-For our purposes, we are just interested in the actual user facing the drone, which is the person closest to the camera, thus usually the biggest one among all the people found by Mask R-CNN. Bounding boxes (not shown in the picture) and labels associated with each object instance are used to identify the correct mask (i.e., the one corresponding to the user), which is later used during training.
+As demonstrated in section \ref{subsec:gradcam-results}, the approach defined by \cite{mantegazza2019visionbased} is lacking generalization capabilities because of its dataset. More specifically, the model is biased by many elements appearing in the drone arena, in which the data have been originally collected. In order to eliminate the problem, we modify the training set by performing background replacement on its images.
+
+As anticipated in section \ref{subsec:masking-maskrcnn}, we use Mask R-CNN to preprocess the dataset in order to detect and create the mask of every object appearing in the input images. Each mask is labeled with the category to which the object belong (e.g., person, TV, bike, car, ...). However, for our purposes, we are only interested in the mask corresponding to the user who is actually facing the drone. Since the user is always the nearest to the drone's camera, its mask must be the one with the largest size among all people's masks found by Mask R-CNN. This mask is used to distinguish between the subject and the background. 
+
+To perform the background replacement, for each sample, the user's mask is passed to the training procedure and used to accordingly blend the input image with another, which serves as the background. The ground truth remains unchanged, and this is the main advantage of our approach. We can simulate a dataset acquired in different environments without the need of actually collecting it, which would require a dedicated \gls{mocap} system.
+
+By providing a considerable amount of images to use as backgrounds, the \gls{ml} model trained on the modified dataset should be able to actually ignore the background. The \gls{cnn}, instead, will hopefully learn the abstract concept of a person, in order to predict its position in any condition.
+
+\medskip
+
+For our work, we select the publicly available dataset\footnote{\url{http://web.mit.edu/torralba/www/indoor.html}} for Indoor Scene Recognition, presented during the 9th Conference on Computer Vision and Pattern Recognition (CVPR). Created by researchers from MIT\cite{cvpr09}, the dataset contains a total of 15620 images divided into 67 indoor categories. For our task, categorization is not actually needed, but it ensures a good variety of scenarios to present to the model. For shortness, the dataset will be referred to as "CVPR".
+
+During training, each sample is assigned to a randomly chosen background from the CVPR dataset. Figure \ref{fig:bgreplace-example} shows a demonstration applied to the samples previously presented in figure \ref{fig:frontalnet-dataset-overview}. 
+
+%\vspace*{5ex}
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[width=1\textwidth]{"contents/images/05-bgreplace-overview"}
+	\caption[Example of background replacement on the training set]{Example of background replacement on the training set}
+	\label{fig:bgreplace-example}
+\end{figure}
+\clearpage
 
 
 
 
 \section{Standard Image Augmentation}
 \label{sec:implementation-imgaug}
+
+\lipsum[1]
+
+
+
+\section{Model Alternatives}
+\label{sec:model-variants}
 
 \lipsum[1]
 
@@ -32,3 +69,4 @@ For our purposes, we are just interested in the actual user facing the drone, wh
 \label{sec:implementation-training}
 
 \lipsum[1]
+
