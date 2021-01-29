@@ -1,12 +1,12 @@
 \chapter{Model Implementation}
 \label{chap:implementation}
 
-In this chapter, we explain how the proposed solution has been implemented. We rely on the FrontalNet model, described in section \ref{subsec:frontalnet-architecture}. Our main contribution concerns the way the dataset is treated and processed. 
+In this chapter, we explain how the proposed solution has been implemented. Our main contribution concerns the way the dataset is treated and processed to reduce overfitting. 
 
 The chapter is composed as follows:
 \begin{itemize}
 	\item Sections \ref{sec:implementation-bgreplace} and \ref{sec:implementation-imgaug} focus on the implementation of our generalization strategy.
-	\item Section \ref{sec:model-variants} provides an overview of our different model alternatives, that will be considered for comparison and evaluation in chapter \ref{chap:evaluation}.
+	\item Section \ref{sec:model-variants} provides three model alternatives, that will be considered for evaluation and comparison in chapter \ref{chap:evaluation}.
 	\item Sections \ref{sec:implementation-generator} and \ref{sec:implementation-training} describe the training procedure, with a particular focus on time performance.
 \end{itemize}
 
@@ -16,22 +16,22 @@ The chapter is composed as follows:
 \section{Background Replacement}
 \label{sec:implementation-bgreplace}
 
-As demonstrated in section \ref{subsec:gradcam-results}, the approach defined by \cite{mantegazza2019visionbased} is lacking generalization capabilities because of its dataset. More specifically, the model is biased by many elements appearing in the drone arena, in which the data have been originally collected. In order to eliminate the problem, we modify the training set by performing background replacement on its images.
+As demonstrated in section \ref{subsec:gradcam-results}, the approach defined by \cite{mantegazza2019visionbased} is lacking generalization capabilities. The main reason behind this problem is attributable to its dataset composition. More specifically, the model is biased by many elements appearing in the drone arena, in which the data have been originally collected. As a solution to eliminate the problem, we modify the training set by performing background replacement on its images.
 
-As anticipated in section \ref{subsec:masking-maskrcnn}, we use Mask R-CNN to preprocess the dataset in order to detect and create the mask of every object appearing in the input images. Each mask is labeled with the category to which the object belong (e.g., person, TV, bike, car, ...). However, for our purposes, we are only interested in the mask corresponding to the user who is actually facing the drone. Since the user is always the nearest to the drone's camera, its mask must be the one with the largest size among all people's masks found by Mask R-CNN. This mask is used to distinguish between the subject and the background. 
+In section \ref{subsec:masking-maskrcnn}, we anticipated the use of Mask R-CNN to preprocess the dataset. The algorithm detects and creates a mask for all the objects appearing in the input images, labeling each mask with the category to which the object belong (e.g., person, TV, bike, car, ...). However, for our purposes, we are only interested in the mask corresponding to the user who is actually facing the drone. Since the user is always the nearest person to the drone's camera, its mask must be the one with the largest size among all people's masks found by Mask R-CNN.
 
-To perform the background replacement, for each sample, the user's mask is passed to the training procedure and used to accordingly blend the input image with another, which serves as the background. The ground truth remains unchanged, and this is the main advantage of our approach. We can simulate a dataset acquired in different environments without the need of actually collecting it, which would require a dedicated \gls{mocap} system.
+To perform the background replacement, the training procedure receives together with each sample also the corresponding user's mask. This is used for distinguishing the subject from the rest of the image, to accordingly blend the camera's frame with another image, serving as the background. The ground truth remains unchanged, and this is the main advantage of our approach. We can simulate a dataset acquired in different environments without the need of actually collecting it, which would otherwise require a dedicated \gls{mocap} system. Our method is fairly similar to domain randomization (section \ref{subsec:domain-randomization}), a technique widely applied in robotics to train \gls{ml} models in simulated virtual environments.
 
-By providing a considerable amount of images to use as backgrounds, the \gls{ml} model trained on the modified dataset should be able to actually ignore the background. The \gls{cnn}, instead, will hopefully learn the abstract concept of a person, in order to predict its position in any condition.
+By providing a considerable amount of images to use as backgrounds, the \gls{ml} model trained on the modified dataset should be able to actually ignore the background. The \gls{cnn}, instead, will hopefully learn the concept of a person, in order to predict its position in any condition.
 
 \medskip
 
-For our work, we select the publicly available dataset\footnote{\url{http://web.mit.edu/torralba/www/indoor.html}} for Indoor Scene Recognition, presented during the 9th Conference on Computer Vision and Pattern Recognition (CVPR). Created by researchers from MIT\cite{cvpr09}, the dataset contains a total of 15620 images divided into 67 indoor categories. For our task, categorization is not actually needed, but it ensures a good variety of scenarios to present to the model. For shortness, the dataset will be referred to as "CVPR".
+For our work, we select the publicly available dataset\footnote{\url{http://web.mit.edu/torralba/www/indoor.html}} for Indoor Scene Recognition presented during the 9th Conference on Computer Vision and Pattern Recognition (CVPR). Created by researchers from MIT (\cite{cvpr09}), the dataset contains a total of 15'620 images divided into 67 indoor categories. For our task, categorization is not actually needed, but it ensures a good variety of scenarios to present to the model. For shortness, in this thesis, the dataset will be referred to as \textit{CVPR}.
 
 During training, each sample is assigned to a randomly chosen background from the CVPR dataset. Figure \ref{fig:bgreplace-example} shows a demonstration applied to the samples previously presented in figure \ref{fig:frontalnet-dataset-overview}. 
 
 %\vspace*{5ex}
-\begin{figure}[!htb]
+\begin{figure}[!h]
 	\centering
 	\includegraphics[width=1\textwidth]{"contents/images/05-bgreplace-overview"}
 	\caption[Example of background replacement on the training set]{Example of background replacement on the training set}
@@ -42,10 +42,95 @@ During training, each sample is assigned to a randomly chosen background from th
 
 
 
-\section{Standard Image Augmentation}
+\section{Classic Augmentation}
 \label{sec:implementation-imgaug}
 
-\lipsum[1]
+Data augmentation is another common regularization technique for improving the ability of neural networks to generalize their task on previously unseen samples. Introduced in section \ref{subsec:data-augmentation}, image augmentation is ubiquitously used with \gls{cnn}s for reducing overfitting on the training images by applying random transformations.
+
+Our implementation relies on Albumentations (\cite{Buslaev_2020}), a state of the art Python library which provides a huge variety of image augmentations. Constantly updated and well-documented, Albumentations can boast the best benchmarking performance in the field\footnote{\url{https://github.com/albumentations-team/albumentations\#benchmarking-results}}.
+
+\medskip
+
+Image transformations can be divided into two types:
+\begin{itemize}
+	\item Spatial-level augmentations: also called affine transformations, they relocates pixels by cropping, scaling, rotating, translating, mirroring and shearing the images. These transformations also have to accordingly modify additional elements associated with the images such as ground truth, masks, bounding boxes or keypoints.
+	\item Pixel-level augmentations: algorithms which only modify pixels (or group of pixels) without relocating them or changing the image shape. These transformations leave unchanged any other additional element associated with the images such as ground truth, masks, bounding boxes or keypoints.
+\end{itemize}
+Our \gls{cnn} learns to predict the user's pose, but the relation between the person's position in the image and the ground is not known a priori. Being not able to modify the ground truth according to affine transformations, spatial-level augmentation is not an option in our case. The only exception is for horizontal mirroring, which only requires to invert the \texttt{Y} coordinate in the ground truth\footnote{\texttt{Y} coordinate represent the horizontal alignment, as explained in section \ref{sec:datasets}}. For this reason, we only apply pixel-level augmentations.
+
+\medskip
+
+According to user-defined probabilities, Albumentations gives the opportunity to apply a set of different augmentations with variable intensities. Among pixel-level transformations, the possibilities are limitless and they can produce aggressively augmented images, which might be very different from the originals. Figure \ref{fig:albumentation-example} provides a good example of augmentation, applied both on original and background-augmented samples. Results below are obtained combining transformations on brightness and contrast, multiplicative noise, channels manipulation, and rectangular dropouts.
+
+\begin{figure}[!h]
+	\begin{center}
+		\begin{subfigure}[h]{0.49\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/05-imgaug-example-1"}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[h]{0.49\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/05-imgaug-example-2"}
+		\end{subfigure}
+	\end{center}
+	\vspace{-0.5cm}
+	\caption[Example of image augmentation with Albumentations]{Example of image augmentation with Albumentations}
+	\label{fig:albumentation-example}
+\end{figure}
+
+The combination of different transformations composes a custom pipeline, which time performance depends on custom choices and probabilities. Among all augmentations available\footnote{\url{https://albumentations.ai/docs/api_reference/augmentations}} and tested\footnote{tests performed on a notebook equipped with an Intel Core i7-6700HQ CPU @ 2.60 GHz}, some of them only requires about 0.5 seconds\footnote{Blur, Equalize, RandomBrightnessContrast, RandomGamma} or even less\footnote{up to 0.30 seconds for InvertImg, Solarize, ChannelDropout, ChannelShuffle, ToGray} to be applied on a set of 10'000 $60 \times 108$ images. The most expensive ones take up to 12 seconds\footnote{HueSaturation 1.60 sec, RGBShift 1.50 sec, CLAHE 3.50 sec, CoarseDropout 3.50 sec, MultiplicativeNoise 7 sec, GaussNoise 10 sec, ISONoise 12 sec} under the same conditions.
+
+\medskip
+
+\begin{python}
+augmenter = A.Compose([
+	A.RandomBrightnessContrast(brightness_by_max=True, p=0.75),
+	A.RandomGamma(p=0.5),
+	A.CLAHE(p=0.05),
+	A.Solarize(threshold=(200, 250), p=0.2),
+	A.OneOf([
+		A.Equalize(by_channels=False, p=0.5),
+		A.Equalize(by_channels=True, p=0.5),
+	], p=0.1),
+	A.RGBShift(p=0.3),
+	A.OneOf([
+		A.ChannelDropout(fill_value=128, p=0.2),
+		A.ChannelShuffle(p=0.8),
+	], p=0.1),
+	A.MultiplicativeNoise(per_channel=True, elementwise=True, p=0.05),
+	A.CoarseDropout(holes=(20, 70), size=(1, 4), p=0.2),
+	A.ToGray(p=0.05),
+	A.InvertImg(p=0.05),
+	A.OneOf([
+		A.Blur(blur_limit=4, p=0.5),
+		A.MotionBlur(blur_limit=6, p=0.5),
+	], p=0.05),
+], p=aug_prob)
+\end{python}
+\vspace{-0.5cm}
+\begin{lstlisting}[frame=none,caption={Chosen Albumentations pipeline}, 
+label=lst:albumentations]
+\end{lstlisting}
+
+The Albumentations pipeline adopted for our work is shown in listing \ref{lst:albumentations}. It requires about 4 seconds to process 10'000 images and accepts a parameter \texttt{aug\_prob} to define the prior probability of applying the augmentations to an input image. Some examples of resulting images are available in figure \ref{fig:albumentation-chosen}.
+
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=1 \textwidth]{"contents/images/05-imgaug-chosen"}
+	\caption[Examples of the chosen image augmentation pipeline]{Examples of the chosen image augmentation pipeline}
+	\label{fig:albumentation-chosen}
+\end{figure}
+
+At the end of the pipeline, we also apply Perlin noise (\cite{perlin-noise}) with a probability of 20\%. Injecting noise into images can greatly help \gls{cnn}s on avoiding overfitting (\cite{shorten2019augmentationsurvey}). Since Perlin noise generation is highly time-consuming, a set of textures has been pre-computed and is available for later use. During training, for each augmented sample, one of the generated noises is randomly chosen, cropped, and flipped before its multiplication with the input image. Half of the time, it is applied uniformly on all channels to produce a grayscale noise, while the other half is differentiated over RGB channels. Picture \ref{fig:pelin-noise} illustrates both cases.
+
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=0.75\textwidth]{"contents/images/05-imgaug-pelin"}
+	\caption[Perlin noise example]{Perlin noise example. From left to right: (1) randomly chosen, cropped and flipped texture (2) applied uniformly (3) applied by channel}
+	\label{fig:pelin-noise}
+\end{figure}
+
 
 
 
@@ -53,6 +138,7 @@ During training, each sample is assigned to a randomly chosen background from th
 \label{sec:model-variants}
 
 \lipsum[1]
+
 
 
 

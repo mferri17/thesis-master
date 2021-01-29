@@ -205,7 +205,12 @@ Asd
 
 \textbf{TODO}
 
-Previous works on images: \cite{yue2019domain}, \cite{Takahashi_2020}
+Random Erasing Data Augmentation: \cite{zhong2017random}
+
+Previous works on images:  \cite{yue2019domain}, \cite{Takahashi_2020}, \cite{xie2020unsupervised}
+
+AutoAugment: \cite{cubuk2019autoaugment}
+Learning Data Augmentation Strategies for Object Detection: \cite{zoph2019learning}
 
 
 
@@ -216,13 +221,13 @@ Previous works on images: \cite{yue2019domain}, \cite{Takahashi_2020}
 
 Summary from \cite{mehta2019active}
 
-See \cite{weng2019DR_explanation}
+See \cite{weng2019DR_explanation}, \cite{tobin2017domain}
  
 "Domain randomization is a popular technique for improving domain transfer, often used in a zero-shot setting when the target domain is unknown or cannot easily be used for training. In this work, we empirically examine the effects of domain randomization on agent generalization. Our experiments show that domain randomization may lead to suboptimal, high-variance policies, which we attribute to the uniform sampling of environment parameters."
 
 \medskip
 
-Imitation learning through simulation is recently becoming an interesting and successful approach for both reinforcement learning (\cite{imitation_learning_survey} and \cite{imitation_learning_3d_navigation}) object recognition (\cite{tobin2017domain}, \cite{weng2019DR}).
+Imitation learning through simulation is recently becoming an interesting and successful approach for both reinforcement learning (\cite{imitation_learning_survey}, \cite{imitation_learning_3d_navigation}) object recognition (\cite{tobin2017domain}, \cite{weng2019DR}).
 
 Robot and environment can be replicated through a dedicated simulator such as Gazebo\footnote{\url{http://gazebosim.org/}}, often used in robotics with \gls{ros}\footnote{\url{https://www.ros.org/}} due to its straightforward integration, or even with general-purpose graphic engines. Unreal Engine\footnote{\url{https://www.unrealengine.com/en-US/}} Unity\footnote{\url{https://unity.com/}} are well-known simulators designed for game-development, but recently used for \gls{vr} and \gls{ar} applications. They give developers unlimited possibilities, carefully supported by solid physics engines and active communities.
 
