@@ -38,7 +38,7 @@ In the previous section, we discussed insufficient experimental results obtained
 
 \medskip
 
-Convolutional Neural Networks (CNN) are suited for computer vision thanks to their ability to gain spacial-related insights from images. Anyway, just like for any other \gls{nn}, \gls{cnn}s are "black-box". This means that their internal behavior is particularly challenging for humans to understand.
+Convolutional Neural Networks (CNN) are suited for computer vision thanks to their ability to gain spatial-related insights from images. As any other \gls{nn}, even \gls{cnn}s are "black-boxes". This means that their internal behavior is particularly challenging for humans to understand.
 
 Among network interpretability tecnhiques introduced in section \ref{sec:network-interpretability}, we choose \gls{gradcam}. The algorithm is indeed the most understandable way of visualizing what a \gls{cnn} is actually seeing.
 
@@ -55,9 +55,9 @@ Then, we use the open-source library \texttt{tf-keras-vis} by \cite{tf-keras-vis
 \subsection{Regression to Classification}
 \label{subsec:gradcam-regrtoclass}
 
-\gls{gradcam} is designed to be applied on classification tasks, rather than regression ones. Even though a porting of the algorithm for regression has been published (Regression Activation Map, \cite{wang2019diabetic}), it appears to be an isolated case, since the research in the field it is not developed yet. For this reason, and for network interpretation only, we decide to transform our problem into a classification task.
+\gls{gradcam} is designed to be applied on classification tasks, rather than regression ones. Even though a porting of the algorithm for regression has been published (Regression Activation Map, \cite{wang2019diabetic}), it appears to be an isolated case. For this reason, and for network interpretation only, we decide to transform our problem into a classification task.
 
-The ground truth is composed of four variables with specific domains, and figure \ref{fig:frontalnet-dataset-distribution-regr} in the previous chapter shows their distribution. Every variable has a particular "center" value, which is obtained when the user is somehow centered in the image. We decide to split continuous values into 3 different classes, which account for values smaller, around, and higher than the "center". We call these buckets respectively \texttt{low}, \texttt{medium}, and \texttt{high}.
+The ground truth is composed of four variables with specific domains, and figure \ref{fig:frontalnet-dataset-distribution-regr} in the previous chapter shows their distribution. Every variable has a particular "central" value, which is obtained when the user is somehow centered in the image. We decide to split continuous values into 3 different classes, which account for values smaller, around, and higher than the "center". We call these buckets respectively \texttt{low}, \texttt{medium}, and \texttt{high}.
 
 \begin{itemize}
 	\item \texttt{X} values are splitted at $1.4$ and $1.6$
@@ -126,17 +126,17 @@ When working on standard classification problems, things are pretty easy: if we 
 
 \medskip
 
-However, our \gls{ml} does not look like a standard classification problem, instead, it has been adapted from regression. Classes only serve as categorical values for variables that are actually numerical; also, does not exist a specific portion for each input image that can be associated with one of the three classes in particular. In other words, considering the class \texttt{low}, we do not expect its related heatmap to be different from the one generated for the class \texttt{high}: our discriminator is always the person, and its position in the image.
+However, our \gls{ml} does not look like a standard classification problem, since it has been adapted from regression. Classes only serve as categorical values for variables that are actually numerical; also, does not exist a specific portion for each input image that can be associated with one of the three classes in particular. In other words, considering the class \texttt{low}, we do not expect its related heatmap to be different from the one generated for the class \texttt{high}. Our discriminator is always the person and its position in the image.
 
-Moreover, FrontalNet predicts four different variables, then also the classification model will have multiple outputs. This further introduces another difficulty on reading \gls{gradcam} results, since we expect - once again - that heatmaps will only highlight the person in the image, regardless of the inspected variable.
+Moreover, FrontalNet predicts four different variables, then also the classification model will have multiple outputs. This further introduces another complexity on reading \gls{gradcam} results, since we expect - once again - that heatmaps will only highlight the person in the image, regardless of the inspected variable.
 
-Finally, in some cases, the network predicts the right class (coherent with the \gls{gt}), while in other cases the outputs are incorrect. When examining wrong predictions, both the predicted and actual class could be taken into consideration for understanding what is going wrong with the model.
+Finally, in some cases, the network predicts the right class (coherent with the \gls{gt}), while in other cases the outputs are incorrect. When examining wrong predictions, both the predicted and actual class have to be taken into consideration for understanding what is going wrong with the model.
 
 Of course, this assumptions can be wrong, as the model could actually use other parts of the images (e.g., objects in the background) for actually determining classes to predict. However, this would be an undesired behavior since we expect that a correctly working \gls{cnn} will only care about the person and nothing else.
 
 \bigskip
 
-Figure \ref{fig:gradcam-example-1} displays a typical full example on \gls{gradcam} application for each variable (\texttt{X, Y, Z, W}) and each class (\texttt{low, medium, high}). Heatmaps are not easy to interpret due to a large variety of parameters to consider. As a guideline, for each variable, you could only consider the column which corresponds to the actual (or predicted) class.
+Figure \ref{fig:gradcam-example-1} displays a typical example on \gls{gradcam} application for each variable (\texttt{X, Y, Z, W}) and each class (\texttt{low, medium, high}). Heatmaps are not easy to interpret due to a large variety of parameters to consider. As a guideline, for each variable, you could only consider the column which corresponds to the actual (or predicted) class.
 
 \begin{figure}[!h]
 	\centering
@@ -467,7 +467,7 @@ The first experiments are based on a classic computer vision technique called Ca
 
 \medskip
 
-A core aspect of the Canny function for finding appropriate contours is the choice of its parameters \texttt{minVal} and \texttt{maxVal}, used for distinguishing between \textit{sure-edges}, \textit{probable-edges} and \textit{no-edges}. Several experiments have been made with different values, but no combination of the two parameters is optimal on our dataset.
+A core aspect of the Canny function for finding appropriate contours is the choice of its parameters \texttt{minVal} and \texttt{maxVal}. These are used by the algorithm for distinguishing between \textit{sure-edges}, \textit{probable-edges} and \textit{no-edges}. Several experiments have been made with different values, but no combination of the two parameters is optimal on our dataset.
 
 Figure \ref{fig:canny-overview} shows what happens with \texttt{minVal} and \texttt{maxVal} respectively set to 100 and 400. Most of the time the person is well detected, while other times it completely disappears or even results in a fatal error (red frames). The room baseboard (the line between the floor and the wall) is often still present in the image, while many samples seem to preserve a huge portion of the background.
 
@@ -480,7 +480,7 @@ Figure \ref{fig:canny-overview} shows what happens with \texttt{minVal} and \tex
 
 \medskip
 
-In some cases, it even happens that the body of the person is present in the image but its face disappears. For mitigating this problem, an enhanced version of the algorithm has been considered, designed to always keep the person's face and part of the body in the resulting image, assuming their positions are known. Figure \ref{fig:canny-enanhced} illustrates the problem and demonstrates that results obtained from the enhanced version are still not acceptable, since we are not able enough to appropriately remove the background from the scene.
+In some cases, it even happens that the body of the person is present in the image while the face disappears. For mitigating this problem, an enhanced version of the algorithm has been considered, designed to always keep the person's face and part of the body in the resulting image, assuming their positions are known. Figure \ref{fig:canny-enanhced} illustrates the problem and demonstrates that results obtained from the enhanced version are still not acceptable, since we are not able enough to appropriately remove the background from the scene.
 
 \begin{figure}[!h]
 	\begin{center}
@@ -506,16 +506,16 @@ In some cases, it even happens that the body of the person is present in the ima
 
 
 
-\subsection{Grabcut}
+\subsection{GrabCut}
 \label{subsec:masking-grabcut}
 
-Given the Canny Edge Detection limits, the GrabCut algorithm has been tried. It operates using the subject position in the image and some statistical inference for labeling each pixel of the image as background or foreground. It works with the following algorithm (\cite{opencv_grabcut}):
+GrabCut (\cite{opencv_grabcut}) operates by using the subject position in the image and some statistical inference for labeling each pixel of the image as background or foreground. It works as follows:
 
 \begin{itemize}
 	\item User inputs the rectangle. Everything outside this rectangle will be taken as sure background. Everything inside the rectangle is unknown. Similarly, any user input specifying foreground and background are considered as hard-labeling which won't change in the process.
-	\item Computer does initial labeling depending on the data we gave. It labels the foreground and background pixels (or it hard-labels).
+	\item Computer does initial labeling depending on the given data. It labels the foreground and background pixels (or it hard-labels).
 	\item From now on, a \gls{gmm} is used to model the foreground and background.
-	\item Depending on the data we gave, \gls{gmm} learns and creates a new pixel distribution. That is, the unknown pixels are labeled either \textit{probable-foreground} or \textit{probable-background} depending on their relationship with other hard-labeled pixels in terms of color statistics (like clustering).
+	\item Depending on the data given to GrabCut, \gls{gmm} learns and creates a new pixel distribution. That is, the unknown pixels are labeled either \textit{probable-foreground} or \textit{probable-background} depending on their relationship with other hard-labeled pixels in terms of color statistics (like clustering).
 	\item A graph is built from this pixel distribution. Nodes in the graphs are pixels. Additional two nodes are added, the Source node and the Sink node. Every foreground pixel is connected to the Source node and every background pixel is connected to the Sink node.
 	\item The weights of edges connecting pixels to source or end nodes are defined by the probability of a pixel being foreground or background. The weights between the pixels are defined by the edge information or pixel similarity. If there is a large difference in pixel color, the edge between them will get a low weight.
 	\item Then a min-cut algorithm is used to segment the graph. It cuts the graph into two, separating the source node and the sink node with a minimum cost function. The cost function is the sum of all weights of the edges that are cut. After the cut, all the pixels connected to the Source node become foreground and those connected to the Sink node become background.
@@ -588,7 +588,7 @@ Performance obtained by the algorithm is available in figure \ref{fig:grabcut-re
 
 In order to improve the previous technique, we try mask initialization, which allows us to initially classify the pixels in the image as we prefer. This time, we do consider the pose information for telling GrabCut we already know that some part of the image is \textit{sure-foreground}: face and part of the body.
 
-Let's now consider an example of an image for which the previous solution was completely missing the person in the result, despite the well-initialized rectangle.
+Let's now consider an example of an image for which the previous solution was completely missing the person in the result despite the well-initialized rectangle.
 In figure \ref{fig:grabcut-mask-explain}, we notice manually assigned \textit{sure-foreground} pixels in blue, while GrabCut inferred \textit{probable-foreground} in yellow and \textit{probable-background} in green. Results are undoubtedly better, but we notice that the left-most background has been kept in the final image, while we could easily identify it as \textit{sure-background} using the person pose we assume as known, like in the previous rectangle initialization.
 
 \begin{figure}[!h]
@@ -631,7 +631,7 @@ In figure \ref{fig:grabcut-mask-explain}, we notice manually assigned \textit{su
 \subsubsection{Hybrid initialization}
 \label{subsec:masking-grabcut-hybrid}
 
-We finally try a mixed approach between rectangle and mask initializations, by specifying both the person and face positions in the image. It allows us to initially set sure-background, probable-background, and sure-foreground pixels. Only probable-foreground pixels have to be found by the GrabCut algorithm. 
+We finally try a mixed approach between rectangle and mask initializations, by specifying both the person and face positions in the image. This allows us to initially set sure-background, probable-background, and sure-foreground pixels. Only probable-foreground pixels have to be found by the GrabCut algorithm. 
 
 In figure \ref{fig:grabcut-hybrid-explain} the usual explanation. Here, \textit{sure-background} is dark blue, \textit{probable-background} is green, \textit{probable-foreground} is yellow and \textit{sure-foreground} is light blue. 
 Image \ref{fig:grabcut-hybrid-example} shows results of hybrid initialization applied to the same samples introduced in the figure \ref{fig:grabcut-rect-example}. Results are sub-optimal, with excellent segmentation.
@@ -683,7 +683,7 @@ Image \ref{fig:grabcut-hybrid-example} shows results of hybrid initialization ap
 \subsubsection{Automatic Human Detection}
 \label{subsec:masking-yolo}
 
-Now that we have a promising background removal algorithm, to let it work we need to infer person and face position from the image. \gls{gt} data is not sufficiently precise for providing such information, so we try other state-of-the-art object detection techniques. For properly using hybrid initialization, which demonstrated to be the most precise solution, we need two pieces of information: the bounding boxes associated with both the entire person and its head. For this reason, distinct detectors are necessary.
+Now that we have a promising background removal algorithm, to let it work we need to infer person and face position from the image. \gls{gt} data is not sufficiently precise for providing such information, so we try other state-of-the-art object detection techniques. For properly using hybrid initialization, that we have demonstrated to be the most precise solution, we need two pieces of information: the bounding boxes associated with both the entire person and its head. For this reason, distinct detectors are necessary.
 
 \medskip
 
@@ -712,7 +712,7 @@ While searching for a solution compatible with such low-fidelity images, we find
 \subsection{Mask R-CNN}
 \label{subsec:masking-maskrcnn}
 
-Mask R-CNN (\cite{he2018mask}) is a state of the art deep learning framework for object detection and instance segmentation, whose technical details have been illustrated in section \ref{subsec:sota-maskrcnn}. Originally developed by Facebook researchers in PyTorch\cite{pytorch}, now available in the \texttt{Detectron2} package (\cite{wu2019detectron2}), the algorithm has been ported to TensorFlow 1 (\cite{MaskRCNN_matterport}) and later adapted for TensorFlow 2 by \cite{MaskRCNN_akTwelve}\footnote{\url{https://github.com/akTwelve/Mask_RCNN}}. The latter has been used for applying Mask R-CNN on our dataset images.
+Mask R-CNN (\cite{he2018mask}) is a state of the art deep learning framework for object detection and instance segmentation, whose technical details have been illustrated in section \ref{subsec:sota-maskrcnn}. Originally developed by Facebook researchers in \cite{pytorch}, now available in the \texttt{Detectron2} package (\cite{wu2019detectron2}), the algorithm has been ported to TensorFlow 1 (\cite{MaskRCNN_matterport}) and later adapted for TensorFlow 2 by \cite{MaskRCNN_akTwelve}\footnote{\url{https://github.com/akTwelve/Mask_RCNN}}. The latter has been used for applying Mask R-CNN on our dataset images.
 
 \medskip
 
@@ -751,7 +751,7 @@ Results are incredibly precise and the method undoubtedly outperforms any other 
 	\label{fig:maskrcnn-dario}
 \end{figure}
 
-This high-level of accuracy in detection and segmentation comes with an extremely high computing power requirement\footnote{accordingly to the original paper, Mask R-CNN can only run at 5 \gls{fps}}. For reference, running Mask R-CNN on the test set - composed of about 11'000 images - requires a total computing time\footnote{we observe, using the \texttt{time} command for IPython, the following CPU times: user 35min, sys 20min, total 55min; and Wall time: 1h 4min} of approximately 55 minutes on Google Colab with a GPU runtime\footnote{equipped with NVIDIA T4 GPU}.
+This high-level of accuracy in detection and segmentation comes with an extremely high computing power requirement\footnote{accordingly to the original paper, Mask R-CNN can only run at 5 \gls{fps}}. For reference, running Mask R-CNN on the test set - composed of about 11'000 images - requires a total computing time\footnote{we observe, using the \texttt{time} command for IPython, the following CPU times: user 35min, sys 20min, total 55min; and Wall time: 1h 4min} of approximately 55 minutes on Google Colab using a GPU runtime\footnote{equipped with NVIDIA T4 GPU}.
 
 Because of this, the inference on the images must be done offline. The training procedure will only receive, together with each input image, the previously computed user's mask. This will be used to perform background replacement.
 
