@@ -84,16 +84,9 @@ At \gls{idsia}, a dedicated room has been equipped with a \gls{mocap} system com
 \section{Software}
 \label{sec:software}
 
-This section presents tools and software used to conduct our research for improving the existing system. The original work is written in Python 3 and based on ROS, TensorFlow 1, and Keras. We adapt the code for working with TensorFlow 2.
+This section presents tools and software used to conduct our research and improve the existing system. Our first experiments were carried out with Jupyter Notebooks via Google Colab on a GPU-accelerated runtime, while the final code is provided as Python scripts. Specific details about the hardware used for training the model are available in section \ref{sec:implementation-training}. 
 
-Our first experiments were carried out with Jupyter Notebooks via Google Colab on a GPU-accelerated runtime, while the final code is provided as Python scripts. For debugging, we use a Windows 10 laptop equipped with an NVIDIA GeForce GTX 950M graphic card, while training is performed on a dedicated Ubuntu 18.04 workstation available at \gls{idsia}, mounting four NVIDIA GeForce RTX 2080 Ti \footnote{anyway, multiple available GPUs are used for single-GPU computing, not simultaneously}.
-
-
-
-\subsection{Frameworks}
-\label{subsec:frameworks}
-
-Here is a list of the main libraries which compose our software.
+The original work is written in Python 3 and based on ROS, TensorFlow 1, and Keras. We adapt the code for working with TensorFlow 2. Here is a list of the main libraries which compose our software.
 
 \paragraph*{\texttt{Numpy}}
 Largely used in the whole project for computation on arrays. Numpy is the fundamental package for scientific computing in Python, that provides a multidimensional array object, various derived objects (such as masked arrays and matrices), and an assortment of routines for fast operations on arrays. 
@@ -129,7 +122,7 @@ Used for applying GradCAM and other interpretability techniques. Open-source lib
 Used for human detection and segmentation in background replacement. Open-source implementation of Mask R-CNN on Python 3, Keras, and TensorFlow 2 available on GitHub thanks to \cite{MaskRCNN_akTwelve}. The model generates bounding boxes, segmentation masks, and categorization labels for each instance of an object in the image.
 
 \paragraph*{\texttt{\gls{ros}}}
-Even tough not used in our work, it is crucial in \cite{mantegazza2019visionbased} to actually control the drone during flight. \cite{ROS} is an open-source robotics middleware suite\footnote{available for C++, Python, and Lisp} for building robot applications, providing hardware abstraction, implementation of commonly-used functionality, message-passing between processes, and package management. It also integrates with additional tools, such as \cite{rviz} and \cite{Gazebo}, for real-time 3D visualizations and simulations.
+Even tough not used in our work, it is crucial in \cite{mantegazza2019visionbased} to actually control the drone during flight. \cite{ROS} is an open-source robotics middleware suite\footnote{available for C++, Python, and Lisp} for building robot applications, providing hardware abstraction, implementation of commonly-used functionality, message-passing between processes, and package management. It also integrates with additional tools for real-time 3D visualizations and simulations.
 
 
 
@@ -168,6 +161,7 @@ During data collection, both user's and drone's poses are captured by the OptiTr
 
 
 \subsection{Composition}
+\label{subsec:dataset-composition}
 
 Data collected inside the arena have been used to build the dataset for training a machine learning model, able to infer the target pose from a picture. For building both the training and the testing set, several flight sessions have been recorded using the omniscient controller described above. 
 

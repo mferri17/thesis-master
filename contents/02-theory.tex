@@ -44,35 +44,37 @@ In this section, we firstly present a general overview on the topic, then we foc
 \subsection{The State of the Art of Human–Drone Interaction}
 \label{subsec:human-drone-sota}
 
-An article published in Nov 2019 for IEEE Access (\cite{human-drone-sota}), explores literature and state of the art for human-drone interaction. Drones range from small toy-grade remote-controlled aircraft to fully-autonomous systems capable of decision-making through a large variety of sensors. Their usage grew a lot in the last years and it is expected to keep growing, thanks to decreasing costs and powerful features they can provide both for personal, commercial, and social usage.
+Drones attracted a lot of attention in the last years and their usage is expected to keep growing, thanks to decreasing costs and powerful features they can provide both for personal, commercial, and social usage.
 
-According to the article, \gls{faa} expects that total drone registrations will increase by more than 60\% between 2018 and 2022 with a particular increment in the commercial sector rather than the hobbyist one, even though the latter still counts the largest number of units. Moreover, \gls{faa} reports that almost half of drones usage is for aerial photography (48\%), followed by industrial inspection (28\%) and agriculture (17\%). Accordingly to \cite{human-drone-sota}, drones will become ubiquitous to society and, in the next decade, they will be extensively used in advertising, shipping, sports, emergency, and many other fields for augmenting human capabilities.
+An article published in Nov 2019 for the IEEE Access (\cite{human-drone-sota}) explores literature and state of art for human-drone interaction. It reports that \gls{faa} expects total drone registrations to increase by more than 60\% between 2018 and 2022. The main increment will be seen in the commercial sector, rather than the hobbyist one, even though the latter still counts the the large majority of units. Nowadays, almost half of drone usage is for aerial photography (48\%), followed by industrial inspection (28\%) and agriculture (17\%). The authors argue that in the next decade drones will become ubiquitous to society, and extensively used in advertising, shipping, sports, emergency, and many other fields for augmenting human capabilities.
 
-The main concerns about drones today regard safety issues caused by dangerous propellers and limited flight times, usually no longer than 30 minutes due to limited battery capacity. Research in the sector of human-drone interaction mainly focuses on their control (through gestures, voice, or custom interfaces), communication between the user and the drone itself (in terms of acknowledgment and intents), perception of users' safety during flight, and innovative use cases. 
+Providing a nice overview of the latest works, the article highlights the most important challenges of today's research in human-drone interaction. The main studies in the area treat drones' control and human-machine communication, while the principal concerns regard the users' perception of safety during flight.
+
+These topics are strictly related to our task, concerning autonomous flight in human proximity.
 
 
 
 \subsection{Vision-based Control of a Quadrotor in User Proximity}
 \label{subsec:sota-dario}
 
-Our work is built upon the original master thesis and paper from Dario Mantegazza named \textit{Vision-based Control of a Quadrotor in User Proximity: Mediated vs End-to-End Learning Approaches} from Dario Mantegazza, developed at \gls{idsia} between 2018 and 2019 (\cite{mantegazza2018thesis}, \cite{mantegazza2019visionbased}).
+Our work is built upon the original master thesis and paper from Dario Mantegazza, named \textit{Vision-based Control of a Quadrotor in User Proximity: Mediated vs End-to-End Learning Approaches}, developed at \gls{idsia} between 2018 and 2019 (\cite{mantegazza2018thesis}, \cite{mantegazza2019visionbased}).
 
 \medskip
 
 In his thesis, the author proposes a machine learning technique for teaching a model to control a drone interacting with a person. In a few words, the goal is to continuously fly the drone to hover in front of a moving user. The problem is approached as a reactive control procedure and addressed with supervised learning. Thus, it provides an interesting starting point for many other robotics applications.
 
-Training data is acquired by programmatically flying the drone to frontally face a user. In this phase, the drone is controlled through an omniscient controller that knows both the drone's and person's pose. Images produced by the front-facing camera of the drone are used as input for a custom-designed \gls{resnet} architecture, that infers the relative user's position \gls{wrt} the drone. Practically, the neural network performs a regression on the four variables that form the user's pose (X, Y, Z, YAW), and learns to predict their values by using spacial information contained in the input images. 
+Training data is acquired by programmatically flying the drone to frontally face a user. In this phase, the quadrotor is controlled through an omniscient controller that knows both the drone's and person's pose. Images produced by the front-facing camera of the drone are used as input for a custom-designed \gls{resnet} architecture, that infers the relative user's position \gls{wrt} the drone. Practically, the neural network performs a regression on the four variables that form the user's pose (X, Y, Z, YAW), and learns to predict their values by using spatial information contained in the input images.
 
-In the paper, the author also makes a comparison between the mediated approach described above and another end-to-end approach that directly learns control signals\footnote{desired pitch, roll, yaw, and vertical velocity} for the drone, instead of the user's pose. Another experiment also considers a learned controller. All the solutions provide similar results, but this thesis only takes into consideration the mediated approach. In fact, it can be adapted to other tasks by simply designing a custom controller, providing a more transparent and analyzable solution.
+In the paper, the author also makes a comparison between the mediated approach described above and another end-to-end approach based on imitation learning. This second solution directly learns control signals\footnote{desired pitch, roll, yaw, and vertical velocity} for the drone, instead of the user's pose. A third experiment also considers the task of automatically learning a controller which drives the drone based on the given user's position.
+
+All the solutions provide very similar results, but for this thesis we will only take into consideration the mediated approach. The reason behind this choice is that the learned model can be adapted to other tasks by simply designing a custom controller for the drone. It also provides a more transparent and analyzable solution.
 
 \medskip
 
 Even though this kind of problems on human recognition and pose estimation could be faced with more advanced deep learning algorithms, making a simple regression on four variables allows the network to be fairly small, so that the prediction task is light, fast to execute, and possibly portable on low-end devices.
 
-\bigskip
-
-Our entire project makes use of the original network architecture and dataset defined in \cite{mantegazza2019visionbased}, respectively explained in section \ref{subsec:frontalnet-architecture} and \ref{sec:dataset}, For a better understanding, the original code repository\footnote{\url{https://github.com/idsia-robotics/proximity-quadrotor-learning}} and a descriptive video\footnote{\url{https://drive.switch.ch/index.php/s/MlEDrsuHcSl5Aw5}} are available. 
-For enhancing readability of this thesis, having no official name, the custom \gls{resnet} architecture proposed by the author will be simply called \textit{FrontalNet}.
+Our entire project makes use of the original network architecture and dataset defined in \cite{mantegazza2019visionbased}, respectively explored in sections \ref{subsec:frontalnet-architecture} and \ref{sec:dataset}, For a better understanding, the original code repository\footnote{\url{https://github.com/idsia-robotics/proximity-quadrotor-learning}} and a descriptive video\footnote{\url{https://drive.switch.ch/index.php/s/MlEDrsuHcSl5Aw5}} are also available. 
+To enhance readability, having no official name, the custom \gls{resnet} architecture proposed by the author will be simply called \textit{FrontalNet}.
 
 
 \subsubsection{FrontalNet Architecture}
@@ -102,9 +104,9 @@ Performance is evaluated both quantitatively and qualitatively on the end-to-end
 \glsreset{r2}
 For quantitative evaluation, the chosen metric is \gls{r2}\footnote{\gls{r2} interpretation will be explained in the evaluation chapter \ref{chap:evaluation}}, which has an interval of $[-\inf, 1]$, where 1 represents the optimality. 
 
-The author also conducts an experiment about the minimum cardinality of the dataset for obtaining acceptable performance. Results are available in figure \ref{fig:frontalnet-r2}, directly taken from the paper. As shown, decent performance requires at least 5'000 samples and keep improving as their number increases.
+The author also conducts an experiment for finding the minimum cardinality of the dataset to obtain acceptable performance. Results are available in figure \ref{fig:frontalnet-r2}, directly taken from the paper. As shown, at least 5,000 samples are required to achieve decent performance, which continues to improve as the size of the training set increases.
 
-Specifically, predictions seem more accurate for variables Z and W with an \gls{r2} score of 0.82 and 0.88, respectively. Different the findings for X and Y which only reach an \gls{r2} of 0.59 and 0.57, respectively.
+Specifically, predictions seem more accurate for variables \texttt{Z} and \texttt{W} with an \gls{r2} score of 0.82 and 0.88, respectively. Quite different the results for \texttt{X} and \texttt{Y} which only reach an \gls{r2} of 0.59 and 0.57, respectively.
 
 \begin{figure}[!htb]
 	\centering
@@ -128,7 +130,7 @@ The previous considerations on the variables are confirmed by the qualitative ev
 \subsection{Embedded Implementation of Controller for Nano-Drones}
 \label{subsec:sota-nicky}
 
-Autonomous navigation is an important and well-known area of research in robotics, which usually requires accomplishing complex and computationally-expensive tasks such as localization, mapping and path planning. Recent studies have started to approach autonomous driving through imitation learning (\cite{imitation-learning}), where neural networks learn by imitating human behavior in specific tasks. 
+Autonomous navigation is an important and well-known area of research in robotics, which usually requires accomplishing complex and computationally-expensive tasks such as localization, mapping and path planning. Recent studies have started to approach autonomous driving through imitation learning (\cite{imitation_learning_survey}), where neural networks learn by imitating human behavior in specific tasks. 
 
 \medskip
 
@@ -217,6 +219,12 @@ AutoAugment: \cite{cubuk2019autoaugment}
 Learning Data Augmentation Strategies for Object Detection: \cite{zoph2019learning}
 
 
+Image transformations can be divided into two types:
+\begin{itemize}
+	\item Spatial-level augmentations: also called affine transformations, they relocates pixels by cropping, scaling, rotating, translating, mirroring and shearing the images. These transformations also have to accordingly modify additional elements associated with the images such as ground truth, masks, bounding boxes or keypoints.
+	\item Pixel-level augmentations: algorithms which only modify pixels (or group of pixels) without relocating them or changing the image shape. These transformations leave unchanged any other additional element associated with the images such as ground truth, masks, bounding boxes or keypoints.
+\end{itemize}
+
 
 \subsection{Domain Randomization}
 \label{subsec:domain-randomization}
@@ -231,7 +239,7 @@ See \cite{weng2019DR_explanation}, \cite{tobin2017domain}
 
 \medskip
 
-Imitation learning through simulation is recently becoming an interesting and successful approach for both reinforcement learning (\cite{imitation_learning_survey}, \cite{imitation_learning_3d_navigation}) object recognition (\cite{tobin2017domain}, \cite{weng2019DR}).
+Imitation learning through simulation is recently becoming an interesting and successful approach for both reinforcement learning (\cite{imitation_learning_3d_navigation}) and object recognition (\cite{tobin2017domain}, \cite{weng2019DR}).
 
 Robot and environment can be replicated through a dedicated simulator such as Gazebo\footnote{\url{http://gazebosim.org/}}, often used in robotics with \gls{ros}\footnote{\url{https://www.ros.org/}} due to its straightforward integration, or even with general-purpose graphic engines. Unreal Engine\footnote{\url{https://www.unrealengine.com/en-US/}} Unity\footnote{\url{https://unity.com/}} are well-known simulators designed for game-development, but recently used for \gls{vr} and \gls{ar} applications. They give developers unlimited possibilities, carefully supported by solid physics engines and active communities.
 
