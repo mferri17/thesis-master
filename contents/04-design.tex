@@ -148,9 +148,7 @@ Figure \ref{fig:gradcam-example-1} displays a typical example on \gls{gradcam} a
 	\label{fig:gradcam-example-1}
 \end{figure}
 
-Heatmaps are not easy to interpret, due to a large variety of parameters to consider. As a guideline, it is possible to only take into consideration, for each variable, the column which corresponds to the predicted class (or the actual, if it differs).
-
-Actual and predicted values are available in the right-most parenthesis, as "GT" and "PR" respectively. Rows define variables, while columns stand for the classes. It is clearly visible how no specific correlation in \gls{gradcam} results is available between variables, classes, and computed predictions.
+Heatmaps are not easy to interpret, due to a large variety of parameters to consider. As a guideline, it is possible to only take into consideration, for each variable, the column which corresponds to the predicted class (or the actual, if it differs). Actual and predicted values are available in the right-most parenthesis, as "GT" and "PR" respectively. Rows define variables, while columns stand for the classes. It is clearly visible how no specific correlation in \gls{gradcam} results is available between variables, classes, and computed predictions.
 
 By calling \gls{gradcam} without specifying a particular class, it is also possible to obtain an average result on all classes, which is shown in the last column. Applying a similar reasoning also on variables, we are able to produce a single meaningful images. This represents a \gls{gradcam} global average, which is computed on every variable and class at once (figure \ref{fig:gradcam-example-2}).
 
@@ -172,7 +170,7 @@ From the previous section, we understand that reasoning with \gls{gradcam} heatm
 
 \subsubsection*{Reasonable detections}
 
-First of all, figure \ref{fig:gradcam-ok} displays examples of correctly working scenarios, in which the person is well-detected by \gls{gradcam}. In these situations, it can happen that the entire user is highlighted, but also that only the body or the head get proper attention.
+Figure \ref{fig:gradcam-ok} displays examples of correctly working scenarios, in which the person is well-detected by \gls{gradcam}. In these situations, it often happens that the entire user is highlighted, but sometimes only the body or the head get proper attention.
 
 \begin{figure}[!h]
 	\begin{center}
@@ -201,7 +199,7 @@ First of all, figure \ref{fig:gradcam-ok} displays examples of correctly working
 	\label{fig:gradcam-ok}
 \end{figure}
 
-Such precise results are not the standard. In many cases, heatmaps are unstable, going in and out of the target person. The two sequences of frames shown in figures \ref{fig:gradcam-seq-dario} and \ref{fig:gradcam-seq-beard} fairly describe the usual behavior of the model seen by \gls{gradcam}.
+Such precise results are not the standard. In many cases, the network focus is unstable, and the heatmaps frequently go in and out of the target person. The two sequences of frames shown in figures \ref{fig:gradcam-seq-dario} and \ref{fig:gradcam-seq-beard} fairly describe the usual behavior of the model seen by \gls{gradcam}.
 
 \begin{figure}[!h]
 	\begin{center}
@@ -293,7 +291,7 @@ Such precise results are not the standard. In many cases, heatmaps are unstable,
 		\end{subfigure}
 	\end{center}
 	\vspace{-0.5cm}
-	\caption[\gls{gradcam}: Sequence of unstable detections which goes in and out of the person]{\gls{gradcam}: Sequence of unstable detections which goes in and out of the person}
+	\caption[\gls{gradcam}: Sequence of unstable detections going in and out of the person]{\gls{gradcam}: Sequence of unstable detections going in and out of the person}
 	\label{fig:gradcam-seq-beard}
 \end{figure}
 
@@ -451,7 +449,7 @@ The examples presented above mostly reflect the model expected behavior. However
 
 \gls{gradcam} results demonstrate that the model is not robust enough to only focus on the user who is actually facing the drone's camera. Instead, various portions of the input images appear to be taken into consideration when the model makes its predictions. Many distractors are coming from the background.
 
-In light of this, we can reasonably assume that the \gls{resnet} has undesirably learned some details about the drone arena, in which the dataset has been collected. The issue is common with supervised learning and it is called overfitting. It happens when a \gls{ml} model learns a lot of information which only belong to the training set, being not able to properly work on unseen data.
+In light of this, we can reasonably assume that the \gls{resnet} has undesirably learned some details about the drone arena, in which the dataset has been collected. The issue is common with supervised learning and it is called overfitting. It happens when a \gls{ml} model learns a lot of information which only belong to the training set, being not able to properly work on previously unseen data.
 
 This is most likely the reason why the model is unable to control the drone outside of the arena, as previously discussed in section \ref{sec:frontalnet-generalization}.
 
@@ -461,9 +459,9 @@ This is most likely the reason why the model is unable to control the drone outs
 \section{Person Masking}
 \label{sec:masking}
 
-From \gls{gradcam} results presented in the previous section, we conclude that the model is not capable of generalization. We have demonstrated that the main cause of the problem is inherent in the drone arena, thus we want to remove the room from the equation.
+From \gls{gradcam} results presented in the previous section, we conclude that the model is not capable of generalization. We have demonstrated that the main cause of the problem is inherent in the drone arena, thus we would like to remove this factor (i.e., the room itself) from the equation.
 
-We propose a solution, inspired by domain randomization, that consists of performing advanced data augmentation on the training data. We just keep the user in the images, by masking out the background and randomly replacing it with something else. This section explores various algorithms for creating the mask of a person in an image. After several experiments, the solution we have decided to adopt is Mask R-CNN.
+We propose a solution, inspired by domain randomization, that consists of performing advanced data augmentation on the training data. Considering the images that compose our dataset, we just keep the user facing the drone and remove the background by randomly replacing it with something else. This section explores various algorithms for creating the mask of a person in an image. After several experiments, the solution we have decided to adopt is Mask R-CNN (section \ref{subsec:masking-maskrcnn}).
 
 
 

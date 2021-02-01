@@ -12,7 +12,7 @@ We focus on improving the original work from \cite{mantegazza2019visionbased}, i
 
 
 
-\section{Hardware}
+\section{Environment}
 \label{sec:hardware}
 
 Working from a machine learning perspective, our task does not require to interact with physical components. However, it is helpful to know the environment in which the drone was originally taught to fly. This is physically located in Manno (Switzerland) at \gls{idsia}\footnote{now relocated to Lugano}.
@@ -29,7 +29,7 @@ Working from a machine learning perspective, our task does not require to intera
 	\label{fig:bebop}
 \end{figure}
 
-The entire work is built around the Parrot Bebop Drone 2 (figure \ref{fig:bebop}), a lightweight drone (500 grams) with a size of $382 \times 328 \times 89$ millimeters. A 2700 mAh swappable battery gives power to four brushless motors and a dual-core processor with a quad-core GPU, for a maximum flight time of 25 minutes. Connectivity is provided through 2.4 GHz 802.11a/b/n/ac Wi-Fi that enables remote control via mobile app or Parrot Skycontroller (up to a distance of 2km).
+The entire work is built around the Parrot Bebop 2 (figure \ref{fig:bebop}), a lightweight drone (500 grams) with a size of $382 \times 328 \times 89$ millimeters. A 2700 mAh swappable battery gives power to four brushless motors and a dual-core processor with a quad-core GPU, for a maximum flight time of 25 minutes. Connectivity is provided through 2.4 GHz 802.11a/b/n/ac Wi-Fi that enables remote control via mobile app or Parrot Skycontroller (up to a distance of 2km).
 
 The drone is equipped with many simultaneous sensors to compute velocities, orientation, altitude, and GPS coordinates, in order to ensure maximum stability during the whole flight. For this project, we mainly focus on its camera, able to shoot 14 \gls{mp} photos and record Full HD 1080p videos at 30 \gls{fps}. Even though the original \gls{fov} is 180°, raw camera images pass through a software stabilization that produces 16:9 images with a horizontal \gls{fov} of about 80°. The 3-axis digital stabilization technique implemented by Parrot is able to compensate for the drone's pitch and roll, in order to provide correct-oriented horizontal images and stable videos regardless of the drone's movements. Full specifications provided by the official \cite{bebop}.
 
@@ -80,57 +80,10 @@ At \gls{idsia}, a dedicated room has been equipped with a \gls{mocap} system com
 
 
 
-
-\section{Software}
-\label{sec:software}
-
-This section presents tools and software used to conduct our research and improve the existing system. Our first experiments were carried out with Jupyter Notebooks via Google Colab on a GPU-accelerated runtime, while the final code is provided as Python scripts. Specific details about the hardware used for training the model are available in section \ref{sec:implementation-training}. 
-
-The original work is written in Python 3 and based on ROS, TensorFlow 1, and Keras. We adapt the code for working with TensorFlow 2. Here is a list of the main libraries which compose our software.
-
-\paragraph*{\texttt{Numpy}}
-Largely used in the whole project for computation on arrays. Numpy is the fundamental package for scientific computing in Python, that provides a multidimensional array object, various derived objects (such as masked arrays and matrices), and an assortment of routines for fast operations on arrays. 
-
-\paragraph*{\texttt{Pickle}}
-Mainly used for saving and loading Numpy arrays. The pickle module implements binary protocols for (de-)serializing Python object structures. 
-
-\paragraph*{\texttt{Matplotlib}}
-The first choice for building charts, visualize images or any kind of figure. Matplotlib is a comprehensive library for creating static, animated, and interactive visualizations in Python. Its \texttt{pyplot} module is inspired by MATLAB.
-
-\paragraph*{\texttt{OpenCV}}
-Mainly used for efficient image/video manipulation and visualization, together with Matplotlib. OpenCV is an open-source library that includes several hundreds of computer vision algorithms.
-
-\paragraph*{\texttt{TensorFlow 2}}
-The entire project strongly relies on \cite{tensorflow} (TF) from start to end: network interpretation, person masking, training, and quantitative evaluation. Created by the Google Brain team, TensorFlow is an open-source library for numerical computation and large-scale machine learning. It can be used across a range of tasks but has a particular focus on training and inference of deep neural networks. In version 2, it introduces a lot of comforts for easier development with a less steep learning curve.
-
-\paragraph*{\texttt{Keras}}
-Used for defining the network architecture, training, and evaluating the model. \cite{keras} is the high-level API of TensorFlow 2: an approachable, highly-productive interface for solving machine learning problems, with a focus on modern deep learning. It provides essential abstractions and building blocks for developing and shipping machine learning solutions with high iteration velocity.
-
-\paragraph*{\texttt{TensorBoard}}
-Used with TensorFlow to precisely profile data generator performance for optimizing training time on the GPU. \cite{tensorBoard} is a tool for providing the measurements and visualizations needed during the machine learning workflow. It enables tracking experiment metrics, visualizing the model graph, and much more.
-
-\paragraph*{\texttt{Sklearn}}
-Only used for automatically computing some evaluation metrics. Sklearn is a simple and efficient tool for predictive data analysis reusable in various contexts built on NumPy, SciPy, and Matplotlib.
-
-\paragraph*{\texttt{Albumentation}}
-Used during training for implementing classic image augmentation. \cite{albumentations} efficiently implements a rich variety of image transform operations that are optimized for performance through a concise yet powerful interface. Widely used in industry, deep learning research, machine learning competitions, and open source projects.
-
-\paragraph*{\texttt{tf-keras-vis}}
-Used for applying GradCAM and other interpretability techniques. Open-source library for network interpretation, available on GitHub thanks to \cite{tf-keras-vis}. Derived from the original keras-vis (\cite{keras-vis}) high-level toolkit for visualizing and debugging trained Keras neural network models.
-
-\paragraph*{\texttt{akTwelve Mask\_RCNN}}
-Used for human detection and segmentation in background replacement. Open-source implementation of Mask R-CNN on Python 3, Keras, and TensorFlow 2 available on GitHub thanks to \cite{MaskRCNN_akTwelve}. The model generates bounding boxes, segmentation masks, and categorization labels for each instance of an object in the image.
-
-\paragraph*{\texttt{\gls{ros}}}
-Even tough not used in our work, it is crucial in \cite{mantegazza2019visionbased} to actually control the drone during flight. \cite{ROS} is an open-source robotics middleware suite\footnote{available for C++, Python, and Lisp} for building robot applications, providing hardware abstraction, implementation of commonly-used functionality, message-passing between processes, and package management. It also integrates with additional tools for real-time 3D visualizations and simulations.
-
-
-
-
-\section{Data}
+\section{Dataset}
 \label{sec:dataset}
 
-This section refers to the dataset acquired for \cite{mantegazza2019visionbased}, which is also used for our research.
+This section refers to the dataset defined in \cite{mantegazza2019visionbased}, which is also used for our research.
 
 
 \subsection{Collection}
@@ -232,3 +185,47 @@ From the distribution of the variables in the training set, shown in figure \ref
 \end{figure}
 
 
+
+
+\section{Frameworks}
+\label{sec:software}
+
+This section presents tools and software used to conduct our research and improve the existing system. Our first experiments were carried out with Jupyter Notebooks via Google Colab on a GPU-accelerated runtime, while the final code is provided as Python scripts. Specific details about the hardware used for training the model are available in section \ref{subsec:training-timing}. 
+
+The original work is written in Python 3 and based on ROS, TensorFlow 1, and Keras. We adapt the code for working with TensorFlow 2. Here is a list of the main libraries which compose our software.
+
+\paragraph*{\texttt{\gls{ros}}}
+Even tough not used in our work, it is crucial in \cite{mantegazza2019visionbased} to actually control the drone during flight. It will be used in the future for testing our model improvements on the real drone. \cite{ROS} is an open-source robotics middleware suite\footnote{available for C++, Python, and Lisp} for building robot applications, providing hardware abstraction, implementation of commonly-used functionality, message-passing between processes, and package management. It also integrates with additional tools for real-time 3D visualizations and simulations.
+
+\paragraph*{\texttt{Numpy}}
+Largely used in the whole project for computation on arrays. Numpy is the fundamental package for scientific computing in Python, that provides a multidimensional array object, various derived objects (such as masked arrays and matrices), and an assortment of routines for fast operations on arrays. 
+
+\paragraph*{\texttt{Pickle}}
+Mainly used for saving and loading Numpy arrays. The pickle module implements binary protocols for (de-)serializing Python object structures. 
+
+\paragraph*{\texttt{Matplotlib}}
+The first choice for building charts, visualize images or any kind of figure. Matplotlib is a comprehensive library for creating static, animated, and interactive visualizations in Python. Its \texttt{pyplot} module is inspired by MATLAB.
+
+\paragraph*{\texttt{OpenCV}}
+Mainly used for efficient image/video manipulation and visualization, together with Matplotlib. OpenCV is an open-source library that includes several hundreds of computer vision algorithms.
+
+\paragraph*{\texttt{TensorFlow 2}}
+The entire project strongly relies on \cite{tensorflow} (TF) from start to end: network interpretation, person masking, training, and quantitative evaluation. Created by the Google Brain team, TensorFlow is an open-source library for numerical computation and large-scale machine learning. It can be used across a range of tasks but has a particular focus on training and inference of deep neural networks. In version 2, it introduces a lot of comforts for easier development with a less steep learning curve.
+
+\paragraph*{\texttt{Keras}}
+Used for defining the network architecture, training, and evaluating the model. \cite{keras} is the high-level API of TensorFlow 2: an approachable, highly-productive interface for solving machine learning problems, with a focus on modern deep learning. It provides essential abstractions and building blocks for developing and shipping machine learning solutions with high iteration velocity.
+
+\paragraph*{\texttt{TensorBoard}}
+Used with TensorFlow to precisely profile data generator performance for optimizing training time on the GPU. \cite{tensorboard} is a tool for providing the measurements and visualizations needed during the machine learning workflow. It enables tracking experiment metrics, visualizing the model graph, and much more.
+
+\paragraph*{\texttt{Sklearn}}
+Only used for automatically computing some evaluation metrics. Sklearn is a simple and efficient tool for predictive data analysis reusable in various contexts built on NumPy, SciPy, and Matplotlib.
+
+\paragraph*{\texttt{Albumentation}}
+Used during training for implementing classic image augmentation. \cite{albumentations} efficiently implements a rich variety of image transform operations that are optimized for performance through a concise yet powerful interface. Widely used in industry, deep learning research, machine learning competitions, and open source projects.
+
+\paragraph*{\texttt{tf-keras-vis}}
+Used for applying GradCAM and other interpretability techniques. Open-source library for network interpretation, available on GitHub thanks to \cite{tf-keras-vis}. Derived from the original keras-vis (\cite{keras-vis}) high-level toolkit for visualizing and debugging trained Keras neural network models.
+
+\paragraph*{\texttt{akTwelve Mask\_RCNN}}
+Used for human detection and segmentation in background replacement. Open-source implementation of Mask R-CNN on Python 3, Keras, and TensorFlow 2 available on GitHub thanks to \cite{MaskRCNN_akTwelve}. The model generates bounding boxes, segmentation masks, and categorization labels for each instance of an object in the image.
