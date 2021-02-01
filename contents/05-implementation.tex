@@ -11,7 +11,7 @@ Firstly, we focus on the implementation of our generalization strategy, mainly c
 \section{Background Replacement}
 \label{sec:implementation-bgreplace}
 
-As demonstrated in section \ref{subsec:gradcam-results}, the approach defined by \cite{mantegazza2019visionbased} is lacking generalization capabilities. The main reason behind this problem is attributable to its dataset composition. More specifically, the model is biased by many elements appearing in the drone arena, in which the data have been originally collected. As a solution to eliminating the problem, we modify the training set by performing background replacement on its images.
+As demonstrated in section \ref{subsec:gradcam-results}, the approach defined by Mantegazza at el. \cite{mantegazza2019visionbased} is lacking generalization capabilities. The main reason behind this problem is attributable to its dataset composition. More specifically, the model is biased by many elements appearing in the drone arena, in which the data have been originally collected. As a solution to eliminating the problem, we modify the training set by performing background replacement on its images.
 
 In section \ref{subsec:masking-maskrcnn}, we anticipated the use of Mask R-CNN to pre-process the dataset. The algorithm detects and creates a mask for all the objects appearing in the input images, labeling each mask with the category to which the object belongs (e.g., person, TV, bike, car, etc.). However, for our purposes, we are only interested in the mask corresponding to the user who is actually facing the drone. Since the user is always the nearest person to the drone's camera, its mask must be the one with the largest size among all people's masks found by Mask R-CNN.
 
@@ -21,7 +21,7 @@ By providing a considerable amount of images to use as backgrounds, the \gls{ml}
 
 \medskip
 
-For our work, we select the publicly available dataset\footnote{\url{http://web.mit.edu/torralba/www/indoor.html}} for Indoor Scene Recognition presented during the 9th Conference on Computer Vision and Pattern Recognition (CVPR). Created by researchers from MIT (\cite{cvpr09}), the dataset contains a total of 15'620 images divided into 67 indoor categories. For our task, categorization is not actually needed, but it ensures a good variety of scenarios to present to the model. For shortness, in this thesis, the dataset will be referred to as \textit{CVPR}.
+For our work, we select the publicly available dataset\footnote{\url{http://web.mit.edu/torralba/www/indoor.html}} for Indoor Scene Recognition presented during the 9th Conference on Computer Vision and Pattern Recognition (CVPR). Created by researchers from MIT \cite{cvpr09}, the dataset contains a total of 15'620 images divided into 67 indoor categories. For our task, categorization is not actually needed, but it ensures a good variety of scenarios to present to the model. For shortness, in this thesis, the dataset will be referred to as \textit{CVPR}.
 
 During training, each sample is assigned to a randomly chosen background from the CVPR dataset. Figure \ref{fig:bgreplace-example} shows a demonstration applied to the samples previously presented in figure \ref{fig:frontalnet-dataset-overview}. 
 
@@ -42,7 +42,7 @@ During training, each sample is assigned to a randomly chosen background from th
 
 Data augmentation is a common regularization technique for improving the ability of neural networks to generalize their task on unknown data. Introduced in section \ref{subsec:data-augmentation}, image augmentation is ubiquitously used with \gls{cnn}s for reducing overfitting on the training images by applying random transformations.
 
-Our implementation relies on Albumentations (\cite{Buslaev_2020}), a state of the art Python library that provides a huge variety of image augmentations. Constantly updated and well-documented, Albumentations can boast the best benchmarking performance in the field\footnote{\url{https://github.com/albumentations-team/albumentations\#benchmarking-results}}.
+Our implementation relies on Albumentations \cite{Buslaev_2020}, a state of the art Python library that provides a huge variety of image augmentations. Constantly updated and well-documented, Albumentations can boast the best benchmarking performance in the field\footnote{\url{https://github.com/albumentations-team/albumentations\#benchmarking-results}}.
 
 \medskip
 
@@ -108,7 +108,7 @@ augmenter = A.Compose([
 label=lst:albumentations]
 \end{lstlisting}
 
-Furthermore, injecting noise into images can greatly help \gls{cnn}s on avoiding overfitting (\cite{shorten2019augmentationsurvey}). For this reason, at the end of the pipeline, we also apply Perlin noise (\cite{perlin-noise}) with a probability of 20\%. Its generation is highly time-consuming, then a set of textures has been pre-computed. During training, for each augmented sample, one of the generated Perlin noises is randomly chosen, cropped, flipped, and finally applied to the input image. Half of the time, the noise is multiplied uniformly on all channels to produce a grayscale texture, while the other half is differentiated over RGB channels. Picture \ref{fig:perlin-noise} illustrates both cases.
+Furthermore, injecting noise into images can greatly help \gls{cnn}s on avoiding overfitting \cite{shorten2019augmentationsurvey}. For this reason, at the end of the pipeline, we also apply Perlin noise \cite{perlin-noise} with a probability of 20\%. Its generation is highly time-consuming, then a set of textures has been pre-computed. During training, for each augmented sample, one of the generated Perlin noises is randomly chosen, cropped, flipped, and finally applied to the input image. Half of the time, the noise is multiplied uniformly on all channels to produce a grayscale texture, while the other half is differentiated over RGB channels. Picture \ref{fig:perlin-noise} illustrates both cases.
 
 \begin{figure}[!h]
 	\centering
@@ -133,7 +133,7 @@ Furthermore, injecting noise into images can greatly help \gls{cnn}s on avoiding
 We have defined the methodologies to perform background replacement and data augmentation on the original images. According to the objective of our work, we are interested in the beneficial effect on generalization caused by the usage of background replacement, which can even increase when combined with image augmentation. For this reason, we define three model alternatives to evaluate the validity of our solution.
 
 \begin{itemize}
-    \item A baseline model, which is trained on the original dataset as-is (section \ref{sec:dataset}), and corresponds to the exact approach proposed in \cite{mantegazza2019visionbased}. Since it is trained with data coming directly from the drone arena, we call it the \texttt{Arena} model.
+    \item A baseline model, which is trained on the original dataset as-is (section \ref{sec:dataset}), and corresponds to the exact approach proposed by Mantegazza et al. \cite{mantegazza2019visionbased}. Since it is trained with data coming directly from the drone arena, we call it the \texttt{Arena} model.
     \item The first variant is defined by enabling background replacement. In this case, we replace original backgrounds (i.e., the drone arena) with randomly chosen images. For this purpose, we use the CVPR dataset presented in section \ref{sec:implementation-bgreplace}, therefore we call this model \texttt{CVPR}.
     \item Finally, we apply both background replacement and image augmentation. This combination constitutes the most advanced model proposed in our thesis. For simplicity, it is called \texttt{CVPR Aug}.
 \end{itemize}
@@ -148,7 +148,7 @@ The evaluation of these three models is available in chapter \ref{chap:evaluatio
 
 This section focus on the design and optimization of the data generator, which consists of the retrieval and pre-processing of the dataset to prepare its injection into the \gls{cnn}.
 
-For its implementation, we rely on the \texttt{tf.data} API (\cite{tfdata}) provided by TensorFlow. It allows the development of complex and modular input pipelines for transforming and iterate over the data in a highly-customizable way. Compared with other methods for managing the model's dataset, \texttt{tf.data} gives the possibility of optimizing its operations through asynchronous execution on the GPU\footnote{\url{https://www.tensorflow.org/guide/data_performance}}. This allows achieving the best possible performance by minimizing the total idle time\footnote{wasted on waiting for input or resources, thus without actual running activities}.
+For its implementation, we rely on the \texttt{tf.data} API \cite{tfdata} provided by TensorFlow. It allows the development of complex and modular input pipelines for transforming and iterate over the data in a highly-customizable way. Compared with other methods for managing the model's dataset, \texttt{tf.data} gives the possibility of optimizing its operations through asynchronous execution on the GPU\footnote{\url{https://www.tensorflow.org/guide/data_performance}}. This allows achieving the best possible performance by minimizing the total idle time\footnote{wasted on waiting for input or resources, thus without actual running activities}.
 
 
 
@@ -264,7 +264,7 @@ label=lst:tfdata_generator]
 
 \subsection{Profiling}
 
-As we have discussed, optimizations are crucial when working with complex input pipelines. We use TensorBoard (\cite{tensorboard}) for profiling the training procedure and evaluating the actual improvements provided by our choices. The tool produces accurate statistics on CPU and GPU usage.
+As we have discussed, optimizations are crucial when working with complex input pipelines. We use TensorBoard \cite{tensorboard} for profiling the training procedure and evaluating the actual improvements provided by our choices. The tool produces accurate statistics on CPU and GPU usage.
 
 Table \ref{tab:data-generator-profiling} reports the performance summary for our three models, both with and without enabled optimizations. As expected, the improvement is clearly visible with the \texttt{CVPR} and the \texttt{CVPR Aug} models, but absent for the \texttt{Arena} model. In general, GPU Compute Time is equal to 63.5 ms in all cases. The main difference is observed for the Input Time between optimized and non-optimized alternatives.
 
@@ -364,7 +364,7 @@ This section illustrates technical details about the training procedure. We firs
 \glsreset{mae}
 \glsreset{adam}
 
-As in the original paper from Mantegazza et al. \cite{mantegazza2019visionbased}, we use the \gls{mae} loss function and the \gls{adam} optimizer with the default learning rate of $0.001$ and automatic reducer on plateaus (4 epochs patience). The batch size is $64$ and the last 30\% of the training data, without shuffling, are used as a validation set.
+As in the original paper from Mantegazza et al. \cite{mantegazza2019visionbased}, we use the \gls{mae} loss function and the \gls{adam} optimizer \cite{kingma2014adam} with the default learning rate of $0.001$ and automatic reducer on plateaus (4 epochs patience). The batch size is $64$ and the last 30\% of the training data, without shuffling, are used as a validation set.
 
 The training runs for 60 epochs, without early stopping. The dataset is shuffled and repeated three times for each epoch. This imitates an oversampling strategy, especially suited for the \texttt{CVPR} and the \texttt{CVPR Aug} models. The latter is trained with a prior augmentation probability of 95\%.
 

@@ -29,9 +29,9 @@ Working from a machine learning perspective, our task does not require to intera
 	\label{fig:bebop}
 \end{figure}
 
-The entire work is built around the Parrot Bebop 2 (figure \ref{fig:bebop}), a lightweight drone (500 grams) with a size of $382 \times 328 \times 89$ millimeters. A 2700 mAh swappable battery gives power to four brushless motors and a dual-core processor with a quad-core GPU, for a maximum flight time of 25 minutes. Connectivity is provided through 2.4 GHz 802.11a/b/n/ac Wi-Fi that enables remote control via mobile app or Parrot Skycontroller (up to a distance of 2km).
+The entire work is built around the Parrot Bebop 2 \cite{bebop} (figure \ref{fig:bebop}), a lightweight drone (500 grams) with a size of $382 \times 328 \times 89$ millimeters. A 2700 mAh swappable battery gives power to four brushless motors and a dual-core processor with a quad-core GPU, for a maximum flight time of 25 minutes. Connectivity is provided through 2.4 GHz 802.11a/b/n/ac Wi-Fi that enables remote control via mobile app or Parrot Skycontroller (up to a distance of 2km).
 
-The drone is equipped with many simultaneous sensors to compute velocities, orientation, altitude, and GPS coordinates, in order to ensure maximum stability during the whole flight. For this project, we mainly focus on its camera, able to shoot 14 \gls{mp} photos and record Full HD 1080p videos at 30 \gls{fps}. Even though the original \gls{fov} is 180°, raw camera images pass through a software stabilization that produces 16:9 images with a horizontal \gls{fov} of about 80°. The 3-axis digital stabilization technique implemented by Parrot is able to compensate for the drone's pitch and roll, in order to provide correct-oriented horizontal images and stable videos regardless of the drone's movements. Full specifications provided by the official \cite{bebop}.
+The drone is equipped with many simultaneous sensors to compute velocities, orientation, altitude, and GPS coordinates, in order to ensure maximum stability during the whole flight. For this project, we mainly focus on its camera, able to shoot 14 \gls{mp} photos and record Full HD 1080p videos at 30 \gls{fps}. Even though the original \gls{fov} is 180°, raw camera images pass through a software stabilization that produces 16:9 images with a horizontal \gls{fov} of about 80°. The 3-axis digital stabilization technique implemented by Parrot is able to compensate for the drone's pitch and roll, in order to provide correct-oriented horizontal images and stable videos regardless of the drone's movements.
 
 
 
@@ -42,7 +42,7 @@ To monitor the drone and the user's movement we require a \gls{mocap} system, th
 
 \medskip
 
-\gls{idsia} adopt \cite{optitrack}, which is producing real-time \gls{mocap} systems since 1996 and are today world’s choice for low-latency and high-precision 6 \gls{dof} tracking for ground and aerial robotics, both indoor and outdoor.
+\gls{idsia} adopt OptiTrack \cite{optitrack}, which is producing real-time \gls{mocap} systems since 1996 and are today world’s choice for low-latency and high-precision 6 \gls{dof} tracking for ground and aerial robotics, both indoor and outdoor.
 
 
 
@@ -70,7 +70,7 @@ At \gls{idsia}, a dedicated room has been equipped with a \gls{mocap} system com
 		\begin{subfigure}[h]{0.69\textwidth}
 			\centering
 			\includegraphics[width=1\textwidth]{"contents/images/03-arena"}
-			\caption[]{Drone with passive markers (\cite{mantegazza2018thesis})}
+			\caption[]{Drone with passive markers \cite{mantegazza2018thesis}}
 			\label{fig:drone-arena}
 		\end{subfigure}
 	\end{center}
@@ -83,7 +83,7 @@ At \gls{idsia}, a dedicated room has been equipped with a \gls{mocap} system com
 \section{Dataset}
 \label{sec:dataset}
 
-This section refers to the dataset defined in \cite{mantegazza2019visionbased}, which is also used for our research.
+This section refers to the dataset defined in Mantegazza et al. \cite{mantegazza2019visionbased}, which is also used for our research.
 
 
 \subsection{Collection}
@@ -100,14 +100,14 @@ During data collection, both user's and drone's poses are captured by the OptiTr
 \begin{figure}[!h]
 	\centering
 	\includegraphics[width=0.5\textwidth]{"contents/images/03-drone-facing"}
-	\caption[Markers placed on top of drone and user's head]{Markers placed on top of drone and user's head (\cite{mantegazza2018thesis})}
+	\caption[Markers placed on top of drone and user's head]{Markers placed on top of drone and user's head \cite{mantegazza2018thesis}}
 	\label{fig:drone-facing}
 \end{figure}
 
 \begin{figure}[!htb]
 	\centering
 	\includegraphics[width=1\textwidth]{"contents/images/03-arena-demo-2"}
-	\caption[OptiTrack and data collection illustration]{OptiTrack and data collection illustration (\cite{mantegazza2018thesis})}
+	\caption[OptiTrack and data collection illustration]{OptiTrack and data collection illustration \cite{mantegazza2018thesis}}
 	\label{fig:drone-demo-2}
 \end{figure}
 
@@ -195,7 +195,7 @@ This section presents tools and software used to conduct our research and improv
 The original work is written in Python 3 and based on ROS, TensorFlow 1, and Keras. We adapt the code for working with TensorFlow 2. Here is a list of the main libraries which compose our software.
 
 \paragraph*{\texttt{\gls{ros}}}
-Even tough not used in our work, it is crucial in \cite{mantegazza2019visionbased} to actually control the drone during flight. It will be used in the future for testing our model improvements on the real drone. \cite{ROS} is an open-source robotics middleware suite\footnote{available for C++, Python, and Lisp} for building robot applications, providing hardware abstraction, implementation of commonly-used functionality, message-passing between processes, and package management. It also integrates with additional tools for real-time 3D visualizations and simulations.
+Even tough not used in our work, it is crucial in Mantegazza et al. \cite{mantegazza2019visionbased} to actually control the drone during flight. It will be used in the future for testing our model improvements on the real drone. ROS \cite{ROS} is an open-source robotics middleware suite\footnote{available for C++, Python, and Lisp} for building robot applications, providing hardware abstraction, implementation of commonly-used functionality, message-passing between processes, and package management. It also integrates with additional tools for real-time 3D visualizations and simulations.
 
 \paragraph*{\texttt{Numpy}}
 Largely used in the whole project for computation on arrays. Numpy is the fundamental package for scientific computing in Python, that provides a multidimensional array object, various derived objects (such as masked arrays and matrices), and an assortment of routines for fast operations on arrays. 
@@ -210,22 +210,22 @@ The first choice for building charts, visualize images or any kind of figure. Ma
 Mainly used for efficient image/video manipulation and visualization, together with Matplotlib. OpenCV is an open-source library that includes several hundreds of computer vision algorithms.
 
 \paragraph*{\texttt{TensorFlow 2}}
-The entire project strongly relies on \cite{tensorflow} (TF) from start to end: network interpretation, person masking, training, and quantitative evaluation. Created by the Google Brain team, TensorFlow is an open-source library for numerical computation and large-scale machine learning. It can be used across a range of tasks but has a particular focus on training and inference of deep neural networks. In version 2, it introduces a lot of comforts for easier development with a less steep learning curve.
+The entire project strongly relies on TensorFlow \cite{tensorflow} (TF) from start to end: network interpretation, person masking, training, and quantitative evaluation. Created by the Google Brain team, TensorFlow is an open-source library for numerical computation and large-scale machine learning. It can be used across a range of tasks but has a particular focus on training and inference of deep neural networks. In version 2, it introduces a lot of comforts for easier development with a less steep learning curve.
 
 \paragraph*{\texttt{Keras}}
-Used for defining the network architecture, training, and evaluating the model. \cite{keras} is the high-level API of TensorFlow 2: an approachable, highly-productive interface for solving machine learning problems, with a focus on modern deep learning. It provides essential abstractions and building blocks for developing and shipping machine learning solutions with high iteration velocity.
+Used for defining the network architecture, training, and evaluating the model. Keras  \cite{keras} is the high-level API of TensorFlow 2: an approachable, highly-productive interface for solving machine learning problems, with a focus on modern deep learning. It provides essential abstractions and building blocks for developing and shipping machine learning solutions with high iteration velocity.
 
 \paragraph*{\texttt{TensorBoard}}
-Used with TensorFlow to precisely profile data generator performance for optimizing training time on the GPU. \cite{tensorboard} is a tool for providing the measurements and visualizations needed during the machine learning workflow. It enables tracking experiment metrics, visualizing the model graph, and much more.
+Used with TensorFlow to precisely profile data generator performance for optimizing training time on the GPU. TensorBoard \cite{tensorboard} is a tool for providing the measurements and visualizations needed during the machine learning workflow. It enables tracking experiment metrics, visualizing the model graph, and much more.
 
 \paragraph*{\texttt{Sklearn}}
 Only used for automatically computing some evaluation metrics. Sklearn is a simple and efficient tool for predictive data analysis reusable in various contexts built on NumPy, SciPy, and Matplotlib.
 
 \paragraph*{\texttt{Albumentation}}
-Used during training for implementing classic image augmentation. \cite{albumentations} efficiently implements a rich variety of image transform operations that are optimized for performance through a concise yet powerful interface. Widely used in industry, deep learning research, machine learning competitions, and open source projects.
+Used during training for implementing classic image augmentation. Albumentations \cite{albumentations} efficiently implements a rich variety of image transform operations that are optimized for performance through a concise yet powerful interface. Widely used in industry, deep learning research, machine learning competitions, and open source projects.
 
 \paragraph*{\texttt{tf-keras-vis}}
-Used for applying GradCAM and other interpretability techniques. Open-source library for network interpretation, available on GitHub thanks to \cite{tf-keras-vis}. Derived from the original keras-vis (\cite{keras-vis}) high-level toolkit for visualizing and debugging trained Keras neural network models.
+Used for applying GradCAM and other interpretability techniques. Open-source library for network interpretation with TensorFlow 2.0+, available on GitHub \cite{tf-keras-vis}. It is derived from the original \texttt{keras-vis} \cite{keras-vis} developed by Google engineers, which is a toolkit for visualizing and debugging trained Keras neural network models.
 
 \paragraph*{\texttt{akTwelve Mask\_RCNN}}
-Used for human detection and segmentation in background replacement. Open-source implementation of Mask R-CNN on Python 3, Keras, and TensorFlow 2 available on GitHub thanks to \cite{MaskRCNN_akTwelve}. The model generates bounding boxes, segmentation masks, and categorization labels for each instance of an object in the image.
+Used for human detection and segmentation in background replacement. Open-source implementation of Mask R-CNN on Python 3, Keras, and TensorFlow 2 available on GitHub \cite{MaskRCNN_akTwelve}. The model generates bounding boxes, segmentation masks, and categorization labels for each instance of an object in the image.

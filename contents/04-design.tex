@@ -13,7 +13,7 @@ This chapter explores the issues of the existing model, proposes a solution, and
 \section{Problem Summary}
 \label{sec:frontalnet-generalization}
 
-In section \ref{subsec:sota-dario}, we introduce the original paper we are working on, and present its architecture and basic performance. Chapter \ref{chap:system} illustrates environment composition and presents the dataset used to train the machine learning model, as declared in \cite{mantegazza2019visionbased}.
+In section \ref{subsec:sota-dario}, we introduce the original paper we are working on, and present its architecture and basic performance. Chapter \ref{chap:system} illustrates environment composition and presents the dataset used to train the machine learning model, as declared in Mantegazza et al. \cite{mantegazza2019visionbased}.
 
 \medskip
 
@@ -48,14 +48,14 @@ As explained in section \ref{subsec:gradcam-theory}, \gls{gradcam} is able to ef
 
 \medskip
 
-Research in the field is still on-going and most of the available resources are for TensorFlow 1. The most powerful and famous library for network interpretability is \texttt{Lucid}\footnote{\url{https://github.com/tensorflow/lucid}}, from the official TensorFlow team. Since Lucid does not provide native support with Keras models, we prefer to use instead the \texttt{tf-keras-vis} library (\cite{tf-keras-vis}). This is a porting for TensorFlow 2.0+ of \texttt{keras-vis}, developed by Google engineers (\cite{keras-vis}).
+Research in the field is still on-going and most of the available resources are for TensorFlow 1. The most powerful and famous library for network interpretability is \texttt{Lucid} \cite{tf-lucid}, from the official TensorFlow team. Since Lucid does not provide native support with Keras models, we prefer to use instead the \texttt{tf-keras-vis} library \cite{tf-keras-vis} for TensorFlow 2.0+.
 
 
 
 \subsection{Regression to Classification}
 \label{subsec:gradcam-regrtoclass}
 
-\gls{gradcam} is designed to be applied on classification tasks, rather than regression ones. Even though a porting of the algorithm for regression has been published (Regression Activation Map, \cite{wang2019diabetic}), it appears to be an isolated case. For this reason, and for network interpretation only, we decide to transform our problem into a classification task.
+\gls{gradcam} is designed to be applied on classification tasks, rather than regression ones. Even though a porting of the algorithm for regression has been published (Regression Activation Map \cite{wang2019diabetic}), it appears to be an isolated case. For this reason, and for network interpretation only, we decide to transform our problem into a classification task.
 
 The ground truth is composed of four variables with specific domains. Figure \ref{fig:frontalnet-dataset-distribution-regr} in the previous chapter shows their distribution. Every variable has a particular "central" value, which is obtained when the user is centered in the image. 
 
@@ -468,7 +468,7 @@ We propose a solution, inspired by domain randomization, that consists of perfor
 \subsection{Canny}
 \label{subsec:masking-canny}
 
-The first experiments are based on a classic computer vision technique called Canny Edge Detection (\cite{canny1986}). A custom algorithm\footnote{adapted from \url{https://stackoverflow.com/a/29314286/10866825}} applies the related function from OpenCV (\cite{opencv_canny}) to find the edges inside the image, which are then used for also finding the contours. Only the biggest contour is taken into consideration for building a mask around the subject in the image.
+The first experiments are based on a classic computer vision technique called Canny Edge Detection \cite{canny1986}. A custom algorithm\footnote{adapted from \url{https://stackoverflow.com/a/29314286/10866825}} applies the related function from OpenCV \cite{opencv_canny} to find the edges inside the image, which are then used for also finding the contours. Only the biggest contour is taken into consideration for building a mask around the subject in the image.
 
 \medskip
 
@@ -512,9 +512,9 @@ In some cases, it even happens that the body of the person is present in the ima
 \subsection{GrabCut}
 \label{subsec:masking-grabcut}
 
-GrabCut (\cite{grabcut2004}) operates by using the subject position in the image and some statistical inference for labeling each pixel of the image as background or foreground. 
+GrabCut \cite{grabcut2004} operates by using the subject position in the image and some statistical inference for labeling each pixel of the image as background or foreground. 
 
-The base algorithm (\cite{opencv_grabcut}) requires a bounding box as an input, a rectangle to enclose the subject to be segmented. Everything outside this rectangle will be taken as \textit{sure-background}; everything inside the rectangle is unknown. The image is first transformed into a graph, then iteratively processed by using a Gaussian Mixture Model (\cite{Reynolds2009}) for color-based statistical labeling, and a min-cut algorithm to segment the graph until convergence.
+The base algorithm \cite{opencv_grabcut} requires a bounding box as an input, a rectangle to enclose the subject to be segmented. Everything outside this rectangle will be taken as \textit{sure-background}; everything inside the rectangle is unknown. The image is first transformed into a graph, then iteratively processed by using a Gaussian Mixture Model \cite{Reynolds2009} for color-based statistical labeling, and a min-cut algorithm to segment the graph until convergence.
 
 OpenCV GrabCut implementation has two initialization modalities. It is possible to pass only the rectangle, as explained before, or a mask of the image which further specifies whether a certain pixel is \textit{sure-background}, \textit{probable-background}, \textit{probable-foreground} or \textit{sure-foreground}. This categorization is also used by the library during the algorithm itself. 
 
@@ -682,7 +682,7 @@ Given the available data, the mapping between user's pose (the \gls{gt}) and its
 
 \medskip
 
-For detecting the user we try YOLO (\cite{redmon2016look}), a state of the art technique for object detection. We decide to adopt the \texttt{cvlib}\footnote{\url{https://www.cvlib.net/}} library, which underneath uses the OpenCV dnn module\footnote{\url{https://docs.opencv.org/master/d2/d58/tutorial_table_of_content_dnn.html}} for implementing a YOLOv3 model trained on the Microsoft COCO dataset (\cite{lin2015microsoft}).
+For detecting the user we try YOLO \cite{redmon2016look}, a state of the art technique for object detection. We decide to adopt the \texttt{cvlib} library \cite{cvlib}, which underneath uses the OpenCV dnn module \cite{opencv_dnn} for implementing a YOLOv3 model trained on the Microsoft COCO dataset \cite{lin2015microsoft}.
 
 A demo on our dataset is shown in figure \ref{fig:yolo}, where we notice that YOLO overall provides quite good results. However, in 10-20\% of the cases, it does not detect any object in the image, most probably because of their low resolution.
 
@@ -693,7 +693,7 @@ A demo on our dataset is shown in figure \ref{fig:yolo}, where we notice that YO
 	\label{fig:yolo}
 \end{figure}
 
-The same problem also affects face detection, which is needed for providing the related mask to the GrabCut algorithm. An open-source head detector has been tried\footnote{\url{https://github.com/AVAuco/ssd_head_keras}}. However, results are very poor, once again due to the small size of our images.
+The same problem also affects face detection, which is needed for providing the related mask to the GrabCut algorithm. An open-source head detector has been tried\footnote{\url{https://github.com/AVAuco/ssd_head_keras}}. Results are poor, once again due to the small size of our images.
 
 %\medskip
 
@@ -704,7 +704,7 @@ The same problem also affects face detection, which is needed for providing the 
 \subsection{Mask R-CNN}
 \label{subsec:masking-maskrcnn}
 
-Mask R-CNN (\cite{he2018mask}) is a state of the art deep learning framework for object detection and instance segmentation, whose technical details have been illustrated in section \ref{subsec:sota-maskrcnn}. Initially developed by Facebook researchers in \cite{pytorch}, the algorithm has been ported to TensorFlow 1 (\cite{MaskRCNN_matterport}). We rely on its adaptation for TensorFlow 2 by \cite{MaskRCNN_akTwelve}\footnote{\url{https://github.com/akTwelve/Mask_RCNN}}.
+Mask R-CNN \cite{he2018mask} is a state of the art deep learning framework for object detection and instance segmentation, whose technical details have been illustrated in section \ref{subsec:sota-maskrcnn}. Initially developed by Facebook researchers in PyTorch \cite{pytorch}, the algorithm has been ported on TensorFlow 1 \cite{MaskRCNN_matterport} and later adapted for TensorFlow 2 \cite{MaskRCNN_akTwelve}\footnote{\url{https://github.com/akTwelve/Mask_RCNN}}.
 
 \medskip
 

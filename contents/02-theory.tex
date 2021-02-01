@@ -46,7 +46,7 @@ In this section, we firstly present a general overview on the topic, then we foc
 
 Drones attracted a lot of attention in the last years and their usage is expected to keep growing, thanks to decreasing costs and powerful features they can provide both for personal, commercial, and social usage.
 
-An article published in Nov 2019 for the IEEE Access (\cite{human-drone-sota}) explores literature and state of art for human-drone interaction. It reports that \gls{faa} expects total drone registrations to increase by more than 60\% between 2018 and 2022. The main increment will be seen in the commercial sector, rather than the hobbyist one, even though the latter still counts the the large majority of units. Nowadays, almost half of drone usage is for aerial photography (48\%), followed by industrial inspection (28\%) and agriculture (17\%). The authors argue that in the next decade drones will become ubiquitous to society, and extensively used in advertising, shipping, sports, emergency, and many other fields for augmenting human capabilities.
+An article published in Nov 2019 for the IEEE Access \cite{human-drone-sota} explores literature and state of art for human-drone interaction. It reports that \gls{faa} expects total drone registrations to increase by more than 60\% between 2018 and 2022. The main increment will be seen in the commercial sector, rather than the hobbyist one, even though the latter still counts the the large majority of units. Nowadays, almost half of drone usage is for aerial photography (48\%), followed by industrial inspection (28\%) and agriculture (17\%). The authors argue that in the next decade drones will become ubiquitous to society, and extensively used in advertising, shipping, sports, emergency, and many other fields for augmenting human capabilities.
 
 Providing a nice overview of the latest works, the article highlights the most important challenges of today's research in human-drone interaction. The main studies in the area treat drones' control and human-machine communication, while the principal concerns regard the users' perception of safety during flight.
 
@@ -57,7 +57,7 @@ These topics are strictly related to our task, concerning autonomous flight in h
 \subsection{Vision-based Control of a Quadrotor in User Proximity}
 \label{subsec:sota-dario}
 
-Our work is built upon the original master thesis and paper from Dario Mantegazza, named \textit{Vision-based Control of a Quadrotor in User Proximity: Mediated vs End-to-End Learning Approaches}, developed at \gls{idsia} between 2018 and 2019 (\cite{mantegazza2018thesis}, \cite{mantegazza2019visionbased}).
+Our work is built upon the original master thesis \cite{mantegazza2018thesis} and paper \cite{mantegazza2019visionbased} from Dario Mantegazza, named \textit{Vision-based Control of a Quadrotor in User Proximity: Mediated vs End-to-End Learning Approaches}, developed at \gls{idsia} between 2018 and 2019.
 
 \medskip
 
@@ -73,21 +73,21 @@ All the solutions provide very similar results, but for this thesis we will only
 
 Even though this kind of problems on human recognition and pose estimation could be faced with more advanced deep learning algorithms, making a simple regression on four variables allows the network to be fairly small, so that the prediction task is light, fast to execute, and possibly portable on low-end devices.
 
-Our entire project makes use of the original network architecture and dataset defined in \cite{mantegazza2019visionbased}, respectively explored in sections \ref{subsec:frontalnet-architecture} and \ref{sec:dataset}, For a better understanding, the original code repository\footnote{\url{https://github.com/idsia-robotics/proximity-quadrotor-learning}} and a descriptive video\footnote{\url{https://drive.switch.ch/index.php/s/MlEDrsuHcSl5Aw5}} are also available. 
+Our entire project makes use of the original network architecture and dataset defined in {mantegazza2019visionbased}, respectively explored in sections \ref{subsec:frontalnet-architecture} and \ref{sec:dataset}, For a better understanding, the original code repository\footnote{\url{https://github.com/idsia-robotics/proximity-quadrotor-learning}} and a descriptive video\footnote{\url{https://drive.switch.ch/index.php/s/MlEDrsuHcSl5Aw5}} are also available. 
 To enhance readability, having no official name, the custom \gls{resnet} architecture proposed by the author will be simply called \textit{FrontalNet}.
 
 
 \subsubsection{FrontalNet Architecture}
 \label{subsec:frontalnet-architecture}
 
-The network is composed of a total of 1'332'484 trainable parameters, accepts a single $60 \times 108$ pixels image in input, and outputs 4 regression variables that correspond to the user's pose coordinates. Each \gls{resnet} block is provided with batch normalization, ReLU activations (for info, \cite{act-relu}) are used for all layers except for the output neurons, which are associated with a linear activation function (for info, \cite{act-linear}). 
+The network is composed of a total of 1'332'484 trainable parameters, accepts a single $60 \times 108$ pixels image in input, and outputs 4 regression variables that correspond to the user's pose coordinates. Each \gls{resnet} block is provided with batch normalization, ReLU activations \cite{act-relu} are used for all layers except for the output neurons, which are associated with a linear activation function \cite{act-linear}. 
 
 Figure \ref{fig:frontalnet-architecture-1} provides an illustration of the mediated architecture we consider for this thesis\footnote{take a look at image \ref{fig:frontalnet-architecture-paper3approaches} for details about the architectures related to the other approaches}. A complete list of all layers is also available in figures \ref{fig:frontalnet-architecture-3a} and \ref{fig:frontalnet-architecture-3a} of the appendix. 
 
 \begin{figure}[!h]
 	\centering
 	\includegraphics[width=0.3\textwidth]{"contents/images/03-frontalnet-1A"}
-	\caption[Schematic FrontalNet architecture]{Schematic FrontalNet architecture (\cite{mantegazza2019visionbased})}
+	\caption[Schematic FrontalNet architecture]{Schematic FrontalNet architecture \cite{mantegazza2019visionbased}}
 	\label{fig:frontalnet-architecture-1}
 \end{figure}
 
@@ -95,7 +95,7 @@ Figure \ref{fig:frontalnet-architecture-1} provides an illustration of the media
 \subsubsection{FrontalNet Performance}
 \label{subsec:frontalnet-performance}
 
-FrontalNet is trained using the \gls{mae} loss function with the \gls{adam} optimizer (for info, \cite{kingma2014adam}) and a base learning rate of 0.001, progressively reduced on validation loss plateaus that last more than 5 epochs. A maximum of 200 epochs are run in total, but with an early stopping policy with patience of 10 epochs on the validation loss. 
+FrontalNet is trained using the \gls{mae} loss function with the \gls{adam} optimizer \cite{kingma2014adam} and a base learning rate of 0.001, progressively reduced on validation loss plateaus that last more than 5 epochs. A maximum of 200 epochs are run in total, but with an early stopping policy with patience of 10 epochs on the validation loss. 
 
 Performance is evaluated both quantitatively and qualitatively on the end-to-end model, rather than the mediated one considered for our work. However, as explained before, both approaches obtain similar results. We can accordingly consider the following evaluation to be valid for the mediated approach too.
 
@@ -111,7 +111,7 @@ Specifically, predictions seem more accurate for variables \texttt{Z} and \textt
 \begin{figure}[!htb]
 	\centering
 	\includegraphics[width=0.8\textwidth]{"contents/images/03-frontalnet-r2"}
-	\caption[FrontalNet \gls{r2} results (\cite{mantegazza2019visionbased})]{FrontalNet \gls{r2} results (\cite{mantegazza2019visionbased}). A1, A2 and A3 in the chart stands for different models, but they anyway achieve almost the same results.}
+	\caption[FrontalNet \gls{r2} results \cite{mantegazza2019visionbased}]{FrontalNet \gls{r2} results \cite{mantegazza2019visionbased}. A1, A2 and A3 in the chart stands for different models, but they anyway achieve almost the same results.}
 	\label{fig:frontalnet-r2}
 \end{figure}
 
@@ -122,7 +122,7 @@ The previous considerations on the variables are confirmed by the qualitative ev
 \begin{figure}[!htb]
 	\centering
 	\includegraphics[width=0.8\textwidth]{"contents/images/03-frontalnet-gt-pred-2"}
-	\caption[FrontalNet GT vs prediction results (\cite{mantegazza2019visionbased})]{FrontalNet GT vs prediction results (\cite{mantegazza2019visionbased}). A1, A2 and A3 in the chart stands for different models, but they anyway achieve almost the same results.}
+	\caption[FrontalNet GT vs prediction results \cite{mantegazza2019visionbased}]{FrontalNet GT vs prediction results \cite{mantegazza2019visionbased}. A1, A2 and A3 in the chart stands for different models, but they anyway achieve almost the same results.}
 	\label{fig:frontalnet-gt-pred}
 \end{figure}
 
@@ -130,17 +130,17 @@ The previous considerations on the variables are confirmed by the qualitative ev
 \subsection{Embedded Implementation of Controller for Nano-Drones}
 \label{subsec:sota-nicky}
 
-Autonomous navigation is an important and well-known area of research in robotics, which usually requires accomplishing complex and computationally-expensive tasks such as localization, mapping and path planning. Recent studies have started to approach autonomous driving through imitation learning (\cite{imitation_learning_survey}), where neural networks learn by imitating human behavior in specific tasks. 
+Autonomous navigation is an important and well-known area of research in robotics, which usually requires accomplishing complex and computationally-expensive tasks such as localization, mapping and path planning. Recent studies have started to approach autonomous driving through imitation learning \cite{imitation_learning_survey}, where neural networks learn by imitating human behavior in specific tasks. 
 
 \medskip
 
-In 2018, researchers at the UZH University of Zürich have demonstrated that \gls{resnet}s are able to provide satisfactory performance in the field (\cite{Loquercio_2018}). They developed DroNet, a forked \gls{cnn} that predicts, from a single gray-scale image, a steering angle and a collision probability. In other words, the model learns to steer and avoid obstacles from forward-looking videos recorded by cars and bikes while driving in real contexts. In this case, both the prediction and controller tasks were powered off-drone on a dedicated computer, remotely connected through WiFi. 
+In 2018, researchers at the UZH University of Zürich have demonstrated that \gls{resnet}s are able to provide satisfactory performance in the field. They developed DroNet \cite{Loquercio_2018}, a forked \gls{cnn} that predicts, from a single gray-scale image, a steering angle and a collision probability. In other words, the model learns to steer and avoid obstacles from forward-looking videos recorded by cars and bikes while driving in real contexts. In this case, both the prediction and controller tasks were powered off-drone on a dedicated computer, remotely connected through WiFi. 
 
-A year later, ETH Zürich was able to develop PULP-DroNet, porting the \gls{cnn} on the Crazyflie\footnote{\url{https://www.bitcraze.io/products/crazyflie-2-1/}}, a nano-drone with a size of only 3 $3 \times 3$ centimeters for a weight of 27 grams. They propose a general methodology for deploying on-board deep learning algorithms for ultra-low-power devices \cite{palossi2019pulpdronetIoTJ}, without any need for an external laptop to run the software.
+A year later, ETH Zürich was able to develop PULP-DroNet \cite{palossi2019pulpdronetIoTJ}, porting the \gls{cnn} on the Crazyflie\footnote{\url{https://www.bitcraze.io/products/crazyflie-2-1/}}, a nano-drone with a size of only 3 $3 \times 3$ centimeters for a weight of 27 grams. They propose a general methodology for deploying on-board deep learning algorithms for ultra-low-power devices, without any need for an external laptop to run the software.
 
 \medskip
 
-Inspired by PULP-DroNet, \gls{idsia} adapted its FrontalNet to work on-board the Crazyflie with excellent results (\cite{zimmerman2020thesis}). The nano-drone is able to achieve good quantitative and qualitative performance, regardless of any problem deriving from working with such low-end devices. The main challenges are represented by low computational power, energy consumption management, and low-fidelity camera with no video stabilization\footnote{Himax HM01B0 camera, theoretically able to produce $320 \times 320$ \gls{mp} images at 60 FPS. However, the frame rate is incredibly reduced during data collection due to some platform limitation in image transferring.}.
+Inspired by PULP-DroNet, \gls{idsia} adapted its FrontalNet to work on-board the Crazyflie with excellent results \cite{zimmerman2020thesis}. The nano-drone is able to achieve good quantitative and qualitative performance, regardless of any problem deriving from working with such low-end devices. The main challenges are represented by low computational power, energy consumption management, and low-fidelity camera with no video stabilization\footnote{Himax HM01B0 camera, theoretically able to produce $320 \times 320$ \gls{mp} images at 60 FPS. However, the frame rate is incredibly reduced during data collection due to some platform limitation in image transferring.}.
 
 
 
@@ -161,9 +161,9 @@ When working with real-world problems, it is extremely important to be able to e
 
 \medskip
 
-\gls{xai} is the field of study which tries to make \gls{ml} results, and their underlying basis for decision-making, properly understandable to humans (\cite{xai-wiki}). For \gls{cnn}s, researchers have developed many techniques for understanding what a \gls{nn} actually care of when producing an output based on an input image. 
+\gls{xai} is the field of study which tries to make \gls{ml} results, and their underlying basis for decision-making, properly understandable to humans \cite{xai-wiki}. For \gls{cnn}s, researchers have developed many techniques for understanding what a \gls{nn} actually care of when producing an output based on an input image. 
 
-Main efforts regard feature visualization and attribution, but recent advanced studies have also shown how these methods can be used altogether (\cite{olah2018the}). This section briefly explains these two major areas for \gls{cnn} interpretability, with a particular focus on spatial attribution, the chosen methodology for our work.
+Main efforts regard feature visualization and attribution, but recent advanced studies have also shown how these methods can be used altogether \cite{olah2018the}. This section briefly explains these two major areas for \gls{cnn} interpretability, with a particular focus on spatial attribution, the chosen methodology for our work.
 
 
 
@@ -185,14 +185,14 @@ Sources: \cite{Selvaraju_2019}, \cite{gradcam_medium}
 \begin{figure}[!htb]
 	\centering
 	\includegraphics[width=0.9\textwidth]{"contents/images/gradcam/02-gradcam-schema"}
-	\caption[\gls{gradcam} schematic functioning]{\gls{gradcam} schematic functioning (\cite{Selvaraju_2019})}
+	\caption[\gls{gradcam} schematic functioning]{\gls{gradcam} schematic functioning \cite{Selvaraju_2019}}
 	\label{fig:gradcam-schema}
 \end{figure}
 
 \begin{figure}[!htb]
 \centering
 \includegraphics[width=0.9\textwidth]{"contents/images/gradcam/02-gradcam-catdog"}
-\caption[\gls{gradcam} example on dog-cat classification]{\gls{gradcam} example on dog-cat classification (\cite{Selvaraju_2019})}
+\caption[\gls{gradcam} example on dog-cat classification]{\gls{gradcam} example on dog-cat classification \cite{Selvaraju_2019}}
 \label{fig:gradcam-catdog}
 \end{figure}
 
@@ -240,7 +240,7 @@ See \cite{weng2019DR_explanation}, \cite{tobin2017domain}
 
 \medskip
 
-Imitation learning through simulation is recently becoming an interesting and successful approach for both reinforcement learning (\cite{imitation_learning_3d_navigation}) and object recognition (\cite{tobin2017domain}, \cite{weng2019DR}).
+Imitation learning through simulation is recently becoming an interesting and successful approach for both reinforcement learning \cite{imitation_learning_3d_navigation} and object recognition \cite{tobin2017domain} \cite{weng2019DR}.
 
 Robot and environment can be replicated through a dedicated simulator such as Gazebo\footnote{\url{http://gazebosim.org/}}, often used in robotics with \gls{ros}\footnote{\url{https://www.ros.org/}} due to its straightforward integration. Even general-purpose graphic engines can be used, which includes Unreal Engine\footnote{\url{https://www.unrealengine.com/en-US/}} Unity\footnote{\url{https://unity.com/}} are well-known simulators designed for game-development, but recently used for \gls{vr} and \gls{ar} applications. They give developers unlimited possibilities, carefully supported by solid physics engines and active communities.
 
@@ -266,7 +266,7 @@ A known approach for implementing background replacement is the chroma key. Wide
 
 Although this technique is particularly popular in many fields, placing several green screens into the drone arena is not the easiest task since it requires a lot of material and physical work to set up the proper environment, with possible issues related to the room composition or its illumination.
 
-An experiment in this direction has been conducted during development of \cite{mantegazza2019visionbased}, by placing a green screen on a portion of the arena walls. Masking results were actually satisfying, but the limitations of such a small green screen are huge both in terms of user's movements and background coverage. In fact, figure \ref{fig:greenscreen} displays the setup, which reveals a lot of classic background still appearing in the images.
+An experiment in this direction has been conducted during development of Mantegazza et al. \cite{mantegazza2019visionbased}, by placing a green screen on a portion of the arena walls. Masking results were actually satisfying, but the limitations of such a small green screen are huge both in terms of user's movements and background coverage. In fact, figure \ref{fig:greenscreen} displays the setup, which reveals a lot of classic background still appearing in the images.
 
 In addition, even with the capability of building a well-designed chroma key environment, the solution would be highly dependent on the geographical location of the setup. On the contrary, software-only approaches would be much more portable and reusable together with any other motion capture system in the world.
 
