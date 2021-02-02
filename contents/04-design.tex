@@ -5,7 +5,7 @@
 \glsreset{nn}
 \glsreset{cnn}
 
-This chapter explores the issues of the existing model, proposes a solution, and presents initial experiments on its feasibility.
+This chapter explores the existing model's issues, proposes a solution, and presents initial experiments on its feasibility.
 
 
 
@@ -13,19 +13,19 @@ This chapter explores the issues of the existing model, proposes a solution, and
 \section{Problem Summary}
 \label{sec:frontalnet-generalization}
 
-In section \ref{subsec:sota-dario}, we introduce the original paper we are working on, and present its architecture and basic performance. Chapter \ref{chap:system} illustrates environment composition and presents the dataset used to train the machine learning model, as declared in Mantegazza et al. \cite{mantegazza2019visionbased}.
+In section \ref{subsec:sota-dario}, we introduce the original paper we are working on and present its architecture and basic performance. Chapter \ref{chap:system} illustrates environment composition and presents the dataset used to train the machine learning model, as declared in Mantegazza et al. \cite{mantegazza2019visionbased}.
 
 \medskip
 
-As explained in section \ref{subsec:frontalnet-performance}, FrontalNet achieved quite good performance on the test set. Nevertheless, its behavior must be proven on the real drone to certify the model usability. \cite{mantegazza2019visionbased} reports experiments conducted inside the arena by flying the drone without the \gls{mocap} system, only relying on the learned model for computing the user's pose. The outcome is incredibly good, with the drone actually performing its task without any issues\footnote{see figure \ref{fig:frontalnet-trajectories} in the appendix for further details}.
+As explained in section \ref{subsec:frontalnet-performance}, FrontalNet achieved quite good performance on the test set. Nevertheless, its behavior must be proven on the real drone to certify the model's usability. \cite{mantegazza2019visionbased} reports experiments conducted inside the arena by flying the drone without the \gls{mocap} system, only relying on the learned model for computing the user's pose. The outcome is excellent, with the drone actually performing its task without any issues\footnote{see figure \ref{fig:frontalnet-trajectories} in the appendix for further details}.
 
-However, both quantitative and qualitative evaluations have been carried out using a set of data that is quite similar to the training one. Even though the model predictions were good with unknown users, these people still move in the same drone arena where the training data have been collected. For a complete analysis, we must consider model performance in unknown environments.
+However, both quantitative and qualitative evaluations have been carried out using a set of images similar to the training one. Even though the model predictions were good with unknown users, they still move in the same drone arena where the training data have been collected. For a complete analysis, we must consider model performance in unknown environments.
 
 The official paper does not talk about the topic, but during a direct discussion with the author, we discovered that flying performance outside of the drone arena was not consistent with usual model behavior. The drone was not able to follow the user appropriately, and its movements were unexplainable. We conclude that the \gls{cnn} is not able to generalize the task when outside of the environment it already knows.
 
 \medskip
 
-Our goal is to explore ways of improvement, to generalize the model and make it able to theoretically predict the user's pose in any other unknown scenario. The next sections firstly try to understand the main issues and limitations of the neural network, then provide a solution for the generalization problem.
+Our goal is to explore ways of improvement to generalize the model, allowing it to theoretically predict the user's pose in any other unknown scenario. The next sections first try to understand the neural network's main issues and limitations and then provide a solution for the generalization problem.
 
 
 
@@ -36,28 +36,28 @@ Our goal is to explore ways of improvement, to generalize the model and make it 
 \glsreset{nn}
 \glsreset{gradcam}
 
-In the previous section, we discussed insufficient experimental results obtained by FrontalNet in predicting the user's pose in an unknown environment (i.e., outside of the drone arena). This section highlights the main issues behind the lack of its generalization capabilities, by understanding what the model is actually learning.
+In the previous section, we discussed insufficient experimental results obtained by FrontalNet in predicting the user's pose in an unknown environment (i.e., outside of the drone arena). This section highlights the main issues behind the lack of generalization capabilities by understanding what the model is actually learning.
 
 \medskip
 
 Convolutional Neural Networks (CNN) are suited for computer vision because of their ability to extract spatial-related insights from images. As any other \gls{nn}, even \gls{cnn}s are "black-boxes". This means that their internal behavior is particularly challenging for humans to understand.
 
-Among network interpretability tecnhiques introduced in section \ref{sec:network-interpretability}, we choose \gls{gradcam}. The algorithm is indeed the most understandable way of visualizing what a \gls{cnn} is actually seeing.
+Among network interpretability techniques introduced in section \ref{sec:network-interpretability}, we choose \gls{gradcam}. The algorithm is indeed the most understandable way of visualizing what a \gls{cnn} is actually seeing.
 
 As explained in section \ref{subsec:gradcam-theory}, \gls{gradcam} is able to effectively visualize parts of an input image which are actually responsible for predicting a certain output\footnote{for an easy understandable \gls{gradcam} example, please refer to the figure \ref{fig:gradcam-catdog} which regards a simple dogs VS cats classifier}.
 
 \medskip
 
-Research in the field is still on-going and most of the available resources are for TensorFlow 1. The most powerful and famous library for network interpretability is \texttt{Lucid} \cite{tf-lucid}, from the official TensorFlow team. Since Lucid does not provide native support with Keras models, we prefer to use instead the \texttt{tf-keras-vis} library \cite{tf-keras-vis} for TensorFlow 2.0+.
+Research in the field is still on-going, and most of the available resources are for TensorFlow 1. The most powerful and famous library for network interpretability is \texttt{Lucid} \cite{tf-lucid}, from the official TensorFlow team. Since Lucid does not provide native support with Keras models, we prefer to use instead the \texttt{tf-keras-vis} library \cite{tf-keras-vis} for TensorFlow 2.0+.
 
 
 
 \subsection{Regression to Classification}
 \label{subsec:gradcam-regrtoclass}
 
-\gls{gradcam} is designed to be applied on classification tasks, rather than regression ones. Even though a porting of the algorithm for regression has been published (Regression Activation Map \cite{wang2019diabetic}), it appears to be an isolated case. For this reason, and for network interpretation only, we decide to transform our problem into a classification task.
+\gls{gradcam} is designed to be applied on classification tasks rather than regression ones. Even though a porting of the algorithm for regression has been published (Regression Activation Map \cite{wang2019diabetic}), it appears to be an isolated case. For this reason, and for network interpretation only, we decide to transform our problem into a classification task.
 
-The ground truth is composed of four variables with specific domains. Figure \ref{fig:frontalnet-dataset-distribution-regr} in the previous chapter shows their distribution. Every variable has a particular "central" value, which is obtained when the user is centered in the image. 
+The ground truth is composed of four variables with specific domains. Figure \ref{fig:frontalnet-dataset-distribution-regr} in the previous chapter shows their distribution. Every variable has a particular "central" value obtained when the user is centered in the image. 
 
 We decide to split continuous values into three different classes, which account for values smaller, around, and higher than the "center". We call these buckets respectively \texttt{low}, \texttt{medium}, and \texttt{high}.
 
@@ -102,9 +102,9 @@ So, for example, \texttt{X} values greater than $1.6$ will be classified as \tex
 \subsection{Re-training}
 \label{subsec:gradcam-retrain}
 
-Considering the new ground truth, we define a new model architecture by replacing regression outputs with classification ones. We completely re-train the new model, by using the \texttt{categorical\_crossentropy} loss and the \texttt{accuracy} metric, both suited for multi-class problems. As like for the original FrontalNet model, we opt for an \gls{adam} optimizer and a base learning rate of $0.001$, progressively reduced on validation loss plateaus. 
+Considering the new ground truth, we define a new model architecture by replacing regression outputs with classification ones. We completely re-train the new model, by using the \texttt{categorical\_crossentropy} loss and the \texttt{accuracy} metric, both suited for multi-class problems. As the original FrontalNet model, we opt for an \gls{adam} optimizer and a base learning rate of $0.001$, progressively reduced on validation loss plateaus. 
 
-Results are shown in figure \ref{fig:gradcam-retrain-simple}. After 30 epochs, the charts report a loss slightly smaller than 1, both for training and validation, and accuracy over the 80\% for all the variables. These values are not ideal to draw a conclusion, but have instead been used for comparing different training experiments conducted on the new classification model.
+Results are shown in figure \ref{fig:gradcam-retrain-simple}. After 30 epochs, the charts report a loss slightly smaller than 1, both for training and validation, and accuracy over the 80\% for all the variables. These values are not ideal for drawing a conclusion but have instead been used for comparing different training experiments conducted on the new classification model.
 
 \begin{figure}[!h]
 	\centering
@@ -124,18 +124,18 @@ A proper understanding of \gls{gradcam} results requires a thorough ability on r
 
 To run \gls{gradcam}, it is required to specify a class for which to compute the respective activation mapping. In our case, the class would be one of the three defined in section \ref{subsec:gradcam-regrtoclass}: \texttt{low}, \texttt{medium} or \texttt{high}. 
 
-When working on standard classification problems, things are pretty easy: if we classify animals, we indicate \gls{gradcam} a specific animal class (e.g., \texttt{lion}), and the algorithm will provide a heatmap that overlays the portion of the image which is mainly associated with that animal (e.g., hopefully, the lion will be highlighted, if it is present in the image).
+When working on standard classification problems, things are pretty easy. If we classify animals, we indicate \gls{gradcam} a specific animal class (e.g., \texttt{lion}), and the algorithm will provide a heatmap that overlays the portion of the image which is mainly associated with that animal (e.g., hopefully, the lion will be highlighted, if it is present in the image).
 
-However, our \gls{ml} does not look like a standard classification problem, since it has been adapted from a multi-output regression task. Classes only serve as categorical values for variables that are actually numerical, and this can introduce some issues when analyzing \gls{gradcam} visualizations.
+However, our \gls{ml} does not look like a standard classification problem since it has been adapted from a multi-output regression task. Classes only serve as categorical values for variables that are actually numerical, and this can introduce some issues when analyzing \gls{gradcam} visualizations.
 
 \renewcommand{\labelenumi}{\Alph{enumi}}
 \begin{enumerate}
-    \item For a certain input image, there is no a particular portion of the image which can be strictly associated with one or another class in particular. Therefore, assuming to have a correctly trained model and considering a single image, we do not expect the heatmap generated by \gls{gradcam} for a certain class (e.g., \texttt{low}) to be different from heatmaps generated for the other classes (e.g., \texttt{medium} and \texttt{high}). The discriminator for model's predictions must always be the user, thus also \gls{gradcam} should focus on the user only.
-    \item As the regression task, also the classification one predicts four variables that correspond to the user's coordinates. A multi-output network further introduces another complexity on reading \gls{gradcam} results, since the algorithm can be run differently on each variable, producing different heatmaps. Once again, if the model is correct, we expect that \gls{gradcam} will produce the same output regardless the inspected variable (i.e., it always highlights the user in the images).
-    \item In some cases, the network predictions for one or more variables are different from the actual value (i.e., the ground truth). When examining \gls{gradcam} results corresponding to erroneously estimated values, both the predicted and the actual class have to be taken into consideration for better understanding what is going wrong with the model.
+    \item For a certain input image, there is no particular portion of the image that can be strictly associated with one or another class in particular. Therefore, assuming to have a correctly trained model and considering a single image, we do not expect the heatmap generated by \gls{gradcam} for a certain class (e.g., \texttt{low}) to be different from heatmaps generated for the other classes (e.g., \texttt{medium} and \texttt{high}). The discriminator for the model's predictions must always be the user; thus, also \gls{gradcam} should only focus on the user.
+    \item As the regression task, also the classification one predicts four variables that correspond to the user's coordinates. A multi-output network further introduces another complexity on reading \gls{gradcam} results since the algorithm can be run differently on each variable, producing different heatmaps. Once again, if the model is correct, we expect that \gls{gradcam} will produce the same output regardless of the inspected variable (i.e., it always highlights the user in the images).
+    \item In some cases, the network predictions for one or more variables are different from the actual value (i.e., the ground truth). When examining \gls{gradcam} results corresponding to erroneously estimated values, both the predicted and the actual class have to be considered to understand better what is going wrong with the model.
 \end{enumerate}
 
-Analyzing \gls{gradcam} results, we want to confirm the hypothesis made in A and B. If heatmaps mainly overlay people in the images, we can conclude that the \gls{cnn} is effectively able to understand the concept of a person, and produce its outputs based on the user's position only. Otherwise, if \gls{gradcam} reveals that other parts of the images are considered important by the model, then we realize that the predictions are driven by undesired factors (e.g., objects in the background).
+Analyzing \gls{gradcam} results, we want to confirm the hypothesis made in A and B. If heatmaps mainly overlay people in the images, we can conclude that the \gls{cnn} can effectively understand the concept of a person and produce its outputs based on the user's position only. Otherwise, if \gls{gradcam} reveals that other parts of the images are considered important by the model, then we realize that the predictions are driven by undesired factors (e.g., objects in the background).
 
 \medskip
 
@@ -148,9 +148,9 @@ Figure \ref{fig:gradcam-example-1} displays a typical example on \gls{gradcam} a
 	\label{fig:gradcam-example-1}
 \end{figure}
 
-Heatmaps are not easy to interpret, due to a large variety of parameters to consider. As a guideline, it is possible to only take into consideration, for each variable, the column which corresponds to the predicted class (or the actual, if it differs). Actual and predicted values are available in the right-most parenthesis, as "GT" and "PR" respectively. Rows define variables, while columns stand for the classes. It is clearly visible how no specific correlation in \gls{gradcam} results is available between variables, classes, and computed predictions.
+Heatmaps are not easy to interpret due to a large variety of parameters to consider. As a guideline, it is possible to only consider, for each variable, the column which corresponds to the predicted class (or the actual, if it differs). Actual and predicted values are available in the right-most parenthesis, as "GT" and "PR" respectively. Rows define variables, while columns stand for the classes. It is clearly visible how no specific correlation in \gls{gradcam} results is available between variables, classes, and computed predictions.
 
-By calling \gls{gradcam} without specifying a particular class, it is also possible to obtain an average result on all classes, which is shown in the last column. Applying a similar reasoning also on variables, we are able to produce a single meaningful images. This represents a \gls{gradcam} global average, which is computed on every variable and class at once (figure \ref{fig:gradcam-example-2}).
+By calling \gls{gradcam} without specifying a particular class, it is also possible to obtain an average result on all classes, shown in the last column. Applying similar reasoning also on variables, we can produce a single meaningful image. This represents a \gls{gradcam} global average, which is computed on every variable and class at once (figure \ref{fig:gradcam-example-2}).
 
 \begin{figure}[!h]
 	\centering
@@ -164,13 +164,13 @@ By calling \gls{gradcam} without specifying a particular class, it is also possi
 \subsection{Results}
 \label{subsec:gradcam-results}
 
-As already shown in figure \ref{fig:gradcam-example-1}, it seems that the network is not only considering the person in the frame for computing its output, but instead relies on the whole image with particular attention on some spots.
+As already shown in figure \ref{fig:gradcam-example-1}, it seems that the network is not only considering the person in the frame for computing its output but instead relies on the whole image with particular attention on some spots.
 
-From the previous section, we understand that reasoning with \gls{gradcam} heatmaps is not trivial, and separating visualization by variables and classes is not totally convenient when we can simply plot the global average \gls{gradcam} instead. For simplicity, this section will only focus on single-image results. However, full \gls{gradcam} visualizations are available in the appendix \ref{sec:extra-gradcam} for further inspection.
+From the previous section, we understand that reasoning with \gls{gradcam} heatmaps is not trivial, and separating visualization by variables and classes is not totally convenient when we can plot the global average \gls{gradcam} instead. For simplicity, this section will only focus on single-image results. However, full \gls{gradcam} visualizations are available in the appendix \ref{sec:extra-gradcam} for further inspection.
 
 \subsubsection*{Reasonable detections}
 
-Figure \ref{fig:gradcam-ok} displays examples of correctly working scenarios, in which the person is well-detected by \gls{gradcam}. In these situations, it often happens that the entire user is highlighted, but sometimes only the body or the head get proper attention.
+Figure \ref{fig:gradcam-ok} displays examples of correctly working scenarios in which the person is well-detected by \gls{gradcam}. In these situations, it often happens that the entire user is highlighted, but sometimes only the body or the head gets proper attention.
 
 \begin{figure}[!h]
 	\begin{center}
@@ -297,7 +297,7 @@ Such precise results are not the standard. In many cases, the network focus is u
 
 \subsubsection*{Problematic detections}
 
-The examples presented above mostly reflect the model expected behavior. However, our network interpretation also reveals a lot of flaws in the prediction task. \gls{gradcam} exhibits several situations in which the model output is affected by recurrent elements in the dataset.
+The examples presented above mostly reflect the model expected behavior. However, our network interpretation also reveals many flaws in the prediction task. \gls{gradcam} exhibits several situations in which the model output is affected by recurrent elements in the dataset.
 
 \begin{itemize}
 	\item Objects in the background are prone to be considered important (figure \ref{fig:gradcam-background})
@@ -449,7 +449,7 @@ The examples presented above mostly reflect the model expected behavior. However
 
 \gls{gradcam} results demonstrate that the model is not robust enough to only focus on the user who is actually facing the drone's camera. Instead, various portions of the input images appear to be taken into consideration when the model makes its predictions. Many distractors are coming from the background.
 
-In light of this, we can reasonably assume that the \gls{resnet} has undesirably learned some details about the drone arena, in which the dataset has been collected. The issue is common with supervised learning and it is called overfitting. It happens when a \gls{ml} model learns a lot of information which only belong to the training set, being not able to properly work on previously unseen data.
+In light of this, we can reasonably assume that the \gls{resnet} has undesirably learned some details about the drone arena in which the dataset has been collected. The issue is common with supervised learning, and it is called overfitting. It happens when a \gls{ml} model learns much information that only belongs to the training set, being not able to properly work later on previously unseen data.
 
 This is most likely the reason why the model is unable to control the drone outside of the arena, as previously discussed in section \ref{sec:frontalnet-generalization}.
 
@@ -459,9 +459,9 @@ This is most likely the reason why the model is unable to control the drone outs
 \section{Person Masking}
 \label{sec:masking}
 
-From \gls{gradcam} results presented in the previous section, we conclude that the model is not capable of generalization. We have demonstrated that the main cause of the problem is inherent in the drone arena, thus we would like to remove this factor (i.e., the room itself) from the equation.
+From \gls{gradcam} results presented in the previous section, we conclude that the model is not capable of generalization. We have demonstrated that the main cause of the problem is inherent in the drone arena; thus, we would like to remove this factor (i.e., the room itself) from the equation.
 
-We propose a solution, inspired by domain randomization, that consists of performing advanced data augmentation on the training data. Considering the images that compose our dataset, we just keep the user facing the drone and remove the background by randomly replacing it with something else. This section explores various algorithms for creating the mask of a person in an image. After several experiments, the solution we have decided to adopt is Mask R-CNN (section \ref{subsec:masking-maskrcnn}).
+We propose a solution, inspired by domain randomization, that consists of performing advanced data augmentation on the training data. Considering the images that compose our dataset, we only keep the user facing the drone and remove the background by randomly replacing it with something else. This section explores various algorithms for creating the mask of a person in an image. After several experiments, the solution we have decided to adopt is Mask R-CNN (section \ref{subsec:masking-maskrcnn}).
 
 
 
@@ -472,9 +472,9 @@ The first experiments are based on a classic computer vision technique called Ca
 
 \medskip
 
-A core aspect of the Canny function, in order to find appropriate contours, is the choice of its parameters \texttt{minVal} and \texttt{maxVal}. These are used by the algorithm for distinguishing between \textit{sure-edges}, \textit{probable-edges} and \textit{no-edges}. Several experiments have been made with different values, but no combination of the two parameters is optimal on our dataset.
+A core aspect of the Canny function, in order to find appropriate contours, is the choice of its parameters \texttt{minVal} and \texttt{maxVal}. These are used by the algorithm for distinguishing between \textit{sure-edges}, \textit{probable-edges} and \textit{no-edges}. Several experiments have been done with different values, but no combination of the two parameters is optimal on our dataset.
 
-Figure \ref{fig:canny-overview} shows what happens with \texttt{minVal} and \texttt{maxVal} respectively set to 100 and 400. Most of the time the person is well-detected, while other times it completely disappears or even results in a fatal error (red frames). The room baseboard (the line between the floor and the wall) is often still present in the image, while many samples seem to preserve a huge portion of the background.
+Figure \ref{fig:canny-overview} shows what happens with \texttt{minVal} and \texttt{maxVal} respectively set to 100 and 400. Most of the time, the person is well-detected, while other times, it completely disappears or even results in a fatal error (red frames). The room baseboard (the line between the floor and the wall) is often still present in the image, while many samples seem to preserve a huge portion of the background.
 
 \begin{figure}[!htb]
 	\centering
@@ -483,7 +483,7 @@ Figure \ref{fig:canny-overview} shows what happens with \texttt{minVal} and \tex
 	\label{fig:canny-overview}
 \end{figure}
 
-In some cases, it even happens that the body of the person is present in the image while the face disappears. For mitigating this problem, an enhanced version of the algorithm has been considered. This version is designed to always keep the person's face and part of the body in the resulting image, assuming their positions are known. Figure \ref{fig:canny-enanhced} illustrates the problem, and demonstrates that results obtained from the enhanced version are still not acceptable, since we are not able enough to appropriately remove the background from the scene.
+In some cases, it even happens that the person's body is present in the image while the face disappears. For mitigating this problem, an enhanced version of the algorithm has been considered. This version is designed to always keep the person's face and part of the body in the resulting image, assuming their positions are known. Figure \ref{fig:canny-enanhced} illustrates the problem and demonstrates that results obtained from the enhanced version are still not acceptable since we cannot appropriately remove the scene's background.
 
 \begin{figure}[!h]
 	\begin{center}
@@ -514,13 +514,13 @@ In some cases, it even happens that the body of the person is present in the ima
 
 GrabCut \cite{grabcut2004} operates by using the subject position in the image and some statistical inference for labeling each pixel of the image as background or foreground. 
 
-The base algorithm \cite{opencv_grabcut} requires a bounding box as an input, a rectangle to enclose the subject to be segmented. Everything outside this rectangle will be taken as \textit{sure-background}; everything inside the rectangle is unknown. The image is first transformed into a graph, then iteratively processed by using a Gaussian Mixture Model \cite{Reynolds2009} for color-based statistical labeling, and a min-cut algorithm to segment the graph until convergence.
+The base algorithm \cite{opencv_grabcut} requires a bounding box as an input, a rectangle to enclose the subject to be segmented. Everything outside this rectangle will be taken as \textit{sure-background}; everything inside the rectangle is unknown. The image is first transformed into a graph, then iteratively processed using a Gaussian Mixture Model \cite{Reynolds2009} for color-based statistical labeling. A min-cut algorithm is used to segment the graph until convergence.
 
-OpenCV GrabCut implementation has two initialization modalities. It is possible to pass only the rectangle, as explained before, or a mask of the image which further specifies whether a certain pixel is \textit{sure-background}, \textit{probable-background}, \textit{probable-foreground} or \textit{sure-foreground}. This categorization is also used by the library during the algorithm itself. 
+OpenCV GrabCut implementation has two initialization modalities. It is possible to pass only the rectangle, as explained before, or a mask of the image which further specifies whether a certain pixel is \textit{sure-background}, \textit{probable-background}, \textit{probable-foreground} or \textit{sure-foreground}. The library also uses this categorization during the algorithm itself. 
 
 \medskip
 
-Both approaches require previous knowledge about the subject position in the image. Our initial experiments assume that such information is given. In section \ref{subsec:masking-yolo}, we will consider an algorithm for automatic human detection.
+Both approaches require previous knowledge about the subject position in the image. Our initial experiments assume that such information is given. In section \ref{subsec:masking-yolo}, we will consider an automatic human detection algorithm.
 
 
 \subsubsection{Rectangle initialization}
@@ -579,9 +579,9 @@ Performance obtained by the algorithm is available in figure \ref{fig:grabcut-re
 \subsubsection{Mask initialization}
 \label{subsec:masking-grabcut-mask}
 
-For advance purposes, OpenCV also gives the possibility to initially classify the pixels with a mask. We choose this methodology for setting the face and part of the body as \textit{sure-foreground} from the beginning.
+For advanced purposes, OpenCV also gives the possibility to initially classify the pixels with a mask. We choose this methodology for setting the face and part of the body as \textit{sure-foreground} from the beginning.
 
-For demonstration, we consider an image for which the rectangle initialization above was completely missing the person in the result. Procedure is shown in figure \ref{fig:grabcut-mask-explain}. We start by specifying \textit{sure-foreground} pixels (blue), then GrabCut automatically infers \textit{probable-foreground} (yellow) and \textit{probable-background} (green) areas. Results are undoubtedly better, but we notice that the left-most background has been kept in the final image. This could easily identified as \textit{sure-background} by using the person pose we assume as known, like we did for rectangle initialization.
+For demonstration, we consider an image for which the rectangle initialization above was completely missing the person in the result. Procedure is shown in figure \ref{fig:grabcut-mask-explain}. We start by specifying \textit{sure-foreground} pixels (blue), then GrabCut automatically infers \textit{probable-foreground} (yellow) and \textit{probable-background} (green) areas. Results are undoubtedly better, but we notice that the left-most background has been kept in the final image. However, this part of the image could have been easily identified as \textit{sure-background} by using the person pose we assume as known, as we did for rectangle initialization.
 
 \begin{figure}[!h]
 	\begin{center}
@@ -627,7 +627,7 @@ Finally, a mixed approach between rectangle and mask initializations has been tr
 
 In figure \ref{fig:grabcut-hybrid-explain} is available a step-by-step explanation like the ones presented above. In there, \textit{sure-background} is dark blue, \textit{probable-background} is green, \textit{probable-foreground} is yellow and \textit{sure-foreground} is light blue.
 
-Image \ref{fig:grabcut-hybrid-example} shows the results of hybrid initialization applied to the same samples introduced in figure \ref{fig:grabcut-rect-example}. The segmentation is very precise and the approach reveals to be almost optimal.
+Image \ref{fig:grabcut-hybrid-example} shows the results of hybrid initialization applied to the same samples introduced in figure \ref{fig:grabcut-rect-example}. The segmentation is very precise, and the approach reveals to be almost optimal.
 
 \begin{figure}[!h]
 	\begin{center}
@@ -676,9 +676,9 @@ Image \ref{fig:grabcut-hybrid-example} shows the results of hybrid initializatio
 \subsubsection{Automatic Human Detection}
 \label{subsec:masking-yolo}
 
-The approaches presented until now are used for doing human segmentation, which is an essential step for performing background removal. In order to work, GrabCut hybrid initialization requires two pieces of information: the bounding boxes associated with both the entire person and its head.
+The approaches presented until now are used for doing human segmentation, which is an essential step for performing background removal. To work, GrabCut hybrid initialization requires two pieces of information: the bounding boxes associated with both the entire person and its head.
 
-Given the available data, the mapping between user's pose (the \gls{gt}) and its appearing in an image is unknown. Thus, proper detection algorithms are required on the top of the segmentation task, to find both the person and its face in an image.
+Given the available data, the mapping between the user's pose (the \gls{gt}) and its appearing in an image is unknown. Thus, proper detection algorithms are required on the top of the segmentation task to find both the person and its face in an image.
 
 \medskip
 
@@ -708,7 +708,7 @@ Mask R-CNN \cite{he2018mask} is a state of the art deep learning framework for o
 
 \medskip
 
-Results on our dataset are incredibly precise and the method undoubtedly outperforms any other previously experimented, as it is able to provide both human detection and segmentation at once. Figure \ref{fig:maskrcnn-dario} below presents how Mask R-CNN easily detects people in our video frames, regardless of their low resolution and any light condition or person position. In many cases, multiple people or objects in the background are correctly detected, even if they are very small in the images.
+Mask R-CNN results on our dataset are incredibly precise, and the method undoubtedly outperforms any other previously experimented since it provides both human detection and segmentation at once. Figure \ref{fig:maskrcnn-dario} below presents how Mask R-CNN easily detects people in our video frames, regardless of their low resolution and any light condition or person position. In many cases, multiple people or objects in the background are correctly detected, even if they are tiny in the images.
 
 \begin{figure}[!h]
 	\begin{center}
@@ -745,13 +745,5 @@ Results on our dataset are incredibly precise and the method undoubtedly outperf
 
 This high-level of accuracy in detection and segmentation comes with an extremely-high computing power requirement\footnote{according to the original paper, Mask R-CNN runs at 5 \gls{fps} on Nvidia Tesla M40 GPU}. For reference, running Mask R-CNN on the test set - composed of about 11'000 images - requires a total computing time\footnote{we observe, using the \texttt{\%\%time} command for IPython, the following CPU times: user 35min, sys 20min, total 55min; and Wall time: 1h 4min} of approximately 55 minutes on Google Colab using a GPU runtime\footnote{equipped with Nvidia T4 GPU}.
 
-Because of this, the inference on the images must be done offline. The training procedure will only receive, together with each input image, the previously computed user's mask. This will be used to perform background replacement.
-
-
-
-
-
-
-
-
+Because of this, the inference on the images must be made offline. Together with each input image, the training procedure will only receive the previously computed user's mask. This will be used to perform background replacement.
 
