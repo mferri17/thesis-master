@@ -20,21 +20,21 @@ The first part of this chapter focuses on the application of statistical metrics
 
 An official test set is made available by Mantegazza et al. \cite{mantegazza2019visionbased}. For enhancing testing capabilities, we take advantage of background replacement to generate artificial datasets from the test set. Even though this technique can lead to potential biases during the evaluation, caused by unrealistic patterns possibly created during the image manipulation, it allows performing quantitative evaluations without the need of recording new data in different environments.
 
+Qualitative evaluation mostly concerns direct comparisons between the models' predictions and the ground truth. On the contrary, quantitative results require statistical computations suited for regression, thus commonly used in machine learning. 
+
 \subsubsection*{Metrics}
 
-Qualitative evaluation mostly concerns direct comparisons between the models' predictions and the ground truth. On the contrary, quantitative results require statistical computations suited for regression, thus commonly used in machine learning. The following list presents an overview of all the principal metrics adopted for our evaluation and used in the next sections.
+The following list presents an overview of all the principal metrics adopted for our evaluation and used in the next sections.
 
 \begin{itemize}
-    \item \gls{mae} measures the average residuals in the dataset, which means the absolute difference between the actual and predicted values. The lower the \gls{mae}, the better the model. Considering $y_i$ the predicted value and $\hat{y_i}$ the actual value:
-    $$ MAE = \frac{1}{N} \sum_{i=1}^N |y_i - \hat{y_i}| $$
-    
-    \item \gls{rmse} measures the standard deviation of residuals. As for \gls{mae}, \gls{rmse} should be as lower as possible. It penalizes large prediction errors, thus is not particularly suited to be used on a dataset with many outliers. The main advantage and reason for its usage in evaluating regression models is because \gls{rmse} has the same unit as the dependent variable, so it is easy to interpret.
-    $$ RMSE = \sqrt{\frac{1}{N} \sum_{i=1}^N (y_i - \hat{y_i})^2} $$
-    
-    \item \gls{r2} (or coefficient of determination) measures the robustness of the regression. It represents the proportion of the variance in the dependent variable which is explained by the independent variable. As such variance is dataset dependent, \gls{r2} may not be meaningfully comparable across different datasets. Thus, the metric should only be compared among different models for the same dataset but not on different datasets for the same model.
-    
-    \gls{r2} is often the best choice for evaluating regression performance because it provides a measure of fitness for the model to predict unseen data correctly. Also, its domain is easily understandable since it goes from $-\infty$ to 1: an optimal model (with no prediction errors) will have an \gls{r2} of 1; a model that always predicts the average value will have an \gls{r2} of 0; a model worse than the average predictor will have a negative \gls{r2}. Considering $\overline{y}$ the mean value:
-    $$ R^2 = 1 - \frac{\sum_{i=1}^N (y_i - \hat{y_i})^2}{\sum_{i=1}^N (y_i - \overline{y})^2} $$
+	\item \gls{mae} measures the average residuals in the dataset, which means the absolute difference between the actual and predicted values. The lower the \gls{mae}, the better the model. Considering $y_i$ the predicted value and $\hat{y_i}$ the actual value:
+	$$ MAE = \frac{1}{N} \sum_{i=1}^N |y_i - \hat{y_i}| $$
+	
+	\item \gls{rmse} measures the standard deviation of residuals. As for \gls{mae}, \gls{rmse} should be as lower as possible. It penalizes large prediction errors, thus is not particularly suited to be used on a dataset with many outliers. The main advantage and reason for its usage in evaluating regression models is because \gls{rmse} has the same unit as the dependent variable, so it is easy to interpret.
+	$$ RMSE = \sqrt{\frac{1}{N} \sum_{i=1}^N (y_i - \hat{y_i})^2} $$
+	
+	\item \gls{r2} (or coefficient of determination) measures the robustness of the regression. It represents the proportion of the variance in the dependent variable which is explained by the independent variable. \gls{r2} is often the best choice for evaluating regression performance because it provides a measure of fitness for the model to predict unseen data correctly. Also, its domain is easily understandable since it goes from $-\infty$ to 1: an optimal model (with no prediction errors) will have an \gls{r2} of 1; a model that always predicts the average value will have an \gls{r2} of 0; a model worse than the average predictor will have a negative \gls{r2}. Considering $\overline{y}$ the mean value:
+	$$ R^2 = 1 - \frac{\sum_{i=1}^N (y_i - \hat{y_i})^2}{\sum_{i=1}^N (y_i - \overline{y})^2} $$
 \end{itemize}
 
 
@@ -47,7 +47,7 @@ As for the entire chapter, this section considers the \texttt{Arena}, \texttt{CV
 
 In this phase, the loss function (\gls{mae}) and the \gls{r2} score are take into consideration, both for the train and the validation set. Figures \ref{fig:training-metrics-arena}, \ref{fig:training-metrics-cvpr} and \ref{fig:training-metrics-cvpraug} show metrics evolution over the 60 training epochs. Overall, it can be said that at least 30 epochs are needed to reach the convergence, after which the performance stabilizes.
 
-\texttt{Arena}, \texttt{CVPR}, and \texttt{CVPR Aug} achieve a validation loss of 0.07, 0.13 and 0.20, respectively. As the model complexity increases, the loss does; however, the gap between training and validation loss decreases, as shown in the figure. This may be a symptom of better generalization capabilities, although we do not yet have enough information to draw a conclusion on the subject. Even though the \texttt{CVPR Aug} model appears to be able to improve by further increasing the number of epochs, experiments with 200 epochs have substantially the same results as 60.
+\texttt{Arena}, \texttt{CVPR}, and \texttt{CVPR Aug} achieve a validation loss of 0.07, 0.13 and 0.20, respectively. As the model complexity increases, the loss does. However, with data augmentation, the gap between training and validation loss significantly decreases, as shown in figure \ref{fig:training-metrics-cvpraug}. This may be a symptom of better generalization capabilities, although we do not yet have enough information to draw a conclusion on the subject. Even though the \texttt{CVPR Aug} model appears to improve by further increasing the number of epochs, experiments with 200 epochs have substantially the same results as 60.
 
 The \texttt{Arena} model registers an \gls{r2} of 0.99, which can be attributable to overfitting. In fact, such a score would be obtained by an optimal model, but we already know that the original FrontalNet by \cite{mantegazza2019visionbased} could not properly work outside of the drone arena. In the next sections, we will examine models \texttt{CVPR} and \texttt{CVPR Aug} on various test sets to certify their robustness against the \texttt{Arena} one.
 
@@ -78,13 +78,61 @@ The \texttt{Arena} model registers an \gls{r2} of 0.99, which can be attributabl
 \section{Quantitative Evaluation}
 \label{sec:evaluation-quantitative}
 
-\lipsum[1-2]
+Performance reported during training is not sufficient to evaluate the model. Its strengths must be measured on previously unseen data, but the validation set is very similar to the training one.
 
-loss, r2, and rmse comparison over the 3 models and 3 test sets
+For testing, we first rely on the official test set \cite{mantegazza2019visionbased}. Then, we expand it through background replacement, choosing the two indoor scenarios shown in figure \ref{fig:test-indoor}. They do not belong to the CVPR dataset and have been accurately selected to be challenging enough for the model while somehow allowing a person in them to be easily recognized. The respective datasets, created by replacing all the test images backgrounds, are called \texttt{indoor1} and \texttt{indoor2}. Instead, we call \texttt{arena} the original test set.
 
-As described before, \gls{r2} represents the proportion of variance in the dependant variable (the target) that has been explained by the independent variables in the model (the features). As such variance is dataset dependent, \gls{r2} may not be meaningfully comparable across different datasets. Thus, the metric should can only be compared among different models for the same dataset, but not on different datasets for the same model.
+\begin{figure}[!h]
+	\begin{center}
+		\begin{subfigure}[h]{0.49\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/06-indoor1"}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[h]{0.49\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/06-indoor2"}
+		\end{subfigure}
+	\end{center}
+	\vspace{-0.5cm}
+	\caption[Indoor backgrounds for quantitative evaluation]{Indoor backgrounds for quantitative evaluation}
+	\label{fig:test-indoor}
+\end{figure}
 
-\includepdf[pages={1}]{contents/images/06-qt-summary}
+For a complete analysis, we test our three model variants (section \ref{sec:model-variants}) on the three test sets defined above. Again, we choose to compare the loss (\gls{mae}) and the \gls{r2} score. As previously said, \gls{r2} represents the proportion of variance in the target (i.e., the user's pose) that is explained by the model features (i.e., the input image). As such variance is dataset dependent, \gls{r2} may not be meaningfully comparable across different datasets. Thus, the metric can only be compared among different models for the same dataset, but not on different data for the same model.
+
+Unlike for training, during testing, we evaluate the \gls{r2} score separately on each variable, allowing us to inspect models' behavior further. Besides, we compute \gls{rmse}, particularly useful for understanding the errors' magnitude.
+
+Results are shown in table \ref{tab:qt-summary} and summarized below. 
+
+\paragraph*{Arena model evaluation}
+
+This represents the baseline performance on the test set. On its native dataset (i.e., the \texttt{arena} test set) the loss is 0.41 and \gls{r2} lies between 0.74 and 0.86. As expected according to our previous knowledge on model performance out of the drone arena, also on background-replaced test sets the model behavior is very poor. On the \texttt{indoor1} dataset, the loss is 0.86 and the \gls{r2} scores ranges between 0.08 and 0.30. Even worse, on \texttt{indoor2} the loss is 1 and \gls{r2} registers negative values for variables \texttt{X} and \texttt{Z}.
+
+\paragraph*{CVPR model evaluation}
+
+The model trained on the background-replaced dataset is much better than the first when predicting the user's pose with unknown backgrounds. \texttt{CVPR} performance on \texttt{arena} test set are very similar to the one obtained on it by the \texttt{Arena} model. The loss is just 0.01 higher and the only big difference is found for the \texttt{X} \gls{r2}, which decreases from 0.81 to 0.69. Howbeit, the \texttt{indoor1} and \texttt{indoor2} test sets both registers similar performance for this model, with a loss of 0.44 and 0.45, respectively.
+
+\paragraph*{CVPR Aug model evaluation}
+
+Image augmentation seems to provide not only general improvements but also leverages the outcome for all variables. The \texttt{CVPR Aug} model achieves an \gls{r2} score greater of 0.80 for each variable on every test set. Moreover, its performance on the \texttt{arena} test set is the best so far, with a loss of 0.36. Relative \gls{r2} scores go from 0.75 to 0.87, encountering no particular differences among different test sets.
+
+\paragraph*{Notes on variables}
+
+Overall, all the models have consistent trends \gls{wrt} their variables. In all cases, the \texttt{W} \gls{rmse} is considerably highest than the others, and accordingly lower is its \gls{r2}. Also, \texttt{Z} \gls{rmse} is particularly low because of its distribution rather than actual good predictions. In fact, its \gls{r2} is lower than \texttt{Y} \gls{r2} even if the apparent squared error is better.
+
+According to coefficient of determination, \texttt{Y} and \texttt{Z} are the best predicted variables, followed by \texttt{X}. On the latter, image augmentation gives a huge advantage to the \texttt{CVPR Aug} model. 
+
+
+\includepdf[pages={1}, pagecommand={\null\vfill\captionof{table}{Quantitative evaluation: \texttt{Arena}, \texttt{CVPR}, \texttt{CVPR Aug} models on \texttt{arena}, \texttt{indoor1}, \texttt{indoor2} test sets.}\label{tab:qt-summary}}]{contents/images/06-qt-summary}
+
+
+\subsubsection*{Final considerations on quantitative evaluation}
+
+Considering the resulting metrics, it appears that our strategy undoubtedly improves the original model from a numerical perspective. The approach seems able to uncouple the training images from the generalized task of recognizing the user's position. Data augmentation plays a fundamental role in enhancing the robustness of the model. The \texttt{CVPR Aug} model, tested inside the drone arena, even produces better theoretical results than the original model. The reason is probably that such an environment is fairly easy to handle compared to the CVPR backgrounds, used during training, which are usually complex and sometimes tough to interpret even by humans.
+
+To validate the results and extend the reasoning over numbers, a qualitative evaluation must be performed.
+
 
 
 \section{Qualitative Evaluation}
@@ -99,7 +147,4 @@ Charts: video frames with predictions comparison; time series GT \& pred \textbf
 - phone videos dataset
 
 
-\section{Summary}
-\label{sec:evaluation-summary}
 
-conclusions
