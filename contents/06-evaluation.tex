@@ -7,27 +7,20 @@
 \glsreset{r2}
 % \glsresetall
 
-This chapter thoroughly evaluates our generalization strategy by comparing the three model variants proposed in section \ref{sec:model-variants}.
+This chapter thoroughly illustrates the evaluation of our generalization strategy by comparing the three model variants proposed in section \ref{sec:model-variants}. The measurement includes both quantitative and qualitative evaluations. On one side, a quantitative valuation provides numerical results, which are crucial for scientifically assessing the network's capabilities through a set of chosen metrics. On the other side, qualitative observations rely on human interpretation to evaluate models' possible behaviors in some real contexts.
+
+The first part of this chapter focuses on the application of statistical metrics for quantitatively examine the three models both on the training (section \ref{sec:evaluation-training}) and the test set (section \ref{sec:evaluation-quantitative}). The former is used to briefly understand overall models' learning, while the latter aims to present unseen examples to the network to estimate its generalization capabilities.
+
+An official test set is made available by Mantegazza et al. \cite{mantegazza2019visionbased}. For enhancing testing capabilities, we take advantage of background replacement to generate artificial datasets from the test set. Notice that image manipulation can cause unrealistic patterns in the data, leading to potential biases during the evaluation. Nonetheless, the background replacement technique allows us to perform quantitative evaluations without the need of recording new data in different environments. 
 
 
-
-\section{Methodologies}
-\label{sec:evaluation-methods}
-
-The comparison includes both quantitative and qualitative evaluations. On one side, a quantitative valuation provides numerical results, which are crucial for scientifically assessing the network's capabilities through a set of chosen metrics. On the other side, qualitative observations rely on human interpretation to evaluate models' possible behaviors in some real contexts.
-
-The first part of this chapter focuses on the application of statistical metrics for quantitatively examine the three models both on the training (section \ref{sec:evaluation-training}) and the test set (section \ref{sec:evaluation-quantitative}). The former is used to briefly understand overall models' learning, while the latter aims to submit unseen examples for assessing the networks' capability in generalization.
-
-An official test set is made available by Mantegazza et al. \cite{mantegazza2019visionbased}. For enhancing testing capabilities, we take advantage of background replacement to generate artificial datasets from the test set. Even though this technique can lead to potential biases during the evaluation, caused by unrealistic patterns possibly created during the image manipulation, it allows performing quantitative evaluations without the need of recording new data in different environments.
-
-Qualitative evaluation mostly concerns direct comparisons between the models' predictions and the ground truth. On the contrary, quantitative results require statistical computations suited for regression, thus commonly used in machine learning. 
-
-\subsubsection*{Metrics}
+\subsection{Metrics}
+\label{subsec:metrics}
 
 The following list presents an overview of all the principal metrics adopted for our evaluation and used in the next sections.
 
 \begin{itemize}
-	\item \gls{mae} measures the average residuals in the dataset, which means the absolute difference between the actual and predicted values. The lower the \gls{mae}, the better the model. Considering $y_i$ the predicted value and $\hat{y_i}$ the actual value:
+	\item \gls{mae} measures the average residuals in the dataset, which means the absolute difference between the actual and predicted values. The lower the \gls{mae}, the better the model. Assuming $y_i$ as the predicted value and $\hat{y_i}$ as the ground truth, the \gls{mae} is defined as follows:
 	$$ MAE = \frac{1}{N} \sum_{i=1}^N |y_i - \hat{y_i}| $$
 	
 	\item \gls{rmse} measures the standard deviation of residuals. As for \gls{mae}, \gls{rmse} should be as lower as possible. It penalizes large prediction errors, thus is not particularly suited to be used on a dataset with many outliers. The main advantage and reason for its usage in evaluating regression models is because \gls{rmse} has the same unit as the dependent variable, so it is easy to interpret.
@@ -45,11 +38,11 @@ The following list presents an overview of all the principal metrics adopted for
 
 As for the entire chapter, this section considers the \texttt{Arena}, \texttt{CVPR} and \texttt{CVPR Aug} models defined in section \ref{sec:model-variants}. Here, we introduce their performance during the training procedure presented in section \ref{sec:implementation-training}.
 
-In this phase, the loss function (\gls{mae}) and the \gls{r2} score are take into consideration, both for the train and the validation set. Figures \ref{fig:training-metrics-arena}, \ref{fig:training-metrics-cvpr} and \ref{fig:training-metrics-cvpraug} show metrics evolution over the 60 training epochs. Overall, it can be said that at least 30 epochs are needed to reach the convergence, after which the performance stabilizes.
+In this phase, the loss function (\gls{mae}) and the \gls{r2} score are take into consideration, both for the train and the validation set. Figures \ref{fig:training-metrics-arena}, \ref{fig:training-metrics-cvpr} and \ref{fig:training-metrics-cvpraug} show metrics evolution over the 60 training epochs. Overall, it can be said that at least 30 epochs are needed to reach convergence, after which the performance stabilizes.
 
 \texttt{Arena}, \texttt{CVPR}, and \texttt{CVPR Aug} achieve a validation loss of 0.07, 0.13 and 0.20, respectively. As the model complexity increases, the loss does. However, with data augmentation, the gap between training and validation loss significantly decreases, as shown in figure \ref{fig:training-metrics-cvpraug}. This may be a symptom of better generalization capabilities, although we do not yet have enough information to draw a conclusion on the subject. Even though the \texttt{CVPR Aug} model appears to improve by further increasing the number of epochs, experiments with 200 epochs have substantially the same results as 60.
 
-The \texttt{Arena} model registers an \gls{r2} of 0.99, which can be attributable to overfitting. In fact, such a score would be obtained by an optimal model, but we already know that the original FrontalNet by \cite{mantegazza2019visionbased} could not properly work outside of the drone arena. In the next sections, we will examine models \texttt{CVPR} and \texttt{CVPR Aug} on various test sets to certify their robustness against the \texttt{Arena} one.
+The \texttt{Arena} model registers an \gls{r2} of 0.99, which can be attributable to overfitting. In fact, such a score would be obtained by an optimal model, but we already know that the original FrontalNet by \cite{mantegazza2019visionbased} could not properly operate outside of the drone arena. In the next sections, we will examine models \texttt{CVPR} and \texttt{CVPR Aug} on various test sets to certify their robustness against the \texttt{Arena} one.
 
 \begin{figure}[H]
 	\centering
@@ -99,7 +92,7 @@ For testing, we first rely on the official test set \cite{mantegazza2019visionba
 	\label{fig:test-indoor}
 \end{figure}
 
-For a complete analysis, we test our three model variants (section \ref{sec:model-variants}) on the three test sets defined above. Again, we choose to compare the loss (\gls{mae}) and the \gls{r2} score. As previously said, \gls{r2} represents the proportion of variance in the target (i.e., the user's pose) that is explained by the model features (i.e., the input image). As such variance is dataset dependent, \gls{r2} may not be meaningfully comparable across different datasets. Thus, the metric can only be compared among different models for the same dataset, but not on different data for the same model.
+For a complete analysis, we test our three model variants (section \ref{sec:model-variants}) on the three test sets defined above. Again, we choose to compare the loss (\gls{mae}) and the \gls{r2} score. As previously explained in section \ref{subsec:metrics}, \gls{r2} represents the proportion of variance in the target (i.e., the user's pose) that is explained by the model features (i.e., the input image). As such variance is dataset dependent, \gls{r2} may not be meaningfully comparable across different datasets. Thus, the metric can only be compared among different models for the same dataset, but not on different data for the same model.
 
 Unlike for training, during testing, we evaluate the \gls{r2} score separately on each variable, allowing us to inspect models' behavior further. Besides, we compute \gls{rmse}, particularly useful for understanding the errors' magnitude.
 
@@ -119,9 +112,9 @@ Image augmentation seems to provide not only general improvements but also lever
 
 \paragraph*{Notes on variables}
 
-Overall, all the models have consistent trends \gls{wrt} their variables. In all cases, the \texttt{W} \gls{rmse} is considerably highest than the others, and accordingly lower is its \gls{r2}. Also, \texttt{Z} \gls{rmse} is particularly low because of its distribution rather than actual good predictions. In fact, its \gls{r2} is lower than \texttt{Y} \gls{r2} even if the apparent squared error is better.
+Overall, all the models have consistent trends \gls{wrt} their variables. In all cases, the \texttt{W} \gls{rmse} is considerably higher than the others, and accordingly lower is its \gls{r2}. Also, \texttt{Z} \gls{rmse} is particularly low because of its distribution rather than actual good predictions. In fact, its \gls{r2} is lower than \texttt{Y} \gls{r2} even if the apparent squared error is better.
 
-According to coefficient of determination, \texttt{Y} and \texttt{Z} are the best predicted variables, followed by \texttt{X}. On the latter, image augmentation gives a huge advantage to the \texttt{CVPR Aug} model. 
+According to the coefficient of determination, \texttt{Y} and \texttt{Z} are the best predicted variables, followed by \texttt{X}. On the latter, image augmentation gives a huge advantage to the \texttt{CVPR Aug} model. 
 
 
 \includepdf[pages={1}, pagecommand={\null\vfill\captionof{table}{Quantitative evaluation: \texttt{Arena}, \texttt{CVPR}, \texttt{CVPR Aug} models on \texttt{arena}, \texttt{indoor1}, \texttt{indoor2} test sets.}\label{tab:qt-summary}}]{contents/images/06-qt-summary}
@@ -138,13 +131,49 @@ To validate the results and extend the reasoning over numbers, a qualitative eva
 \section{Qualitative Evaluation}
 \label{sec:evaluation-qualitative}
 
-Charts: video frames with predictions comparison; time series GT \& pred \textbf{model} comparison; time series GT \& pred \textbf{background} comparison for a given model; variance considerations
+In this section, we do not consider precise metrics for assessing the model's fitness. Instead, we rely on simulation to create various visualizations and produce a behavioral evaluation of the results. In practice, we confront the models' predictions with the ground truth from a qualitative viewpoint.
 
-- arena dataset
+A first evaluation, detailed in \ref{subsec:ql-timeline}, presents the comparison with timeline charts to investigate the general trend of each model on different test sets.
 
-- bg replaced dataset
+Next, in \ref{subsec:ql-interactive}, we make use of interactive visualizations that display the current frame, the predictions, and the ground truth altogether. These are used to interpret, from a human perspective, the models' results on specific images.
 
-- phone videos dataset
 
+
+\subsection{Timeline comparison}
+\label{subsec:ql-timeline}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1 \textwidth]{"contents/images/06-gtpred-arena"}
+	\caption[Qualitative evaluation: \gls{gt} vs. predictions results on the \texttt{arena} test set]{Qualitative evaluation: \gls{gt} vs. predictions results on the \texttt{arena} test set}
+	\label{fig:ql-gtpred-arena}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1 \textwidth]{"contents/images/06-gtpred-indoor1"}
+	\caption[Qualitative evaluation: \gls{gt} vs. predictions results on the \texttt{indoor1} test set]{Qualitative evaluation: \gls{gt} vs. predictions results on the \texttt{indoor1} test set}
+	\label{fig:ql-gtpred-indoor1}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1 \textwidth]{"contents/images/06-gtpred-indoor2"}
+	\caption[Qualitative evaluation: \gls{gt} vs. predictions results on the \texttt{indoor2} test set]{Qualitative evaluation: \gls{gt} vs. predictions results on the \texttt{indoor2} test set}
+	\label{fig:ql-gtpred-indoor2}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1 \textwidth]{"contents/images/06-gtpred-mixed"}
+	\caption[Qualitative evaluation: \gls{gt} vs. predictions results on the \texttt{mixed} test set]{Qualitative evaluation: \gls{gt} vs. predictions results on the \texttt{mixed} test set}
+	\label{fig:ql-gtpred-mixed}
+\end{figure}
+
+
+
+
+\subsection{Per-frame comparison}
+\label{subsec:ql-interactive}
 
 
