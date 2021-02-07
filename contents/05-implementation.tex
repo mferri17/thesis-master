@@ -21,9 +21,9 @@ By providing a considerable amount of images to use as backgrounds, the \gls{ml}
 
 \medskip
 
-For our work, we select the publicly available dataset for Indoor Scene Recognition presented during the 9th Conference on Computer Vision and Pattern Recognition (CVPR) \cite{cvpr09}. The dataset contains a total of 15'620 images divided into 67 indoor categories. For our task, categorization is not actually needed, but it ensures a good variety of scenarios to present to the model. For shortness, in this thesis, the dataset will be referred to as \textit{CVPR}.
+For our work, we select the publicly available dataset \cite{cvpr09} for Indoor Scene Recognition presented during the 9th Conference on Computer Vision and Pattern Recognition (CVPR). The dataset contains a total of 15'620 images divided into 67 indoor categories. For our task, categorization is not actually needed, but it ensures a good variety of scenarios to present to the model. For shortness, in this thesis, the dataset will be referred to as \textit{CVPR}.
 
-During training, each sample is assigned to a randomly chosen background from the CVPR dataset. Figure \ref{fig:bgreplace-example} shows a demonstration applied to the samples previously presented in figure \ref{fig:frontalnet-dataset-overview}. 
+During training, each sample is assigned to a randomly chosen background from the CVPR dataset. Even though the background replacement is done on the fly, the combination of each input image with a background forms a brand new dataset. Using this data, we train the network from scratch, starting to learn considerably different features than before. Figure \ref{fig:bgreplace-example} shows a demonstration of the background replacement technique applied to the samples already presented in figure \ref{fig:frontalnet-dataset-overview}. 
 
 \vspace*{5ex}
 \begin{figure}[!h]
@@ -42,11 +42,11 @@ During training, each sample is assigned to a randomly chosen background from th
 
 Data augmentation is a common technique for improving neural networks' ability to generalize their task on unknown data. Introduced in section \ref{subsec:data-augmentation}, image augmentation is ubiquitously used with \gls{cnn}s for reducing overfitting on the training images by applying random transformations.
 
-For implementing image augmentation, we choose Albumentations \cite{Buslaev_2020} for its benchmarking performance\footnote{\url{https://github.com/albumentations-team/albumentations\#benchmarking-results}}. Albumentations is a state of the art Python library that allows the definition of custom sequences composed of many different transformations. These are applied according to user-specified probabilities and intensities. The possibilities are limitless, and the resulting images might be very different from the originals.
+For implementing image augmentation, we choose Albumentations \cite{Buslaev_2020} due to its benchmarking performance\footnote{\url{https://github.com/albumentations-team/albumentations\#benchmarking-results}}. Albumentations is a state of the art Python library that allows the definition of custom sequences composed of many different transformations. These are applied according to user-specified probabilities and intensities. The possibilities are limitless, and the resulting images might be very different from the originals.
 
 \medskip
 
-In our case, it is not possible to modify the ground truth according to affine transformations because the relationship between the person's position in the image and the ground is not known a priori. This is why spatial-level augmentations (see section \ref{subsec:data-augmentation}) are not an option. Instead, we mainly apply pixel-level transformations.
+In our case, it is not possible to modify the ground truth according to affine transformations because the relationship between the person's position in the image and the ground is not known a priori. For this reason, spatial-level augmentations (see section \ref{subsec:data-augmentation}) are not an option. Instead, we mainly apply pixel-level transformations.
 
 The only exception is horizontal flipping, which only requires inverting the \texttt{Y} coordinate in the ground truth. As explained in section \ref{subsec:dataset-composition}, the \texttt{Y} coordinate represents the horizontal alignment of the user \gls{wrt} the drone. Figure \ref{fig:frontalnet-dataset-distribution-class}, in the previous chapter, shows a propensity for the user to be on the right-part of the images. For this reason, we decide to mirror the camera's frames horizontally with a probability of 50\%.
 
@@ -106,7 +106,7 @@ augmenter = A.Compose([
 label=lst:albumentations]
 \end{lstlisting}
 
-Furthermore, adding noise to images can greatly help \gls{cnn}s on avoiding overfitting \cite{shorten2019augmentationsurvey}. For this reason, at the end of the pipeline, we also apply Perlin noise \cite{perlin-noise} with a probability of 20\%. Since noise generation is highly time-consuming, we pre-compute a set of textures to be used later. During training, for each augmented sample, one of the generated Perlin noises is randomly chosen, cropped, flipped, and finally applied to the input image. Half of the time, the noise is multiplied uniformly on all channels to produce a grayscale texture, while the other half of the times is differentiated over RGB channels. Picture \ref{fig:perlin-noise} illustrates both cases.
+Furthermore, adding noise to images can greatly help \gls{cnn}s on avoiding overfitting \cite{shorten2019augmentationsurvey}. For this reason, at the end of the pipeline, we also apply Perlin noise \cite{perlin-noise} with a probability of 20\%. Since noise generation is highly time-consuming, we pre-compute a set of textures to be used later. During training, one of the generated Perlin noises for each augmented sample is randomly chosen, cropped, flipped, and finally applied to the input image. Half of the time, the noise is multiplied uniformly on all channels to produce a grayscale texture, while the other half of the time is differentiated over the RGB channels. Picture \ref{fig:perlin-noise} illustrates both cases.
 
 \begin{figure}[!h]
 	\centering
@@ -128,12 +128,12 @@ Furthermore, adding noise to images can greatly help \gls{cnn}s on avoiding over
 \section{Models Definition}
 \label{sec:model-variants}
 
-We have defined the methodologies to perform background replacement and data augmentation on the original images. According to our work's objective, we are interested in the beneficial effects on generalization caused by background replacement.  These effects can be amplified when back ground replacement is combined with image augmentation. For this reason, we define three model alternatives to evaluate the validity of our solution.
+We have defined the methodologies to perform background replacement and data augmentation on the original images. According to our work's objective, we are interested in the beneficial effects on generalization caused by background replacement.  These effects can be amplified when background replacement is combined with image augmentation. For this reason, we define three model alternatives to evaluate the validity of our solution.
 
 \begin{itemize}
     \item A baseline model, which is trained on the original dataset as-is (section \ref{sec:dataset}), and corresponds to the exact approach proposed by Mantegazza et al. \cite{mantegazza2019visionbased}. Since it is trained with data coming directly from the drone arena, we call it the \texttt{Arena} model.
     \item A first variant of the above model, defined by enabling only background replacement (not image augmentation). In this case, we replace original backgrounds (i.e., the drone arena) with randomly chosen images. For this purpose, we use the CVPR dataset presented in section \ref{sec:implementation-bgreplace}, therefore we call this model \texttt{CVPR}.
-    \item A second variant of the model include both background replacement and image augmentation. This combination constitutes the most advanced model proposed in our thesis. For simplicity, it is called \texttt{CVPR Aug}.
+    \item A second variant of the model includes both background replacement and image augmentation. This combination constitutes the most advanced model proposed in our thesis. For simplicity, it is called \texttt{CVPR Aug}.
 \end{itemize}
 
 The evaluation of the three models is described in chapter \ref{chap:evaluation}.
@@ -146,22 +146,20 @@ The evaluation of the three models is described in chapter \ref{chap:evaluation}
 
 This section focuses on the design and optimization of the data generator, which consists of retrieving and pre-processing the dataset before passing it to the \gls{cnn}.
 
-For the implementation of the generator, we rely on the \texttt{tf.data} API \footnote{\url{https://www.tensorflow.org/guide/data}} provided by TensorFlow. The library allows the development of complex and modular input pipelines for transforming and iterate over the data in a highly-customizable way. Compared with other methods for managing the model's dataset, \texttt{tf.data} gives the possibility of optimizing its operations through asynchronous execution on the GPU. This allows to achieve the best possible performance by minimizing the total idle time\footnote{Idle time refers to the time wasted on waiting for input or resources, thus without actual training activities}.
+For the implementation of the generator, we rely on the \texttt{tf.data} API \footnote{\url{https://www.tensorflow.org/guide/data}} provided by TensorFlow. The library allows the development of complex and modular input pipelines for transforming and iterate over the data in a highly-customizable way. Compared with other methods for managing the model's dataset, \texttt{tf.data} gives the possibility of optimizing its operations through asynchronous execution on the GPU. This optimization allows achieving the best possible performance by minimizing the total idle time\footnote{Idle time refers to the time wasted on waiting for input or resources, thus without actual training activities}.
 
 
 
 \subsection{Basic functioning}
 \label{subsec:data-generator-basic}
 
-The input pipeline always starts from the retrieval of the dataset. When working with a massive amount of data or when there is the need of augmenting a dataset online\footnote{In some cases, data augmentation can be previously performed to create a static augmented dataset. However, most of the times, augmentation is done during training.}, a common practice is to save each sample separately on disk. This method allows keeping in memory only the data required for a training step rather than the entire dataset. Otherwise, working with an extensive training set can lead to memory issues when using modest hardware.
+The input pipeline always starts from the retrieval of the dataset. When working with a massive amount of data or when there is the need of augmenting a dataset online\footnote{In some cases, data augmentation can be previously performed to create a static augmented dataset. However, most of the time, augmentation is done during training.}, a common practice is to save each sample separately on disk. This method allows keeping in memory only the data required for a training step rather than the entire dataset. Otherwise, working with an extensive training set can lead to memory issues when using modest hardware.
 
 We opt for this solution, and we split both training and test sets in 63'720 and 11'030 \texttt{pickle} files, respectively. Each sample contains the original image from the drone's camera, the ground truth according to the \gls{mocap} system, and the user's mask previously computed with Mask R-CNN.
 
 \medskip
 
-The generator only receives the entire list of file paths as input. On-demand, the samples are loaded using the \texttt{pickle} library, which unfortunately does not benefit from GPU acceleration. 
-
-After a sample is loaded, it passes through the augmentation pipeline. In our case, it includes both background replacement and classic image augmentation. 
+The generator only receives the entire list of file paths as input. On-demand, the samples are loaded using the \texttt{pickle} library, which unfortunately does not benefit from GPU acceleration. t After a sample is loaded, it passes through the augmentation pipeline. In our case, it includes both background replacement and classic image augmentation. 
 
 The former is done on every sample as long as a dataset for backgrounds has been provided to the data generator. The replacement is implemented with TensorFlow functions by blending the camera frame and the randomly chosen background using the relative user's mask. To speed up the process, all the background images from the given dataset are previously loaded in memory, already pre-processed to be compliant with input image shapes and types.
 
@@ -169,26 +167,24 @@ Data augmentation is applied according to a specified prior probability. It firs
 
 Finally, the resulting image and its ground truth are processed to be passed as input to the neural network Keras model.
 
-\texttt{tf.data} comes in help for merging samples into mini-batches of a given size. Also, for each epoch, the dataset can be repeated multiple times to simulate an oversampling strategy.
-
 
 
 \subsection{Optimization}
 
-Deep learning is particularly time-consuming because many operations must be repeated a large number of times. Most of these operations regards the actual learning of the \gls{nn} parameters. However, also the input pipeline defined above can be responsible for a bottleneck in the process. In fact, during input operations the model is not actually learning but only waiting for resources to be prepared.
+Deep learning is incredibly time-consuming because many operations must be repeated a large number of times. Most of these operations regard the actual learning of the \gls{nn} parameters. However, also the input pipeline defined above can be responsible for a bottleneck in the process. In fact, during input operations, the model is not actually learning but only waiting for resources to be prepared.
 
 If the input processing takes longer than actual training-related mathematical computations, then it is said that the program is highly input-bound. A good model should spend a tiny percentage of its total time waiting for input\footnote{a maximum of 5-10\% input time is considered acceptable} and a large majority of the time learning.
 
 \medskip
 
-The main causes of this issue are found in complex input pipelines. This due to pre-processing operations that are usually done on CPU rather than on GPU. This significantly increase the total time required for training. As described above, in our case, both data loading and image augmentation are implemented on the CPU. Furthermore, standard sequential computation requires the GPU to stop and wait for the input at every single mini-batch. This greatly reduces performance.
+The main causes of this issue are found in complex input pipelines. This due to pre-processing operations that are usually done on CPU rather than on GPU. This significantly increases the total time required for training. As described above, in our case, both data loading and image augmentation are implemented on the CPU. Furthermore, standard sequential computation requires the GPU to stop and wait for the input at every single mini-batch. This greatly reduces performance.
 
-\texttt{tf.data} natively takes into account this problem and applies some automatic optimizations. This explains why the framework is preferred over the implementation of a data generator made in pure-Python. However, for better results it is required to explicitly activate other optimizations provided by the library.
+\texttt{tf.data} natively takes into account this problem and applies some automatic optimizations. This explains why the framework is preferred over the implementation of a data generator made in pure-Python. However, for better results, it is required to explicitly activate other optimizations provided by the library.
 
 The following list provides a complete overview of the strategies adopted to reduce the GPU idle time. All of them are available through specific parameters shown in section \ref{subsec:data-generator-code}.
 
 \begin{itemize}
-    \item \textit{Prefetching} decouples the moment when a data is produced from the time when it is actually used for computation. It is done by reading data ahead of the time they are actually requested, enabling the overlapping between input processing and training steps. The result is that total training time is the maximum time between input and computing time, rather than the sum.
+    \item \textit{Prefetching} decouples the moment when a data is produced from the time when it is actually used for computation. It is done by reading data ahead of the time they are requested, enabling the overlapping between input processing and training steps. The result is that total training time is the maximum time between input and computing time, rather than the sum.
     
     In our case, prefetching affects the entire input pipeline.
     
@@ -282,7 +278,6 @@ Table \ref{tab:data-generator-profiling} reports the performance summary for our
 		GPU Compute Time (ms)       &   63.8 &   63.2 &   63.5 &   63.5 &   63.7 &   63.5 \\
 		%All Others Time (ms)        &    8.9 &    8.9 &    7.6 &   10.4 &    7.3 &   7.3 \\
 		\hline
-		\hline
 	\end{tabular}
 \end{table}
 
@@ -290,7 +285,7 @@ For a better understanding, we also display TensorBoard visualizations for stand
 
 Figure \ref{fig:profiling-cvpraug-summary} presents an overview of the performance over 35 training steps. The two charts clearly show how the non-optimized version is highly input-bound (46.9\%).
 
-Figure \ref{fig:profiling-cvpraug-gpu} shows the main tasks for which GPU and CPU are used during training. On GPU, the main difference regards the IDLE time. On the other hand, CPU computation of the optimized version mainly focus on Albumentations, while spreads over different tasks when no parallelization is used. This is probably due to sequential non-prefetched operations, that need a greater number of context switches between GPU and CPU, resulting in a waste of time.
+Figure \ref{fig:profiling-cvpraug-gpu} shows the main tasks for which GPU and CPU are used during training. On GPU, the main difference regards the IDLE time. On the other hand, CPU computation of the optimized version mainly focuses on Albumentations while spreads over different tasks when no parallelization is used. This behavior is probably due to sequential non-prefetched operations that need a greater number of context switches between GPU and CPU, resulting in a waste of time.
 
 
 \begin{figure}[!h]
@@ -363,7 +358,7 @@ This section illustrates technical details about the training procedure. We firs
 
 As in the original paper from Mantegazza et al. \cite{mantegazza2019visionbased}, we use the \gls{mae} loss function and the \gls{adam} optimizer \cite{kingma2014adam} with the default learning rate of $0.001$ and automatic reducer on plateaus (4 epochs patience). The batch size is $64$, and the last 30\% of the training data (not shuffled) is used as a validation set.
 
-The training runs for 60 epochs, without early stopping. The dataset is shuffled and repeated three times for each epoch. This imitates an oversampling strategy, especially suited for the \texttt{CVPR} and the \texttt{CVPR Aug} models. The latter is trained with a prior augmentation probability of 95\%, as detailed in section \ref{sec:implementation-imgaug}.
+The training runs for 60 epochs, without early stopping. The dataset is shuffled and repeated three times for each epoch. This approach imitates an oversampling strategy, especially suited for the \texttt{CVPR} and the \texttt{CVPR Aug} models. The latter is trained with a prior augmentation probability of 95\%, as detailed in section \ref{sec:implementation-imgaug}.
 
 Prefetching and parallelization \texttt{tf.data} parameters are automatically tuned by TensorFlow.
 

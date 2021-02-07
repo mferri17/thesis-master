@@ -22,13 +22,29 @@
 
 %\subsection{Supervised Learning}
 %\label{subsec:supervised-learning}
-%
-%\subsection{Convolutional Neural Networks}
+
+\subsection{Metrics}
+\label{subsec:metrics}
+
+The following list presents an overview of all the principal metrics adopted for our evaluation and used in the next sections.
+
+\begin{itemize}
+	\item \gls{mae} measures the average residuals in the dataset, which means the absolute difference between the actual and predicted values. The lower the \gls{mae}, the better the model. Assuming $y_i$ as the predicted value and $\hat{y_i}$ as the ground truth, the \gls{mae} is defined as follows:
+	$$ MAE = \frac{1}{N} \sum_{i=1}^N |y_i - \hat{y_i}| $$
+	
+	\item \gls{rmse} measures the standard deviation of residuals. As for \gls{mae}, \gls{rmse} should be as lower as possible. It penalizes large prediction errors, thus is not particularly suited to be used on a dataset with many outliers. The main advantage and reason for its usage in evaluating regression models is because \gls{rmse} has the same unit as the dependent variable, so it is easy to interpret.
+	$$ RMSE = \sqrt{\frac{1}{N} \sum_{i=1}^N (y_i - \hat{y_i})^2} $$
+	
+	\item \gls{r2} (or coefficient of determination) measures the robustness of the regression. It represents the proportion of the variance in the dependent variable which is explained by the independent variable. \gls{r2} is often the best choice for evaluating regression performance because it provides a measure of fitness for the model to predict unseen data correctly. Also, its domain is easily understandable since it goes from $-\infty$ to 1: an optimal model (with no prediction errors) will have an \gls{r2} of 1; a model that always predicts the average value will have an \gls{r2} of 0; a model worse than the average predictor will have a negative \gls{r2}. Considering $\overline{y}$ the mean value:
+	$$ R^2 = 1 - \frac{\sum_{i=1}^N (y_i - \hat{y_i})^2}{\sum_{i=1}^N (y_i - \overline{y})^2} $$
+\end{itemize}
+
+
+%\subsection{Convolutional Neural Networks (CNN)}
 %\label{subsec:cnn}
 %
-%\subsection{Residual Neural Networks}
+%\subsection{Residual Neural Networks (ResNet)}
 %\label{subsec:resnet}
-
 
 
 
