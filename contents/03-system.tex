@@ -49,7 +49,7 @@ To monitor the drone and the user's movement, we require a \gls{mocap} system to
 \subsection{Drone Arena}
 \label{subsec:drone-arena}
 
-At \gls{idsia}, a dedicated room has been equipped with a \gls{mocap} system composed by 12 OptiTrack Prime$^x$13 \gls{ir} cameras\footnote{1.3 \gls{mp}, 240 \gls{fps}, $\pm0.20$ mm 3D accuracy in a $9 \times 9$ meters area with 14mm markers} for medium-sized areas (figure \ref{fig:optitrack-camera}). They track passive markers' movements, placed both on the person's head facing the drone and on the drone itself. Schematic and actual representation of the arena are shown in figures \ref{fig:optitrack-schema} and \ref{fig:drone-arena}. Such composition can track a theoretical number of 18 drones inside an available area of $6 \times 6$ meters (here surrounded by a safety net). A virtual fence of $4.8 \times 4.8$ meters virtually constraints the total area in which the drone is allowed to fly.
+At \gls{idsia}, a dedicated room has been equipped with a \gls{mocap} system composed of 12 OptiTrack Prime$^x$13 \gls{ir} cameras\footnote{1.3 \gls{mp}, 240 \gls{fps}, $\pm0.20$ mm 3D accuracy in a $9 \times 9$ meters area with 14mm markers} for medium-sized areas (figure \ref{fig:optitrack-camera}). They track passive markers' movements, placed both on the person's head facing the drone and on the drone itself. Schematic and actual representation of the arena are shown in figures \ref{fig:optitrack-schema} and \ref{fig:drone-arena}. Such composition can track a theoretical number of 18 drones inside an available area of $6 \times 6$ meters (here surrounded by a safety net). A virtual fence of $4.8 \times 4.8$ meters virtually constraints the total area in which the drone is allowed to fly.
 
 \begin{figure}[!htb]
 	\centering
@@ -118,7 +118,7 @@ During data collection, both user's and drone's poses are captured by the OptiTr
 
 Data collected inside the arena have been used to build the dataset for training a machine learning model to infer the target pose from a picture. For building both the training and the testing set, several flight sessions have been recorded using the omniscient controller described above. 
 
-The dataset contains 13 different people, which differ in physical characteristics and outfit, moving in different ways under various (artificial) light conditions. Many objects are present in the background of recorded images, and some experiments involve more than one person in front of the drone\footnote{anyway, the drone always had to follow the nearest user (equipped with OptiTrack markers)}. In total, 45 minutes of usable videos were used to compose the dataset, which counts about 63'000 and 11'000 frames for training and testing sets, respectively.
+The dataset contains thirteen different people, which differ in physical characteristics and outfit, moving in different ways under various (artificial) light conditions. Many objects are present in the background of recorded images, and some experiments involve more than one person in front of the drone\footnote{anyway, the drone always had to follow the nearest user (equipped with OptiTrack markers)}. In total, 45 minutes of videos were used to compose the dataset, which counts about 63'000 and 11'000 frames for training and testing sets, respectively.
 
 A complete overview of images composing the training set is shown in figure \ref{fig:frontalnet-dataset-overview}. Please notice that a few frames in the dataset are affected by digital artifacts, mainly caused by connection issues during video recording (figure \ref{fig:frontalnet-dataset-glitch}); moreover, in some frames, no person is present because of particular movements sequences during which the drone actually lose the user (figure \ref{fig:frontalnet-dataset-missing}).
 
@@ -146,13 +146,13 @@ A complete overview of images composing the training set is shown in figure \ref
 \label{fig:frontalnet-dataset-missing}
 \end{figure}
 
-The ground truth is represented by the four variables associated with each captured image. The variables explain the user's pose \gls{wrt} the drone, and their interpretation is described here:
+The ground truth is represented by four variables associated with each captured image. The variables explain the user's pose \gls{wrt} the drone, and their interpretation is described here:
 
 \begin{itemize}
 	\item \texttt{X} is the distance of the user from the drone and affects the pitch (acceleration along the X-axis). Usually, the drone flies at 1.5 meters from the user.
 	\item \texttt{Y} represents the horizontal alignment of the user in front of the drone and affects the roll (acceleration along the Y-axis). When the user is horizontally centered in front of the drone, this variable will be equal to 0.
 	\item \texttt{Z} represents the vertical alignment of the user in front of the drone and affects the velocity along the Z-axis. When the user is vertically centered in front of the drone, this variable will be equal to 0.
-	\item \texttt{W} represents the angle created between the head's pointing direction and drone position, is influenced by head orientation, and affects the yaw (angular velocity around the Z-axis). If the user is perfectly facing the drone, this variable will be equal to 0.
+	\item \texttt{W} represents the angle created between the head's pointing direction and the drone position, is influenced by head orientation, and affects the yaw (angular velocity around the Z-axis). If the user is perfectly facing the drone, this variable will be equal to 0.
 \end{itemize}
 
 From the distribution of the variables in the training set, shown in figure \ref{fig:frontalnet-dataset-distribution-regr}, we notice that most of the time, the user is somehow centered in the image. This is an effect caused by the \gls{ros} controller based on known poses. The variation of the variables is affected by the user's movements in space; the more sudden they are, the greater the deviation.
@@ -210,7 +210,7 @@ The first choice for building charts, visualize images or various kinds of figur
 Mainly used for efficient image/video manipulation and visualization, together with Matplotlib. OpenCV is an open-source library that includes several hundreds of computer vision algorithms.
 
 \paragraph*{\texttt{TensorFlow 2}}
-The entire project strongly relies on TensorFlow \cite{tensorflow} (TF) from start to end: network interpretation, person masking, training, and quantitative evaluation. Created by the Google Brain team, TensorFlow is an open-source library for numerical computation and large-scale machine learning. It can be used across a range of tasks but has a particular focus on training and inference of deep neural networks. In version 2, it introduces many comforts for easier development with a less steep learning curve.
+The entire project strongly relies on TensorFlow \cite{tensorflow} (TF) from start to end: network interpretation, person masking, training, and evaluation. Created by the Google Brain team, TensorFlow is an open-source library for numerical computation and large-scale machine learning. It can be used across a range of tasks but has a particular focus on training and inference of deep neural networks. In version 2, it introduces many comforts for easier development with a less steep learning curve.
 
 \paragraph*{\texttt{Keras}}
 Used for defining the network architecture, training, and evaluating the model. Keras  \cite{keras} is the high-level API of TensorFlow 2: an approachable, highly-productive interface for solving machine learning problems, focusing on modern deep learning. It provides essential abstractions and building blocks for developing and shipping machine learning solutions with high iteration velocity.

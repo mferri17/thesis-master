@@ -3,15 +3,22 @@
 \label{chap:conclusion}
  
  
+In this thesis, we presented a methodology for generalizing the ResNet defined in \cite{mantegazza2019visionbased}. Designed to predict a user's pose from an image, the model was not able to achieve its task out of the training environment. We first applied Grad-CAM to understand what the model was actually considering while computing its prediction, and we discovered that the network was suffering from many biases coming from the training data.
 
-\section{Final Thoughts}
-\label{sec:concl}
+As a solution, we proposed a modification of the dataset to reduce overfitting. Our approach consists of applying background replacement and image augmentation to the original images for the creation of new data. Retraining the original ResNet on the data obtained after our augmentation pipeline, we created an enhanced version of the model.
 
-\lipsum[2]
-
+Our quantitative and qualitative evaluation demonstrated that our improved model is capable of solving the task in unseen environments. This is a demonstration that our approach improved the generalization capabilities of the original model.
 
 
-\section{Future Works}
-\label{sec:future}
 
-\lipsum[2]
+
+
+\subsubsection*{Future Works}
+\label{subsec:future-works}
+
+Considered the results obtained during our evaluation, we can define a couple of future milestones: 
+
+\begin{itemize}
+    \item A test on the real drone is needed to further confirm the solution's success in the task. We want to ensure that our approach is effectively able to predict a user's pose in any environment through the real drone's camera. Experiments in various scenarios have the possibility of ultimately assess the model's generalization capabilities. 
+    \item A recent work in IDSIA \cite{zimmerman2020thesis} have brought the same task of human pose prediction on-board the Crazyflie, an ultra-low-power nano-drone. It would be interesting to apply our augmentation pipeline on that work to prove the power of the solution on different platforms designed to achieve the same task.
+\end{itemize}

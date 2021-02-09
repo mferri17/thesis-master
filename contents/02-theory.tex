@@ -23,7 +23,7 @@
 %\subsection{Supervised Learning}
 %\label{subsec:supervised-learning}
 
-\subsection{Metrics}
+\subsection{Regression Metrics}
 \label{subsec:metrics}
 
 The following list presents an overview of all the principal metrics adopted for our evaluation and used in the next sections.
@@ -48,61 +48,64 @@ The following list presents an overview of all the principal metrics adopted for
 
 
 
-\section{Human-drone Interaction}
+
+\section{Artificial Intelligence for Drones}
 \label{sec:human-drone-interaction}
 
-A good variety of research can be found on human-robot interaction, and a lot is yet to come. In the field, drones represent a specific segment due to their ability to freely move in the 3D space, opening access to new use cases while representing a real challenge for professionals and researchers.
+\gls{uav}, commonly known as drones, attracted a lot of interest in the last years. Their usage is expected to raise due to decreasing costs and emerging applications for personal, commercial, and social use. As the sector grows, many methodologies are under development for the control and coordination of drones. Most of the recent works in the field propose artificial intelligence solutions for a large variety of tasks.
 
-In this section, we first present a general overview of the topic, and then we focus on related works by \gls{idsia}.
+In this section, we first present a general overview on recent studies for autonomous flight. Then, we shift our attention on the topic of human-drone interaction and we focus on related works by \gls{idsia}.
+
+
+
+\subsection{Autonomous Flight}
+\label{subsec:drone-auto-drive}
+
+Autonomous navigation is an important and well-known research area in robotics, which usually requires accomplishing complex and computationally-expensive tasks such as localization, mapping, and path planning. Recent studies have started to approach autonomous driving through imitation learning \cite{imitation_learning_survey}. The approach consist in making a neural network learn a certain task by imitating humans' or robots' behavior on the given assignment.
+
+In 2016, a conjoint team from \gls{idsia} and \gls{uzh} proposes a machine learning approach for the problem of perceiving forest or mountain trails \cite{giusti2016machine}. They use a \gls{dnn} as a supervised image classifier for understanding the direction of a trail, viewed from a camera placed on top of a robot following the path itself. The solution outperforms previous alternatives in the task, making the drone able to autonomously drive following a tipical forest trail. Quantitative results show an accuracy which is comparable to the accuracy of humans on the same classification task.
+
+Some years later, researchers from \gls{uzh} have demonstrated that \gls{resnet}s can achieve satisfactory performance for drones' autonomous driving in indoor and outdoor scenarios. They developed DroNet \cite{Loquercio_2018}, a forked \gls{cnn} that predicts a steering angle and a collision probability from given a gray-scale image. The model learns to steer and avoid obstacles from forward-looking videos recorded by cars and bikes while driving in real contexts. DroNet requires very little computational power, allowing real-time performance, even on a CPU. In this case, the predictions run off-drone on a dedicated computer, remotely connected through WiFi.
 
 
 
 \subsection{The State of the Art of Human–Drone Interaction}
 \label{subsec:human-drone-sota}
 
-Drones attracted a lot of attention in the last years, and their usage is expected to keep growing, thanks to decreasing costs and the powerful features they can provide for personal, commercial, and social usage.
+A good variety of research can be found on human-robot interaction, and a lot is yet to come. In the field, drones represent a specific segment due to their ability to freely move in the 3D space, opening access to new use cases while representing a real challenge for professionals and researchers.
 
-An article published in Nov 2019 for the IEEE Access \cite{human-drone-sota} explores literature and state of the art for human-drone interaction. It reports that \gls{faa} expects total drone registrations to increase by more than 60\% between 2018 and 2022. The main increment will be seen in the commercial sector, rather than the hobbyist one, even though the latter still counts the large majority of units. Nowadays, almost half of drone usage is for aerial photography (48\%), followed by industrial inspection (28\%) and agriculture (17\%). In the next decade, the authors argue that drones will become ubiquitous to society and extensively used in advertising, shipping, sports, emergency, and many other fields for augmenting human capabilities.
+An article published in November 2019 for the IEEE Access \cite{human-drone-sota} explores literature and state of the art in the field of human-drone interaction. It reports that \gls{faa} expects drones' registrations to increase by more than 60\% between 2018 and 2022. The main increment will be seen in the commercial sector, rather than the hobbyist one, even though the latter still counts the large majority of units. Nowadays, almost half of drone usage is for aerial photography (48\%), followed by industrial inspection (28\%) and agriculture (17\%). In the next decade, the authors argue that drones will become ubiquitous to society and extensively used in advertising, shipping, sports, emergency, and many other fields for augmenting human capabilities.
 
-Providing a nice overview of the latest works, the article highlights the most important challenges of today's research in human-drone interaction. The main studies in the area treat drones' control and human-machine communication, while the principal concerns regard the users' perception of safety during flight.
-
-These topics are strictly related to our task, concerning autonomous flight in human proximity.
+Providing a nice overview of the latest works, the article highlights the most important challenges of today's research on the subject. The main studies in human-drone interaction treat drones' control and human-machine communication. The principal concerns regard the users' perception of safety during flight. These topics are strictly related to our task, concerning autonomous flight in human proximity.
 
 
 
 \subsection{Vision-based Control of a Quadrotor in User Proximity}
 \label{subsec:sota-dario}
 
-Our work is built upon the original master thesis \cite{mantegazza2018thesis} and paper \cite{mantegazza2019visionbased} from Dario Mantegazza, named \textit{Vision-based Control of a Quadrotor in User Proximity: Mediated vs. End-to-End Learning Approaches}, developed at \gls{idsia} between 2018 and 2019.
+Our work is based on the master thesis \cite{mantegazza2018thesis} and paper \cite{mantegazza2019visionbased} from Dario Mantegazza, named \textit{Vision-based Control of a Quadrotor in User Proximity: Mediated vs. End-to-End Learning Approaches}, developed at \gls{idsia} between 2018 and 2019.
 
 \medskip
 
-In his thesis, the author proposes a machine learning technique for teaching a model to control a drone interacting with a person. In a few words, the goal is to continuously fly the drone to hover in front of a moving user. The problem is approached as a reactive control procedure and addressed with supervised learning. Thus, it provides an interesting starting point for many other robotics applications.
+In his thesis, the author proposes a machine learning technique for teaching a model to control a drone while interacting with a person. In a few words, the goal is to continuously fly the drone to hover in front of a moving user. The problem is approached as a reactive control procedure and addressed with supervised learning. Thus, it provides an interesting starting point for many other robotics applications. Training data is acquired by programmatically flying the drone to face a user frontally. In this phase, the quadrotor is controlled through an omniscient controller that knows both the drone's and person's pose. Images produced by the front-facing camera of the drone are used as input for a custom-designed \gls{resnet} architecture that infers the relative user's position \gls{wrt} the drone. The neural network performs a regression on the four variables that form the user's pose (X, Y, Z, YAW) and learns to predict their values using spatial information in the input images.
 
-Training data is acquired by programmatically flying the drone to face a user frontally. In this phase, the quadrotor is controlled through an omniscient controller that knows both the drone's and person's pose. Images produced by the front-facing camera of the drone are used as input for a custom-designed \gls{resnet} architecture that infers the relative user's position \gls{wrt} the drone. In practice, the neural network performs a regression on the four variables that form the user's pose (X, Y, Z, YAW) and learns to predict their values using spatial information in the input images.
+In the paper, the author compares the mediated approach described above with another end-to-end approach based on imitation learning. This second solution directly learns control signals\footnote{desired pitch, roll, yaw, and vertical velocity} for the drone, instead of the user's pose. A third experiment also considers the task of automatically learning a controller that drives the drone based on the given user's position. All the solutions provide very similar results but, for this thesis, we will only take into consideration the mediated approach. The reason behind our choice is that the learned model can be adapted to other tasks by simply designing a custom controller for the drone. Furthermore, it also provides a more transparent and analyzable solution.
 
-In the paper, the author also compares the mediated approach described above and another end-to-end approach based on imitation learning. This second solution directly learns control signals\footnote{desired pitch, roll, yaw, and vertical velocity} for the drone, instead of the user's pose. A third experiment also considers the task of automatically learning a controller that drives the drone based on the given user's position.
-
-All the solutions provide very similar results, but for this thesis, we will only take into consideration the mediated approach. The reason behind this choice is that the learned model can be adapted to other tasks by simply designing a custom controller for the drone. It also provides a more transparent and analyzable solution.
+Even though this kind of problem on human recognition and pose estimation could be faced with more advanced deep learning algorithms, making a simple regression on four variables allows the network to be fairly small so that the prediction task is light, fast to execute, and possibly portable on low-end devices. We will address this topic in section \ref{subsec:sota-nicky}.
 
 \medskip
 
-Even though this kind of problem on human recognition and pose estimation could be faced with more advanced deep learning algorithms, making a simple regression on four variables allows the network to be fairly small so that the prediction task is light, fast to execute, and possibly portable on low-end devices.
-
-Our entire project makes use of the original network architecture and dataset defined in \cite{mantegazza2019visionbased}, respectively explored in sections \ref{subsec:frontalnet-architecture} and \ref{sec:dataset}, For a better understanding, the original code repository\footnote{\url{https://github.com/idsia-robotics/proximity-quadrotor-learning}} and a descriptive video\footnote{\url{https://drive.switch.ch/index.php/s/MlEDrsuHcSl5Aw5}} are also available. 
-To enhance readability, having no official name, the custom \gls{resnet} architecture proposed by the author will be called \textit{FrontalNet}.
+Our entire project makes use of the original network architecture and dataset defined in \cite{mantegazza2019visionbased}, respectively explored in sections \ref{subsec:frontalnet-architecture} and \ref{sec:dataset}. For a better understanding, the original code repository\footnote{\url{https://github.com/idsia-robotics/proximity-quadrotor-learning}} and a descriptive video\footnote{\url{https://drive.switch.ch/index.php/s/MlEDrsuHcSl5Aw5}} are also available. To enhance readability of this thesis, having no official name, the custom \gls{resnet} architecture proposed by the author will be called \textit{FrontalNet}.
 
 
 \subsubsection{FrontalNet Architecture}
 \label{subsec:frontalnet-architecture}
 
-The network comprises a total of 1'332'484 trainable parameters, accepts a single $60 \times 108$ pixels image in input, and outputs 4 regression variables that correspond to the user's pose coordinates. Each \gls{resnet} block is provided with batch normalization, ReLU activations \cite{act-relu} are used for all layers except for the output neurons, which are associated with a linear activation function \cite{act-linear}. 
-
-Figure \ref{fig:frontalnet-architecture-1} provides an illustration of the mediated architecture we consider for this thesis\footnote{take a look at image \ref{fig:frontalnet-architecture-paper3approaches} for details about the architectures related to the other approaches}. A complete list of all layers is also available in figures \ref{fig:frontalnet-architecture-3a} and \ref{fig:frontalnet-architecture-3a} of the appendix. 
+The network comprises a total of 1'332'484 trainable parameters, accepts a single $60 \times 108$ pixels image in input, and outputs 4 regression variables that correspond to the user's pose coordinates. Each \gls{resnet} block is provided with batch normalization, ReLU activations \cite{act-relu} are used for all layers except for the output neurons, which are associated with a linear activation function \cite{act-linear}. Figure \ref{fig:frontalnet-architecture-1} provides an illustration of the mediated architecture we consider for this thesis\footnote{take a look at image \ref{fig:frontalnet-architecture-paper3approaches} for details about the architectures related to the other approaches}. A complete list of all layers is also available in figures \ref{fig:frontalnet-architecture-3a} and \ref{fig:frontalnet-architecture-3a} of the appendix. 
 
 \begin{figure}[!h]
 	\centering
-	\includegraphics[width=0.3\textwidth]{"contents/images/03-frontalnet-1A"}
+	\includegraphics[width=0.4\textwidth]{"contents/images/03-frontalnet-1A"}
 	\caption[Schematic FrontalNet architecture]{Schematic FrontalNet architecture \cite{mantegazza2019visionbased}}
 	\label{fig:frontalnet-architecture-1}
 \end{figure}
@@ -111,33 +114,27 @@ Figure \ref{fig:frontalnet-architecture-1} provides an illustration of the media
 \subsubsection{FrontalNet Performance}
 \label{subsec:frontalnet-performance}
 
-FrontalNet is trained using the \gls{mae} loss function with the \gls{adam} optimizer \cite{kingma2014adam} and a base learning rate of 0.001, progressively reduced on validation loss plateaus that last more than 5 epochs. A maximum of 200 epochs are run in total, but with an early stopping policy with a patience of 10 epochs on the validation loss. 
+\glsreset{r2}
+
+FrontalNet is trained using the \gls{mae} loss function with the \gls{adam} optimizer \cite{kingma2014adam} and a base learning rate of 0.001, progressively reduced on validation loss plateaus that last more than 5 epochs. A maximum of 200 epochs are run in total, using an early stopping policy with a patience of 10 epochs on the validation loss. 
 
 Performance is evaluated quantitatively and qualitatively on the end-to-end model, rather than the mediated one considered for our work. However, as explained before, both approaches obtain similar results. We can accordingly consider the following evaluation to be valid for the mediated approach too.
 
 \medskip 
+For quantitative evaluation, the chosen metric is \gls{r2}, already explained in section \ref{subsec:metrics}. The author also experiments with finding the minimum cardinality of the dataset to obtain acceptable performance. Results are available in figure \ref{fig:frontalnet-r2}, directly taken from the paper. As shown, at least 5,000 samples are required to achieve decent performance, which improves as the size of the training set increases. Specifically, predictions seem more accurate for variables \texttt{Z} and \texttt{W} with an \gls{r2} score of 0.82 and 0.88, respectively. Quite different the results for \texttt{X} and \texttt{Y} which only reach an \gls{r2} of 0.59 and 0.57, respectively.
 
-\glsreset{r2}
-For quantitative evaluation, the chosen metric is \gls{r2}\footnote{\gls{r2} interpretation will be explained in the evaluation chapter \ref{chap:evaluation}}, which has an interval of $[-\infty, 1]$, where 1 represents the optimality. 
-
-The author also experiments with finding the minimum cardinality of the dataset to obtain acceptable performance. Results are available in figure \ref{fig:frontalnet-r2}, directly taken from the paper. As shown, at least 5,000 samples are required to achieve decent performance, which improves as the size of the training set increases.
-
-Specifically, predictions seem more accurate for variables \texttt{Z} and \texttt{W} with an \gls{r2} score of 0.82 and 0.88, respectively. Quite different the results for \texttt{X} and \texttt{Y} which only reach an \gls{r2} of 0.59 and 0.57, respectively.
+These considerations on the variables are confirmed by the qualitative evaluation, obtained by comparing ground truth and predictions during a short simulation. Figure \ref{fig:frontalnet-gt-pred} shows that \texttt{X} and \texttt{Y} predictions are considerably worse than results achieved by \texttt{Z} and \texttt{W} when compared with the ground truth.
 
 \begin{figure}[!htb]
 	\centering
-	\includegraphics[width=0.8\textwidth]{"contents/images/03-frontalnet-r2"}
+	\includegraphics[width=1\textwidth]{"contents/images/03-frontalnet-r2"}
 	\caption[FrontalNet quantitative evaluation: \gls{r2} results \cite{mantegazza2019visionbased}]{FrontalNet quantitative evaluation: \gls{r2} results \cite{mantegazza2019visionbased}. A1, A2 and A3 in the chart stands for different models, but they anyway achieve almost the same results.}
 	\label{fig:frontalnet-r2}
 \end{figure}
 
-\medskip
-
-The previous considerations on the variables are confirmed by the qualitative evaluation, obtained by comparing ground truth and predictions during a short simulation. Figure \ref{fig:frontalnet-gt-pred} shows that X and Y predictions are considerably worse than results achieved by Z and W when compared with the ground truth.
-
 \begin{figure}[!htb]
 	\centering
-	\includegraphics[width=0.8\textwidth]{"contents/images/03-frontalnet-gt-pred-2"}
+	\includegraphics[width=0.85\textwidth]{"contents/images/03-frontalnet-gt-pred-2"}
 	\caption[FrontalNet qualitative evaluation: GT vs. prediction results \cite{mantegazza2019visionbased}]{FrontalNet qualitative evaluation: GT vs. prediction results \cite{mantegazza2019visionbased}. A1, A2 and A3 in the chart stands for different models, but they anyway achieve almost the same results.}
 	\label{fig:frontalnet-gt-pred}
 \end{figure}
@@ -146,17 +143,13 @@ The previous considerations on the variables are confirmed by the qualitative ev
 \subsection{Embedded Implementation of Controller for Nano-Drones}
 \label{subsec:sota-nicky}
 
-Autonomous navigation is an important and well-known research area in robotics, which usually requires accomplishing complex and computationally-expensive tasks such as localization, mapping, and path planning. Recent studies have started to approach autonomous driving through imitation learning \cite{imitation_learning_survey}, where neural networks learn by imitating human behavior in specific tasks. 
+In recent years, both industry and research are starting to work with nano-drones. Their minimal size facilitates indoor flights, even in close proximity to humans. For this reason, they are particularly suited for the exploration of innovative cases on human-drone interaction.
 
 \medskip
 
-In 2018, researchers at the UZH University of Zürich have demonstrated that \gls{resnet}s can provide satisfactory performance in the field. They developed DroNet \cite{Loquercio_2018}, a forked \gls{cnn} that predicts, from a single gray-scale image, a steering angle and a collision probability. In other words, the model learns to steer and avoid obstacles from forward-looking videos recorded by cars and bikes while driving in real contexts. In this case, both the prediction and controller tasks were powered off-drone on a dedicated computer, remotely connected through WiFi. 
+In 2019, researchers from \gls{eth} developed PULP-DroNet \cite{palossi2019pulpdronetIoTJ} by porting the DroNet \cite{Loquercio_2018} model (explained in section \ref{subsec:drone-auto-drive}) on the Crazyflie\footnote{\url{https://www.bitcraze.io/products/crazyflie-2-1/}}. This is a nano-drone with a size of only $3 \times 3$ centimeters for a weight of 27 grams. The authors propose a general methodology for deploying on-board deep learning algorithms for ultra-low-power devices without needing an external laptop to run the software.
 
-A year later, ETH Zürich was able to develop PULP-DroNet \cite{palossi2019pulpdronetIoTJ}, porting the \gls{cnn} on the Crazyflie\footnote{\url{https://www.bitcraze.io/products/crazyflie-2-1/}}, a nano-drone with a size of only 3 $3 \times 3$ centimeters for a weight of 27 grams. They propose a general methodology for deploying on-board deep learning algorithms for ultra-low-power devices without needing an external laptop to run the software.
-
-\medskip
-
-Inspired by PULP-DroNet, \gls{idsia} adapted its FrontalNet to work on-board the Crazyflie with excellent results \cite{zimmerman2020thesis}. The nano-drone can achieve good quantitative and qualitative performance, regardless of any problem deriving from working with such low-end devices. The main challenges are represented by low computational power, energy consumption management, and low-fidelity camera with no video stabilization\footnote{Himax HM01B0 camera, theoretically able to produce $320 \times 320$ \gls{mp} images at 60 FPS. However, the frame rate is incredibly reduced during data collection due to some platform limitation in image transferring.}.
+Inspired by PULP-DroNet, \gls{idsia} adapted its FrontalNet \cite{mantegazza2019visionbased} to work on-board the Crazyflie with encouraging results \cite{zimmerman2020thesis}. The nano-drone can achieve good quantitative and qualitative performance, regardless of the issues deriving from working with such low-end devices. The main challenges highlighted by \cite{zimmerman2020thesis} are found in the need of managing low computational capabilities, energy consumption, and low-fidelity camera images acquired with no video stabilization.
 
 
 
@@ -167,19 +160,11 @@ Inspired by PULP-DroNet, \gls{idsia} adapted its FrontalNet to work on-board the
 \glsreset{ml}
 \glsreset{nn}
 
-A \gls{nn} learns abstract representations for finding a mapping between its input and output, determined by well-defined mathematical computations that involve the input itself and the progressively learned network parameters. Inspired by biological brains, this approach seems to be incredibly effective on a huge variety of tasks.
+A \gls{nn} learns abstract representations for finding a mapping between its input and output, determined by well-defined mathematical computations that involve the input itself and the progressively learned network parameters. Inspired by biological brains, this approach seems to be incredibly effective on a huge variety of tasks. Nevertheless, unlike other \gls{ml} techniques, \gls{nn} are known to produce "black-box" models. Their reasoning and comprehension are intrinsic in the network parameters, which are nothing but numbers, particularly hard to understand even from domain experts. 
 
-\medskip 
+However, when working with real-world problems, it is crucial to produce explainable \gls{ml} results. A thorough understanding of these methods builds trust in algorithms, and makes sure there are no undesirable biases in the models. Otherwise, serious problems can arise especially in critical fields such as medicine and law. \gls{xai} is the field of study which tries to make \gls{ml} models, and their underlying basis for decision-making, properly understandable to humans \cite{xai-wiki}.
 
-However, unlike other \gls{ml} techniques, \gls{nn} are known to produce "black-box" models. Their reasoning and comprehension are intrinsic in the network parameters, which are nothing but numbers, particularly hard to understand even from domain experts. 
-
-When working with real-world problems, it is extremely important to be able to explain what a \gls{ml} model is actually understanding. This builds trust in algorithms and makes sure there are no undesirable biases in the models, which could raise serious problems, especially in critical fields such as medicine and law.
-
-\medskip
-
-\gls{xai} is the field of study which tries to make \gls{ml} results, and their underlying basis for decision-making, properly understandable to humans \cite{xai-wiki}. For \gls{cnn}s, researchers have developed many techniques for understanding what a \gls{nn} actually care of when producing an output based on an input image. 
-
-Main efforts regard feature visualization and attribution, but recent advanced studies have also shown how these methods can be used altogether \cite{olah2018the}. This section briefly explains these two major areas for \gls{cnn} interpretability, with a particular focus on spatial attribution, the chosen methodology for our work.
+For computer vision, researchers have developed some techniques for understanding what a \gls{cnn} considers for producing an output based on an input image. Primary efforts regard feature visualization and attribution, and recent studies have also shown how these methods can be used altogether \cite{olah2018the}. This section briefly explains these two major areas for \gls{cnn} interpretability, with a particular focus on spatial attribution, the chosen methodology for our work.
 
 
 
@@ -276,7 +261,7 @@ Even though the approach obtains auspicious results, a complete and adaptable im
 
 
 
-\subsection{Chroma key}
+\subsection{Chroma Key}
 
 A known approach for implementing background replacement is the chroma key. Widely used in entertainment, it is a technique that makes use of colors in images and videos for splitting between actual content and background. Usually, a chroma key is achieved through a blue or green screen placed behind the subject, making sure that such color is not present in the foreground image. A post-production software then takes care of creating the appropriate mask, which separates the two parts and enables background replacement.
 

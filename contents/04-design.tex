@@ -21,7 +21,7 @@ As explained in section \ref{subsec:frontalnet-performance}, FrontalNet achieved
 
 However, both quantitative and qualitative evaluations have been carried out using a set of images similar to the training one. Even though the model predictions were good with unknown users, they still move in the same drone arena where the training data have been collected. For a complete analysis, we must consider model performance in unknown environments.
 
-The official paper does not talk about the topic, but during a direct discussion with the author, we discovered that flying performance outside of the drone arena was not consistent with usual model behavior. The drone was not able to follow the user appropriately, and its movements were unexplainable. We conclude that the \gls{cnn} is not able to generalize the task when outside of the environment it already knows.
+The official paper does not address the topic, but during a direct discussion with the author, we discovered that flying performance outside of the drone arena was not consistent with the usual model behavior. The drone was not able to follow the user appropriately, and its movements were unpredictable. We conclude that the \gls{cnn} is not able to generalize the task when outside of the environment it already knows.
 
 \medskip
 
@@ -44,7 +44,7 @@ Convolutional Neural Networks (CNN) are suited for computer vision because of th
 
 Among network interpretability techniques introduced in section \ref{sec:network-interpretability}, we choose \gls{gradcam}. The algorithm is indeed the most understandable way of visualizing what a \gls{cnn} is actually seeing.
 
-As explained in section \ref{subsec:gradcam-theory}, \gls{gradcam} is able to effectively visualize parts of an input image which are actually responsible for predicting a certain output\footnote{for an easy understandable \gls{gradcam} example, please refer to the figure \ref{fig:gradcam-catdog} which regards a simple dogs VS cats classifier}.
+As explained in section \ref{subsec:gradcam-theory}, \gls{gradcam} is able to effectively visualize the parts of an input image which are actually responsible for predicting a certain output\footnote{for an easy understandable \gls{gradcam} example, please refer to the figure \ref{fig:gradcam-catdog} which regards a simple dogs VS cats classifier}.
 
 \medskip
 
@@ -384,7 +384,7 @@ The examples presented above mostly reflect the model expected behavior. However
 		\end{subfigure}
 	\end{center}
 	\vspace{-0.5cm}
-	\caption[\gls{gradcam}: Model get easily distracted by various elements]{\gls{gradcam}: Model get easily distracted by various elements}
+	\caption[\gls{gradcam}: Model gets easily distracted by various elements]{\gls{gradcam}: Model get easily distracted by various elements}
 	\label{fig:gradcam-random}
 \end{figure}
 
@@ -676,7 +676,7 @@ Image \ref{fig:grabcut-hybrid-example} shows the results of hybrid initializatio
 \end{figure}
 
 
-\subsubsection{Automatic Human Detection}
+\subsubsection{Human detection}
 \label{subsec:masking-yolo}
 
 The approaches presented until now are used for doing human segmentation, which is an essential step for performing background removal. To work, GrabCut hybrid initialization requires two pieces of information: the bounding boxes associated with both the entire person and its head.
