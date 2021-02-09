@@ -150,7 +150,7 @@ For the implementation of the generator, we rely on the \texttt{tf.data} API \fo
 
 
 
-\subsection{Basic functioning}
+\subsection{Basic Functioning}
 \label{subsec:data-generator-basic}
 
 The input pipeline always starts from the retrieval of the dataset. When working with a massive amount of data or when there is the need of augmenting a dataset online\footnote{In some cases, data augmentation can be previously performed to create a static augmented dataset. However, most of the time, augmentation is done during training.}, a common practice is to save each sample separately on disk. This method allows keeping in memory only the data required for a training step rather than the entire dataset. Otherwise, working with an extensive training set can lead to memory issues when using modest hardware.
@@ -159,7 +159,7 @@ We opt for this solution, and we split both training and test sets in 63'720 and
 
 \medskip
 
-The generator only receives the entire list of file paths as input. On-demand, the samples are loaded using the \texttt{pickle} library, which unfortunately does not benefit from GPU acceleration. t After a sample is loaded, it passes through the augmentation pipeline. In our case, it includes both background replacement and classic image augmentation. 
+The generator only receives the entire list of file paths as input. On-demand, the samples are loaded using the \texttt{pickle} library, which unfortunately does not benefit from GPU acceleration. After a sample is loaded, it passes through the augmentation pipeline. In our case, it includes both background replacement and classic image augmentation. 
 
 The former is done on every sample as long as a dataset for backgrounds has been provided to the data generator. The replacement is implemented with TensorFlow functions by blending the camera frame and the randomly chosen background using the relative user's mask. To speed up the process, all the background images from the given dataset are previously loaded in memory, already pre-processed to be compliant with input image shapes and types.
 
@@ -199,7 +199,7 @@ The following list provides a complete overview of the strategies adopted to red
 
 
 
-\subsection{Source code}
+\subsection{Source Code}
 \label{subsec:data-generator-code}
 
 Listing \ref{lst:tfdata_generator} shows the pseudo-code for implementing the data generator as explained. It takes into account appropriate parameters for controlling data processing and performance optimization.
