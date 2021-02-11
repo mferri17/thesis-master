@@ -20,7 +20,7 @@
 \subsection{Metrics for Regression}
 \label{subsec:metrics}
 
-The following list presents an overview of all the principal metrics adopted for our evaluation and used in the next sections.
+The following list presents an overview of all the principal metrics used in regression. These have been used during the model evaluation in chapter \ref{chap:evaluation}.
 
 \begin{itemize}
 	\item \gls{mae} measures the average residuals in the dataset, which means the absolute difference between the actual and predicted values. The lower the \gls{mae}, the better the model. Assuming $y_i$ as the predicted value and $\hat{y_i}$ as the ground truth, the \gls{mae} is defined as follows:
@@ -156,7 +156,7 @@ Inspired by PULP-DroNet, \gls{idsia} adapted its FrontalNet \cite{mantegazza2019
 
 A \gls{nn} learns abstract representations for finding a mapping between its input and output, determined by well-defined mathematical computations that involve the input itself and the progressively learned network parameters. Inspired by biological brains, this approach seems to be incredibly effective on a huge variety of tasks. Nevertheless, unlike other \gls{ml} techniques, \gls{nn} are known to produce "black-box" models. Their reasoning and comprehension are intrinsic in the network parameters, which are nothing but numbers, particularly hard to understand even from domain experts. 
 
-However, when working with real-world problems, it is crucial to produce explainable ù results. A thorough understanding of \gls{ml} methods builds trust in algorithms, and makes sure there are no undesirable biases in the models. Otherwise, serious problems can arise especially in critical fields such as medicine and law. \gls{xai} is the field of study which tries to make \gls{ml}, and its underlying basis for decision-making, properly understandable to humans \cite{xai-wiki}.
+However, when working with real-world problems, it is crucial to produce explainable results. A thorough understanding of \gls{ml} methods builds trust in algorithms, and makes sure there are no undesirable biases in the models. Otherwise, serious problems can arise especially in critical fields such as medicine and law. \gls{xai} is the field of study which tries to make \gls{ml}, and its underlying basis for decision-making, properly understandable to humans \cite{xai-wiki}.
 
 In Computer Vision, researchers have developed some techniques for understanding what a \gls{cnn} considers for producing an output based on an input image. Primary efforts regard feature visualization and attribution. This section briefly explains these two major areas for \gls{cnn} interpretability, with a particular focus on spatial attribution, the chosen methodology for our work.
 
@@ -170,9 +170,9 @@ In Computer Vision, researchers have developed some techniques for understanding
 Feature visualization aims to represent the way a \gls{cnn} encode its underlying knowledge through a graphical representation of its features. This is done by generating abstract images that explain what the model is really looking for in the input. 
 %The technique finds its roots in 2009 \cite{erhan2009feature} and slowly evolves thanks to the effort of many researchers in the field. A recent paper from Olah et al. \cite{olah2017feature} provides a clear explanation on the subject, highlighting its main usage and issues.
 
-A common technique for implementing feature visualization is by maximizing the activation functions of the network through an optimization algorithm \cite{erhan2009feature, nguyen2016multifaceted}. Such method can be applied on many parts of a \gls{cnn} for understanding individual features: neurons, channels, layers, or even class probabilities. As a result, the algorithm finds a set of input images that is able to effectively maximize the network's output. For example, in a classification problem, feature visualization is able to produce extremely positive examples for a certain class. Please also note that the same features can be associated with different examples in the dataset, as shown in figure \ref{fig:feature-visual-1}. Furthermore, through this technique researchers have demonstrated \cite{olah2017feature} that the layers of a \gls{cnn} build their reasoning in a hierarchical organization. Early layers learn basic visual properties such as edges or textures, while final layers respond to more abstract properties such as patterns, parts, or objects.
+A common technique for implementing feature visualization is by maximizing the activation functions of the network through an optimization algorithm \cite{erhan2009feature} \cite{nguyen2016multifaceted}. Such method can be applied on many parts of a \gls{cnn} for understanding individual features: neurons, channels, layers, or even class probabilities. As a result, the algorithm finds a set of input images that is able to effectively maximize the network's output. For example, in a classification problem, feature visualization is able to produce extremely positive examples for a certain class. Please also note that the same features can be associated with different examples in the dataset, as shown in figure \ref{fig:feature-visual-1}. Furthermore, through this technique researchers have demonstrated \cite{olah2017feature} that the layers of a \gls{cnn} build their reasoning in a hierarchical organization. Early layers learn basic visual properties such as edges or textures, while final layers respond to more abstract properties such as patterns, parts, or objects.
 
-Despite being an interesting area of research, feature visualization alone is not enough to produce a satisfactory understanding. Instead, the technique is more prone to be effectively used in the field of \gls{xai} when combined with other tools to explain the system as a whole \cite{zurowietz2020intvis, olah2018the}.
+Despite being an interesting area of research, feature visualization alone is not enough to produce a satisfactory understanding. Instead, the technique is more prone to be effectively used in the field of \gls{xai} when combined with other tools to explain the system as a whole \cite{zurowietz2020intvis} \cite{olah2018the}.
 
 \begin{figure}[!htb]
 	\begin{center}
@@ -227,7 +227,7 @@ Despite being an interesting area of research, feature visualization alone is no
 
 Feature visualization gives an abstract representation on the feature learned by a \gls{cnn}, hence what it is looking for inside an image. However, it does not provide evidence on how or why individual pieces of the network make a final decision. Instead, spatial attribution is capable of explaining the relationship between neurons by highlighting the specific parts of an input image that are most responsible for a certain response of the model \cite{olah2018the}. These methods usually produce a heatmap that overlayed on the input images gives an easy interpretable human-ready visualization.
 
-The methodology is younger yet more powerful than feature visualization. First studies in the field started in 2014, trying to determine most relevant parts in the input images by partially and iteratively occluding portions of them, in search of significant changes in the network output \cite{zeiler2013visualizing}. Later, researchers started to approach the problem from a mathematical perspective by computing saliency maps through backpropagation, down until the input images \cite{simonyan2014deep} or just till the last convolutional layers \cite{zhou2015learning, Selvaraju_2019}. Among these techniques, we select Grad-CAM \cite{Selvaraju_2019} for its clean and understandable visualizations.
+The methodology is younger yet more powerful than feature visualization. First studies in the field started in 2014, trying to determine most relevant parts in the input images by partially and iteratively occluding portions of them, in search of significant changes in the network output \cite{zeiler2013visualizing}. Later, researchers started to approach the problem from a mathematical perspective by computing saliency maps through backpropagation, back to the input images \cite{simonyan2014deep} or just until the last convolutional layers \cite{zhou2015learning}. Among these techniques, we select Grad-CAM \cite{Selvaraju_2019} for its clean and understandable visualizations.
 
 \medskip
 
@@ -256,10 +256,10 @@ The result of both the algorithms is a heatmap that overlays the regions of an i
 % \end{figure}
 
 \begin{figure}[!htb]
-\centering
-\includegraphics[width=0.9\textwidth]{"contents/images/gradcam/02-gradcam-catdog"}
-\caption[\gls{gradcam} example on dog vs. cat classification]{\gls{gradcam} example on dog vs. cat classification \cite{Selvaraju_2019}}
-\label{fig:gradcam-catdog}
+    \centering
+    \includegraphics[width=0.9\textwidth]{"contents/images/gradcam/02-gradcam-catdog"}
+    \caption[\gls{gradcam} example on dog vs. cat classification]{\gls{gradcam} example on dog vs. cat classification \cite{Selvaraju_2019}}
+    \label{fig:gradcam-catdog}
 \end{figure}
 
 
@@ -268,66 +268,56 @@ The result of both the algorithms is a heatmap that overlays the regions of an i
 \section{Network Generalization}
 \label{sec:network-generalization}
 
-This section explores common methodologies for improving a neural network's generalization capabilities by reducing overfitting. The explained approaches have been selected for specifically introducing our generalization strategy and alternative solutions discarded during the development of the thesis.
+This section explores common methodologies for improving a neural network's generalization capabilities. The explained approaches have been selected for specifically introducing our generalization strategy and providing alternative solutions discarded during the development of the thesis.
 
 
 
 \subsection{Data Augmentation}
 \label{subsec:data-augmentation}
 
-\textbf{TODO}
-
-Random Erasing Data Augmentation: \cite{zhong2017random}
-
-Previous works on images:  \cite{yue2019domain}, \cite{Takahashi_2020}, \cite{xie2020unsupervised}
-
-AutoAugment: \cite{cubuk2019autoaugment}
-Learning Data Augmentation Strategies for Object Detection: \cite{zoph2019learning}
-
-\medskip
-
-Image transformations can be divided into two types:
+One of the most common approaches for reducing overfitting of a \gls{ml} model is data augmentation. When working with datasets for Computer Vision, we speak about image augmentation. It aims to generate new images from the existing training samples. The technique is ubiquitous use for training \gls{cnn}s, especially when the available data is limited or difficult to obtain. A huge variety of approaches has been proposed by researchers for achieving image augmentation \cite{shorten2019augmentationsurvey}. The most common solutions apply geometric transformations \cite{xie2020unsupervised}, which can be divided into two types:
 \begin{itemize}
 	\item Spatial-level augmentations: also called affine transformations, they relocate pixels by cropping, scaling, rotating, translating, mirroring, and shearing the images. These transformations also have to accordingly modify additional elements associated with the images, such as ground truth, masks, bounding boxes, or key points.
 	\item Pixel-level augmentations: algorithms that only modify pixels (or group of pixels) without relocating them or changing the image shape. These transformations leave unchanged any other additional element associated with the images, such as ground truth, masks, bounding boxes, or key points.
 \end{itemize}
+
+Another simple technique is inspired by the neural networks' mechanism of dropout regularization. It consists of erasing parts of the training images to contrast samples in which the subject is not totally visible. Also, it makes sure that the model actually looks at the entire image while learning its task \cite{wan2013dropconn} \cite{zhong2017random}. 
+
+Fancier methods consider the possibility of mixing multiple samples to create a new image. In \cite{Takahashi_2020} and \cite{summers2019improved}, training images are created as a collage of other randomly transformed samples. In \cite{Lemley_2017}, the authors propose to create a combination of images from the same classification category; the result is similar to the intermediate outputs obtained during the application of a morphing effect \cite{wiki_morphing}. In the last years, the field is experiencing the development of \gls{ml} approaches for automatically learning image augmentation strategies \cite{zoph2019learning} \cite{cubuk2019autoaugment}.
+
+Recent techniques of image augmentation are used to transfer a learned task from one domain into another. In other words, a model trained on images created or augmented in a simulation environment can be later used for achieving the same task in the real world. These techniques exploit the concept of Domain Randomization.
 
 
 
 \subsection{Domain Randomization}
 \label{subsec:domain-randomization}
 
-\textbf{TODO}
+Domain Randomization is a trending technique for enabling domain transfer. It is useful when the real-world data is not easy to access and collect \cite{mehta2019active}. The main implementations make use of a simulated environment for representing a virtual world in which the \gls{ml} is trained. If the simulator is good enough in providing a good variety of realistic data, then the real world may appear to the model as just another variation of the training environment. The approach is particularly used for reinforcement learning \cite{imitation_learning_3d_navigation} and object recognition \cite{weng2019DR} \cite{tobin2017domain}.
 
-Summary from \cite{mehta2019active}
+Entire tasks, including environment and moving agents, can be simulated through a dedicated graphical engine. Some of the most important are Gazebo\footnote{\url{http://gazebosim.org/}}, Unreal Engine\footnote{\url{https://www.unrealengine.com/en-US/}}, and Unity\footnote{\url{https://unity.com/}}. Regardless of being designed specifically for Robotics or for generic purposes, such as game-development or \gls{vr}, all of them give developers unlimited possibilities. However, a complete and adaptable simulation of a \gls{ml} task with a physics engine requires a lot of effort.
 
-See \cite{weng2019DR_explanation}, \cite{tobin2017domain}
- 
-"Domain randomization is a popular technique for improving domain transfer, often used in a zero-shot setting when the target domain is unknown or cannot easily be used for training. In this work, we empirically examine the effects of domain randomization on agent generalization. Our experiments show that domain randomization may lead to suboptimal, high-variance policies, which we attribute to the uniform sampling of environment parameters."
+For this reason, recent studies consider advanced image augmentation techniques for achieving Domain Randomization. In \cite{yue2019domain}, the authors propose an interesting and powerful approach for augmenting a dataset using artistic style transfer \cite{gatys2015neural}. They modify an input sample by applying the style of an image taken from another database. The results produce curious synthetic images which give to the training model enough variability to learn a generalized self-driving task. Figure \ref{fig:02-domain-artistic} shows an example of this application.
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=1\textwidth]{"contents/images/02-domain-artistic"}
+    \caption[An example of artistic style transfer for Domain Randomization]{An example of artistic style transfer for Domain Randomization \cite{yue2019domain}}
+    \label{fig:02-domain-artistic}
+\end{figure}
+
+
+
+\subsection{Background Replacement: Chroma Key}
+
+In chapter \ref{chap:system}, we provide an overview of the system by Mantegazza et al. \cite{mantegazza2019visionbased}, presented in section \ref{subsec:sota-dario}. As previously discussed, the images for training the model have been recorded in a single room. Inspired by Domain Randomization, we focus on designing a custom image augmentation technique to simulate a larger variety of environments. More specifically, we want to replace the background behind each user in the dataset.
 
 \medskip
 
-Imitation learning is recently becoming an interesting and successful approach for both reinforcement learning \cite{imitation_learning_3d_navigation} and object recognition \cite{tobin2017domain} \cite{weng2019DR}.
+A known approach for implementing background replacement is the chroma key. Widely used in entertainment, it is a technique that makes use of colors in images and videos for creating a mask that distinguishes between actual content and background. Usually, a chroma key is implemented using a blue or green screen placed behind the subject, making sure that such color is not present in the foreground image. Then, a post-production software takes care of creating the mask of the subject, enabling the background replacement.
 
-Robot and environment can be replicated through a dedicated simulator. A common software used for this purpose in Robotics is  Gazebo\footnote{\url{http://gazebosim.org/}}, due to its straightforward integration with \gls{ros}. However, even general-purpose graphic engines can be used, such as Unreal Engine\footnote{\url{https://www.unrealengine.com/en-US/}} or Unity\footnote{\url{https://unity.com/}}, designed for game-development but recently used also for \gls{vr} and \gls{ar} applications. These simulators give developers unlimited possibilities, carefully supported by solid physics engines and active communities.
+Building up a proper chroma key setup can be challenging, especially in large environments. An experiment in this direction has been conducted during the development of \cite{mantegazza2019visionbased}, by placing a green screen on a portion of the drone arena walls. Masking results were actually satisfying but the limited size of the screen was suffering from limitations in terms of user's movements and background coverage. Figure \ref{fig:greenscreen} displays the setup, revealing a non-ignorable portion of the original background still appearing in the images. Besides, assuming the capability of building a well-designed chroma key environment, the resulting solution would be highly dependent on the setup's geographical location.
 
-\medskip
-
-Given the difficulty of collecting data for our task, exploring the possibility of simulating the entire scenario in a 3D virtual-world is intriguing, especially to replace the need of a complex \gls{mocap} system. Provided the odometry support of virtual simulators, both the drone and the user can be thoroughly modeled to act as in the real world, with similar movements and sensing capabilities. The simulation gives the opportunity of collecting data very efficiently while reproducing realistic indoor and outdoor scenarios.
-
-The approach unlocks a huge number of possibilities and obtains auspicious results in research. However, a complete and adaptable implementation requires a lot of effort and several issues can arise during the development of such simulators. For this reason, we discard the idea of approaching a virtual simulation in favor of a more lightweight and portable solution.
-
-
-
-\subsection{Person Masking: Chroma Key}
-
-A known approach for implementing background replacement is the chroma key. Widely used in entertainment, it is a technique that makes use of colors in images and videos for splitting between actual content and background. Usually, a chroma key is achieved through a blue or green screen placed behind the subject, making sure that such color is not present in the foreground image. A post-production software then takes care of creating the appropriate mask, which separates the two parts and enables background replacement.
-
-Although this technique is trendy in many fields, placing several green screens into the drone arena is not the easiest task since it requires a lot of material and physical work to set up the proper environment, with possible issues related to the room composition or its illumination.
-
-An experiment in this direction has been conducted during the development of Mantegazza et al. \cite{mantegazza2019visionbased}, by placing a green screen on a portion of the arena walls. Masking results were actually satisfying, but such a small green screen's limitations are huge both in terms of user's movements and background coverage. Figure \ref{fig:greenscreen} displays the setup, revealing a non-ignorable portion of the original background still appearing in the images.
-
-Besides, even with the capability to build a well-designed chroma key environment, the solution would be highly dependent on the setup's geographical location. On the contrary, software-only approaches would be much more portable and reusable together with any other motion capture system in the world.
+For this reason, we decide to focus on solutions that only regard software computations. They are much more flexible and open the possibility of extending the same approach for other tasks.
 
 \begin{figure}[!h]
 	\begin{center}

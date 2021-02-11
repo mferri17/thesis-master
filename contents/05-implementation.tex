@@ -42,7 +42,7 @@ During training, each sample is assigned to a randomly chosen background from th
 
 Data augmentation is a common technique for improving neural networks' ability to generalize their task on unknown data. Introduced in section \ref{subsec:data-augmentation}, image augmentation is ubiquitously used with \gls{cnn}s for reducing overfitting on the training images by applying random transformations.
 
-For implementing image augmentation, we choose Albumentations \cite{Buslaev_2020} due to its benchmarking performance\footnote{\url{https://github.com/albumentations-team/albumentations\#benchmarking-results}}. Albumentations is a state of the art Python library that allows the definition of custom sequences composed of many different transformations. These are applied according to user-specified probabilities and intensities. The possibilities are limitless, and the resulting images might be very different from the originals.
+For implementing image augmentation, we choose Albumentations \cite{Buslaev_2020} due to its benchmarking performance\footnote{\url{https://github.com/albumentations-team/albumentations\#benchmarking-results}}. Albumentations is a state of the art Python library that allows the definition of custom sequences composed of many different geometric transformations. These are applied according to user-specified probabilities and intensities. The possibilities are limitless, and the resulting images might be very different from the originals.
 
 \medskip
 
