@@ -3,46 +3,49 @@
 %\markboth{}{}
 \label{chap:intro}
 
-\glsreset{ai}
-\glsreset{dl}
+\glsresetall
+
+Nowadays, the use of \gls{ai} is increasing in Robotics and Computer Vision. Research in the area aims to find innovative solutions, especially using \gls{dl}, for well-known yet complex goals such as autonomous navigation, human-robot interaction, and object detection. A trending approach in the last years is Imitation Learning \cite{imitation_learning_survey}. It consists of training a \gls{nn} on a given task by observing the behavior of experienced agents in the same job.
+
+Being a branch of \gls{dl}, also \gls{il} requires a large amount of data to train on. A fundamental aspect in research is the collection of real-world data to build datasets for \gls{ml} applications. However, in many cases, data is not easy to retrieve. In Robotics, datasets acquired with physical robots are usually limited in size or do not provide a faithful representation of the real world. This happens because many Robotics applications require the robots to act in a well-controlled environment, due to physical, technical, or legal constraints. This is why, in order to provide enough training data to the \gls{ml} model, Imitation Learning often relies on datasets generated in simulation. If the simulator is good enough in proposing the neural network a good variety of realistic data, then the real world may appear to the model as just another variation of the training environment.  The technique is known as Domain Randomization \cite{tobin2017domain}, designed to transfer a learned task from one domain to another.
+
+\medskip
+
+In this thesis, we consider an Imitation Learning technique for teaching a drone how to continuously hover in front of a moving person. We focus on the existing work from Mantegazza et al. \cite{mantegazza2019visionbased}, aiming to improve the generalization capabilities of the model. In the paper, the authors propose a reactive control procedure for controlling the quadcopter using the \gls{ml}-inferred user's pose. They build a \gls{resnet} to predict the user's 3D coordinates with respect to the drone, using in input the images coming from an on-board camera. The network is modeled to perform regression through supervised learning, in which the ground truth is given by an external \gls{mocap} system.
+
+The original approach is an interesting starting point for many other Robotics applications, as it provides a small but fast neural network capable of producing real-time inferences. Also, it explores a challenging task in the research area of human-drone interaction, which will most probably experience interesting growth in the next years \cite{human-drone-sota}. The main issue of the proposed model is the inability of making proper predictions outside of the training room. Since the data collection requires a dedicated \gls{mocap} system to acquire the ground truth, the possibility of recording new data in different locations must be excluded. A related work \cite{zimmerman2020thesis} explored different kinds of data augmentation for the task, applying classical image transformations. Results are encouraging but still not enough to make the model able to generalize the task in unknown environments.
+
+\medskip
+
+Our goal is to understand the underlying causes of the issue and find a solution to the generalization problem. First, we apply Grad-CAM \cite{Selvaraju_2019} for network interpretation. In a few words, it produces a heatmap on the input images which enables the visualization of the parts actually responsible for predicting a certain model’s output. We discover that the model is not only considering the people in the input images for producing its outputs. Instead, many recurrent elements in the training set are attracting the network's attention. We want to reduce the model overfitting by eliminating the biases coming from the data. As a solution, we propose an innovative pipeline for image augmentation, inspired by Domain Randomization. Our approach consists of modifying the original dataset through the replacement of the camera's frames' background. We rely on Mask R-CNN \cite{he2018mask}, a state of the art deep learning algorithm for object detection and segmentation. We adopt the algorithm to pre-compute the users' masks, used during training to blend the input frames with other images, serving as the backgrounds. For the replacement, we use images from a public dataset for Indoor Scene Recognition \cite{cvpr09}. The technique allows the simulation of various scenarios without the need to actually collecting new data. We also apply classic image augmentation before retrain the \gls{resnet} architecture on the background-replaced dataset. Several quantitative and qualitative experiments demonstrate the robustness of the solution, providing satisfactory results in a large variety of real-world scenarios, both indoor and outdoor.
+
+The solution we propose is reasonably applicable to other Computer Vision tasks. In particular, the usage of a computationally expensive method such as Mask R-CNN for pre-processing data enables a severe expansion of a dataset. This can be used to train lighter models, which may require human or object recognition capabilities at a cheaper cost.
+
+\clearpage
+
+This work is the result of a collaboration with the Robotics research team at \gls{idsia}, in Lugano. The thesis has been submitted to \gls{unimib} and \gls{usi} in the context of a Double Degree program for the Master of Science in Informatics.
+
+The entire source code and any additional resources, presentations, or videos are publicly available at \url{https://github.com/mferri17/cnn-drone-befree}.
 
 
-% This project was developed at Istituto Dalle Molle di Studi sull'Intelligenza Artifciale
-% (IDSIA) laboratories in Manno, Switzerland for the Master Thesis inside a double degree
-% program between Universities of Milano Bicocca and USI, Universitò della Svizzera Ital-
-% iana of Lugano.
-% Our entire work and additional details are available at:
-% https://github.com/mferri17/cnn-drone-befree.
 
 
-
-\section{Objective}
-\label{sec:objective}
-
-Autonomous navigation is an important and well-known research area in robotics, which usually requires accomplishing complex and computationally-expensive tasks such as localization, mapping, and path planning. Recent studies have started to approach autonomous driving through imitation learning \cite{imitation_learning_survey}. The approach consist in making a neural network learn its task by imitating human or robot behaviors.
-
-Lorem ipsum dolor sit amet.
-
-
-
-
-\section{Outline}
+\section*{Thesis Outline}
 \label{sec:outline}
 
-The thesis is composed of X chapters:
-\begin{itemize}
-	\item Chapter summarises ;
-	
-	\item Chapter provides ;
-	
-	\item Chapter presents ;
-		
-	\item Chapter illustrates ;
+The document is composed of seven chapters, briefly described here:
 
-	\item Chapter explores ;	
-	
-	\item Chapter addresses .
+\begin{itemize}
+	\item This chapter provides an overview of our work and its structure.
+	\item Chapter \ref{chap:theory} gives a theoretical introduction on the concepts used in the thesis and explores the main literature related with the thesis.
+	\item Chapter \ref{chap:system} illustrates the composition of the existing system and lists the main frameworks used during the development of our software.
+	\item Chapter \ref{chap:design} summarises our design process and choices by presenting the experiments conducted for shaping our final solution.
+	\item Chapter \ref{chap:implementation} carefully describes practical details of our implementation from both methodology and technical perspectives.
+	\item Chapter \ref{chap:evaluation} shows our evaluation results for assessing our approach validity and robustness with quantitative and qualitative viewpoints.
+	\item Chapter \ref{chap:conclusion} concludes the thesis, summarizing what has been done with some final thoughts and future works.
 \end{itemize}
+
+Appendix \ref{chap:extra-figures} also contains additional images, not inserted in the main chapters, that add minor interesting details on various topics.
 
 
 

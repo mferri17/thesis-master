@@ -1,6 +1,8 @@
 \chapter{Background and Related Work}
 \label{chap:theory}
 
+\glsresetall
+
 %\lipsum[1]
 
 
@@ -87,7 +89,7 @@ Our work is based on the master thesis \cite{mantegazza2018thesis} and paper \ci
 
 \medskip
 
-In his thesis, the author proposes a machine learning technique for teaching a model to control a drone while interacting with a person. In a few words, the goal is to continuously fly the drone to hover in front of a moving user. The problem is approached as a reactive control procedure and addressed with supervised learning. Thus, it provides an interesting starting point for many other robotics applications. Training data is acquired by programmatically flying the drone to face a user frontally. In this phase, the quadrotor is controlled through an omniscient controller that knows both the drone's and person's pose. Images produced by the front-facing camera of the drone are used as input for a custom-designed \gls{resnet} architecture that infers the relative user's position \gls{wrt} the drone. The neural network performs a regression on the four variables that form the user's pose (X, Y, Z, YAW) and learns to predict their values using spatial information in the input images.
+In his thesis, the author proposes a machine learning technique for teaching a model to control a drone while interacting with a person. In a few words, the goal is to continuously fly the drone to hover in front of a moving user. The problem is approached as a reactive control procedure and addressed with supervised learning. Thus, it provides an interesting starting point for many other robotics applications. Training data is acquired by programmatically flying the drone to face a user frontally. In this phase, the quadrotor is controlled through an omniscient controller that knows both the drone's and the person's pose. Images produced by the front-facing camera of the drone are used as input for a custom-designed \gls{resnet} architecture that infers the relative user's position \gls{wrt} the drone. The neural network performs a regression on the four variables that form the user's pose (X, Y, Z, YAW) and learns to predict their values using spatial information in the input images.
 
 In the paper, the author compares the mediated approach described above with another end-to-end approach based on imitation learning. This second solution directly learns control signals\footnote{desired pitch, roll, yaw, and vertical velocity} for the drone, instead of the user's pose. A third experiment also considers the task of automatically learning a controller that drives the drone based on the given user's position. All the solutions provide very similar results but, for this thesis, we will only take into consideration the mediated approach. The reason behind our choice is that the learned model can be adapted to other tasks by simply designing a custom controller for the drone. Furthermore, it also provides a more transparent and analyzable solution.
 
@@ -162,21 +164,73 @@ Inspired by PULP-DroNet, \gls{idsia} adapted its FrontalNet \cite{mantegazza2019
 
 A \gls{nn} learns abstract representations for finding a mapping between its input and output, determined by well-defined mathematical computations that involve the input itself and the progressively learned network parameters. Inspired by biological brains, this approach seems to be incredibly effective on a huge variety of tasks. Nevertheless, unlike other \gls{ml} techniques, \gls{nn} are known to produce "black-box" models. Their reasoning and comprehension are intrinsic in the network parameters, which are nothing but numbers, particularly hard to understand even from domain experts. 
 
-However, when working with real-world problems, it is crucial to produce explainable \gls{ml} results. A thorough understanding of these methods builds trust in algorithms, and makes sure there are no undesirable biases in the models. Otherwise, serious problems can arise especially in critical fields such as medicine and law. \gls{xai} is the field of study which tries to make \gls{ml} models, and their underlying basis for decision-making, properly understandable to humans \cite{xai-wiki}.
+However, when working with real-world problems, it is crucial to produce explainable ù results. A thorough understanding of \gls{ml} methods builds trust in algorithms, and makes sure there are no undesirable biases in the models. Otherwise, serious problems can arise especially in critical fields such as medicine and law. \gls{xai} is the field of study which tries to make \gls{ml}, and its underlying basis for decision-making, properly understandable to humans \cite{xai-wiki}.
 
-For computer vision, researchers have developed some techniques for understanding what a \gls{cnn} considers for producing an output based on an input image. Primary efforts regard feature visualization and attribution, and recent studies have also shown how these methods can be used altogether \cite{olah2018the}. This section briefly explains these two major areas for \gls{cnn} interpretability, with a particular focus on spatial attribution, the chosen methodology for our work.
+In Computer Vision, researchers have developed some techniques for understanding what a \gls{cnn} considers for producing an output based on an input image. Primary efforts regard feature visualization and attribution. This section briefly explains these two major areas for \gls{cnn} interpretability, with a particular focus on spatial attribution, the chosen methodology for our work.
 
 
 
 \subsection{Feature Visualization}
+\label{subsec:feature-vis}
 
-\textbf{TODO}
+\glsreset{cnn}
 
-Sources: \cite{olah2017feature}
+Feature visualization aims to represent the way a \gls{cnn} encode its underlying knowledge through a graphical representation of its features. This is done by generating abstract images that explain what the model is really looking for in the input. 
+%The technique finds its roots in 2009 \cite{erhan2009feature} and slowly evolves thanks to the effort of many researchers in the field. A recent paper from Olah et al. \cite{olah2017feature} provides a clear explanation on the subject, highlighting its main usage and issues.
+
+A common technique for implementing feature visualization is by maximizing the activation functions of the network through an optimization algorithm \cite{erhan2009feature, nguyen2016multifaceted}. Such method can be applied on many parts of a \gls{cnn} for understanding individual features: neurons, channels, layers, or even class probabilities. As a result, the algorithm finds a set of input images which is able to effectively maximize the network's output. For example, in a classification problem, feature visualization is able to produce extremely positive examples for a certain class. Please note that certain features can be associated to different examples in the dataset, as shown in figure \ref{fig:feature-visual-1}. Researchers have demonstrated \cite{olah2017feature} that the layers of a \gls{cnn} build their reasoning in a hierarchical organization. Early layers learn basic visual properties such as edges or textures, while final layers respond to more abstract properties such as patterns, parts, or objects.
+
+Despite being an interesting area of research, feature visualization alone is not enough to produce satisfactory understanding. Instead, the technique is more prone to be effectively used in the field of \gls{xai} when combined with other tools to explain the system as a whole \cite{zurowietz2020intvis, olah2018the}.
+
+\begin{figure}[!htb]
+	\begin{center}
+		\begin{subfigure}[h]{0.23\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/02-feature-bird-2"}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[h]{0.23\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/02-feature-ball-2"}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[h]{0.23\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/02-feature-dog-2"}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[h]{0.23\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/02-feature-cat-2"}
+		\end{subfigure}
+		\begin{subfigure}[h]{0.23\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/02-feature-bird-1"}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[h]{0.23\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/02-feature-ball-1"}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[h]{0.23\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/02-feature-dog-1"}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[h]{0.23\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/02-feature-cat-1"}
+		\end{subfigure}
+	\end{center}
+	\vspace{-0.5cm}
+	\caption[Feature visualization: layer-level features for certain dataset example]{Feature visualization: layer-level features (top) for certain dataset examples (bottom).}
+	\label{fig:feature-visual-1}
+\end{figure}
 
 
 
-\subsection{Spatial Attribution with GradCAM}
+\subsection{Spatial Attribution: GradCAM}
 \label{subsec:gradcam-theory}
 
 \textbf{TODO}
@@ -228,6 +282,7 @@ Image transformations can be divided into two types:
 \end{itemize}
 
 
+
 \subsection{Domain Randomization}
 \label{subsec:domain-randomization}
 
@@ -241,27 +296,19 @@ See \cite{weng2019DR_explanation}, \cite{tobin2017domain}
 
 \medskip
 
-Imitation learning through simulation is recently becoming an interesting and successful approach for both reinforcement learning \cite{imitation_learning_3d_navigation} and object recognition \cite{tobin2017domain} \cite{weng2019DR}.
+Imitation learning is recently becoming an interesting and successful approach for both reinforcement learning \cite{imitation_learning_3d_navigation} and object recognition \cite{tobin2017domain} \cite{weng2019DR}.
 
-Robot and environment can be replicated through a dedicated simulator such as Gazebo\footnote{\url{http://gazebosim.org/}}, often used in robotics with \gls{ros}\footnote{\url{https://www.ros.org/}} due to its straightforward integration. Even general-purpose graphic engines can be used, which includes Unreal Engine\footnote{\url{https://www.unrealengine.com/en-US/}} Unity\footnote{\url{https://unity.com/}} are well-known simulators designed for game-development, but recently used for \gls{vr} and \gls{ar} applications. They give developers unlimited possibilities, carefully supported by solid physics engines and active communities.
+Robot and environment can be replicated through a dedicated simulator. A common software used for this purpose in Robotics is  Gazebo\footnote{\url{http://gazebosim.org/}}, due to its straightforward integration with \gls{ros}. However, even general-purpose graphic engines can be used, such as Unreal Engine\footnote{\url{https://www.unrealengine.com/en-US/}} or Unity\footnote{\url{https://unity.com/}}, designed for game-development but recently used also for \gls{vr} and \gls{ar} applications. These simulators give developers unlimited possibilities, carefully supported by solid physics engines and active communities.
 
 \medskip
 
-Given the difficulty of collecting data for our task, exploring the possibility of simulating the entire scenario in a 3D virtual-world is intriguing, especially to replace the need for a complex \gls{mocap} system. Integrating odometry support, drone and people can be thoroughly modeled to act as in the real world, with similar movements and sensing capabilities, to collect the data very efficiently. The virtual simulation gives both the opportunity to reproduce real indoor/outdoor scenes and also to randomize the background with artificially generated textures.
+Given the difficulty of collecting data for our task, exploring the possibility of simulating the entire scenario in a 3D virtual-world is intriguing, especially to replace the need of a complex \gls{mocap} system. Provided the odometry support of virtual simulators, both the drone and the user can be thoroughly modeled to act as in the real world, with similar movements and sensing capabilities. The simulation gives the opportunity of collecting data very efficiently while reproducing realistic indoor and outdoor scenarios.
 
-Even though the approach obtains auspicious results, a complete and adaptable implementation requires a lot of effort yet unlocking a huge number of possibilities. Considering the consistent amount of fine details to consider and issues that can arise during the development of such simulators, we opt to work with an easier generalization pipeline that only concerns machine learning and can be easily reused for other tasks.
-
-
-
-
-\section{Human Detection and Segmentation}
-\label{sec:sota-humandetseg}
-
-\textbf{TODO}
+The approach unlocks a huge number of possibilities and obtains auspicious results in research. However, a complete and adaptable implementation requires a lot of effort and several issues can arise during the development of such simulators. For this reason, we discard the idea of approaching a virtual simulation in favor of a more lightweight and portable solution.
 
 
 
-\subsection{Chroma Key}
+\subsection{Person Masking: Chroma Key}
 
 A known approach for implementing background replacement is the chroma key. Widely used in entertainment, it is a technique that makes use of colors in images and videos for splitting between actual content and background. Usually, a chroma key is achieved through a blue or green screen placed behind the subject, making sure that such color is not present in the foreground image. A post-production software then takes care of creating the appropriate mask, which separates the two parts and enables background replacement.
 
@@ -300,7 +347,7 @@ Besides, even with the capability to build a well-designed chroma key environmen
 
 
 
-\subsection{Mask R-CNN}
+\subsection{Human Detection and Segmentation: Mask R-CNN}
 \label{subsec:sota-maskrcnn}
 
 \textbf{TODO}

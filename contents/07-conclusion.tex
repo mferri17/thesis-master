@@ -2,23 +2,27 @@
 %\addcontentsline{toc}{chapter}{Conclusion and perspectives}
 \label{chap:conclusion}
  
- 
-In this thesis, we presented a methodology for generalizing the ResNet defined in \cite{mantegazza2019visionbased}. Designed to predict a user's pose from an image, the model was not able to achieve its task out of the training environment. We first applied Grad-CAM to understand what the model was actually considering while computing its prediction, and we discovered that the network was suffering from many biases coming from the training data.
 
-As a solution, we proposed a modification of the dataset to reduce overfitting. Our approach consists of applying background replacement and image augmentation to the original images for the creation of new data. Retraining the original ResNet on the data obtained after our augmentation pipeline, we created an enhanced version of the model.
+In this thesis, we presented a methodology for generalizing the neural network defined in \cite{mantegazza2019visionbased}. Designed to predict a user's pose from an image, the model was not able to achieve its task out of the training environment. We applied Grad-CAM to understand what the model was actually considering while computing its prediction, and we discovered that the network was suffering from many biases coming from the training data.
 
-Our quantitative and qualitative evaluation demonstrated that our improved model is capable of solving the task in unseen environments. This is a demonstration that our approach improved the generalization capabilities of the original model.
+As a solution, we proposed a modification of the dataset to reduce overfitting. Our approach consists of applying background replacement and image augmentation to the original images for the creation of new data. Retraining the original neural network on the data obtained after our augmentation pipeline, we created an enhanced version of the model.
 
-
+Our quantitative and qualitative evaluation experiments demonstrated that our improved model is capable of solving the task in unseen environments. Background replacement is not sufficient if used alone, but combined with image augmentation obtains surprising results. The final model produces encouraging predictions both indoor and outdoor, even from images recorded with a smartphone camera. According to the initial objective, we succeeded in enhancing the original model's generalization capabilities.
 
 
-
-\subsubsection*{Future Works}
+\subsection*{Future Works}
 \label{subsec:future-works}
 
-Considered the results obtained during our evaluation, we can define a couple of future milestones: 
+We suggest a couple of future milestones for certifying the potential of our work and expand it towards new research possibilities.
 
 \begin{itemize}
-    \item A test on the real drone is needed to further confirm the solution's success in the task. We want to ensure that our approach is effectively able to predict a user's pose in any environment through the real drone's camera. Experiments in various scenarios have the possibility of ultimately assess the model's generalization capabilities. 
-    \item A recent work in IDSIA \cite{zimmerman2020thesis} have brought the same task of human pose prediction on-board the Crazyflie, an ultra-low-power nano-drone. It would be interesting to apply our augmentation pipeline on that work to prove the power of the solution on different platforms designed to achieve the same task.
+
+    \item Until now, our model's results have been only verified by simulation. A complete test with the real drone is required to confirm the success of the solution in the task. We want to make sure that our approach can predict a user's pose in any environment through the actual drone's camera.
+    
+    \item More recent interpretability techniques can be applied on the new generalized model, such as Score-CAM \cite{wang2020scorecam}. In case spatial attribution provides evidence of the model's ability to recognize people, also feature visualization (section \ref{subsec:feature-vis}) can be tried for a better understanding of what convolutional layers of the model actually learn.
+    
+    \item As detailed in section \ref{subsec:sota-nicky}, a recent work in IDSIA \cite{zimmerman2020thesis} adapted FrontalNet to run on-board an ultra-low-power nano-drone. By applying our augmentation pipeline on that work, we would be able to prove the effectiveness of our solution on different platforms designed to achieve the same task.
+    
+    \item The augmentation pipeline we propose can actually be used for various tasks. Our background replacement approach could become a good alternative to more standard domain randomization techniques (section \ref{subsec:domain-randomization}). Running high-expensive inferences offline, as we did with Mask R-CNN, we enable the opportunity to aggressively augment a dataset. That dataset can be used to train a simpler model that may be able to provide faster and real-time predictions, even on low-end devices.
+    
 \end{itemize}

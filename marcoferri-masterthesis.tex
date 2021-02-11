@@ -207,21 +207,24 @@ morecomment=[l]{//s},
 
 \frontmatter %generates the frontmatter, this is FIXED
 %\let\cleardoublepage\clearpage
+
+
+
 \begingroup
 %\let\cleardoublepage\clearpage
-
 
 \begin{abstract}
 \addcontentsline{toc}{chapter}{Abstract}  % added 
 \input{contents/00-abstract.tex}
 \end{abstract}
 
-
 \begin{acknowledgements}
 \addcontentsline{toc}{chapter}{Acknowledgements}  % added 
 \input{contents/acknowledgements.tex}
 \end{acknowledgements}
+
 \endgroup
+
 
 \clearpage
 
@@ -233,8 +236,7 @@ morecomment=[l]{//s},
 \let\cleardoublepage\clearpage
 \listoffigures %optional
 % \addcontentsline{toc}{chapter}{List of Figures}
-
-\clearpage%\cleardoublepage
+ 
 \listoftables %optional
 % \addcontentsline{toc}{chapter}{List of Tables}
 
