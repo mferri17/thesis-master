@@ -7,25 +7,17 @@
 
 
 
-\section{Robotics}
-\label{sec:robotics}
+\section{Theoretical Foundation}
 
-%\subsection{Pose}
-%\label{subsec:robot-pose}
-%
-%\subsection{Control Theory}
-%\label{subsec:robot-control}
+\subsection{3D Poses in Robotics}
+\label{subsec:robot-pose}
 
 
+\subsection{Supervised Learning}
+\label{subsec:supervised-learning}
 
 
-\section{Machine Learning}
-\label{sec:machine-learning}
-
-%\subsection{Supervised Learning}
-%\label{subsec:supervised-learning}
-
-\subsection{Regression Metrics}
+\subsection{Metrics for Regression}
 \label{subsec:metrics}
 
 The following list presents an overview of all the principal metrics adopted for our evaluation and used in the next sections.
@@ -44,9 +36,9 @@ The following list presents an overview of all the principal metrics adopted for
 
 %\subsection{Convolutional Neural Networks (CNN)}
 %\label{subsec:cnn}
-%
-%\subsection{Residual Neural Networks (ResNet)}
-%\label{subsec:resnet}
+
+\subsection{Residual Neural Networks (ResNet)}
+\label{subsec:resnet}
 
 
 
@@ -178,9 +170,9 @@ In Computer Vision, researchers have developed some techniques for understanding
 Feature visualization aims to represent the way a \gls{cnn} encode its underlying knowledge through a graphical representation of its features. This is done by generating abstract images that explain what the model is really looking for in the input. 
 %The technique finds its roots in 2009 \cite{erhan2009feature} and slowly evolves thanks to the effort of many researchers in the field. A recent paper from Olah et al. \cite{olah2017feature} provides a clear explanation on the subject, highlighting its main usage and issues.
 
-A common technique for implementing feature visualization is by maximizing the activation functions of the network through an optimization algorithm \cite{erhan2009feature, nguyen2016multifaceted}. Such method can be applied on many parts of a \gls{cnn} for understanding individual features: neurons, channels, layers, or even class probabilities. As a result, the algorithm finds a set of input images which is able to effectively maximize the network's output. For example, in a classification problem, feature visualization is able to produce extremely positive examples for a certain class. Please note that certain features can be associated to different examples in the dataset, as shown in figure \ref{fig:feature-visual-1}. Researchers have demonstrated \cite{olah2017feature} that the layers of a \gls{cnn} build their reasoning in a hierarchical organization. Early layers learn basic visual properties such as edges or textures, while final layers respond to more abstract properties such as patterns, parts, or objects.
+A common technique for implementing feature visualization is by maximizing the activation functions of the network through an optimization algorithm \cite{erhan2009feature, nguyen2016multifaceted}. Such method can be applied on many parts of a \gls{cnn} for understanding individual features: neurons, channels, layers, or even class probabilities. As a result, the algorithm finds a set of input images that is able to effectively maximize the network's output. For example, in a classification problem, feature visualization is able to produce extremely positive examples for a certain class. Please also note that the same features can be associated with different examples in the dataset, as shown in figure \ref{fig:feature-visual-1}. Furthermore, through this technique researchers have demonstrated \cite{olah2017feature} that the layers of a \gls{cnn} build their reasoning in a hierarchical organization. Early layers learn basic visual properties such as edges or textures, while final layers respond to more abstract properties such as patterns, parts, or objects.
 
-Despite being an interesting area of research, feature visualization alone is not enough to produce satisfactory understanding. Instead, the technique is more prone to be effectively used in the field of \gls{xai} when combined with other tools to explain the system as a whole \cite{zurowietz2020intvis, olah2018the}.
+Despite being an interesting area of research, feature visualization alone is not enough to produce a satisfactory understanding. Instead, the technique is more prone to be effectively used in the field of \gls{xai} when combined with other tools to explain the system as a whole \cite{zurowietz2020intvis, olah2018the}.
 
 \begin{figure}[!htb]
 	\begin{center}
@@ -233,21 +225,40 @@ Despite being an interesting area of research, feature visualization alone is no
 \subsection{Spatial Attribution: GradCAM}
 \label{subsec:gradcam-theory}
 
-\textbf{TODO}
+Feature visualization gives an abstract representation on the feature learned by a \gls{cnn}, hence what it is looking for inside an image. However, it does not provide evidence on how or why individual pieces of the network make a final decision. Instead, spatial attribution is capable of explaining the relationship between neurons by highlighting the specific parts of an input image that are most responsible for a certain response of the model \cite{olah2018the}. These methods usually produce a heatmap that overlayed on the input images gives an easy interpretable human-ready visualization.
 
-Sources: \cite{Selvaraju_2019}, \cite{gradcam_medium}
+The methodology is younger yet more powerful than feature visualization. First studies in the field started in 2014, trying to determine most relevant parts in the input images by partially and iteratively occluding portions of them, in search of significant changes in the network output \cite{zeiler2013visualizing}. Later, researchers started to approach the problem from a mathematical perspective by computing saliency maps through backpropagation, down until the input images \cite{simonyan2014deep} or just till the last convolutional layers \cite{zhou2015learning, Selvaraju_2019}. Among these techniques, we select Grad-CAM \cite{Selvaraju_2019} for its clean and understandable visualizations.
+
+\medskip
+
+We explain the methodology by first focussing on \gls{cam} \cite{zhou2015learning}, which applies on classification tasks. \gls{cam} requires of a specific \gls{cnn} architecture, composed as follows: a \gls{gap} layer\footnote{The \gls{gap} layer is used for dimensionality reduction, by transforming $h \times w \times d$ feature maps to a single-dimension array of $1 \times 1 \times d$ features \cite{gap_layers}} placed after convolution layers outputs the spatial average of the feature maps; the \gls{gap} output goes into a fully-connected layer; this computes the final classification output through a weighted sum of features values.
+
+Taking inspiration from the forward pass, \gls{cam} projects back the weights of the output layer and computes a weighted sum between them and the feature maps of the last convolutional layer. The operation practically combines multiple activations in a single heatmap that identifies the importance of different parts of an input image for a certain classification output. Figure \ref{fig:cam-schema} illustrates the algorithm. 
+
+\medskip
+
+\gls{gradcam} is a generalization of \gls{cam} which works for any network architecture. The main innovation is that \gls{gradcam} projects back to the network, instead of the last layer's weights, the gradients of the score (for a certain class) \gls{wrt} the feature map activations of a convolutional layer. These gradient are averaged pooled - that is why the \gls{gap} layer is not required anymore - and, as before, weighted sum with the convolutional activation maps. If \gls{gradcam} is applied on a \gls{cam}-compatible network architecture, than it reduces to \gls{cam} itself.
+
+The result of both the algorithms is a heatmap that overlays the regions of an input image responsible for producing a certain model's output. Figure \ref{fig:gradcam-catdog} clearly show the result on a classifier which aims to distinguish cats from dogs.
 
 \begin{figure}[!htb]
 	\centering
-	\includegraphics[width=0.9\textwidth]{"contents/images/gradcam/02-gradcam-schema"}
-	\caption[\gls{gradcam} schematic functioning]{\gls{gradcam} schematic functioning \cite{Selvaraju_2019}}
-	\label{fig:gradcam-schema}
+	\includegraphics[width=0.9\textwidth]{"contents/images/02-cam"}
+	\caption[\gls{cam} schematic functioning]{\gls{cam} schematic functioning \cite{zhou2015learning}}
+	\label{fig:cam-schema}
 \end{figure}
+
+% \begin{figure}[!htb]
+% 	\centering
+% 	\includegraphics[width=0.9\textwidth]{"contents/images/gradcam/02-gradcam-schema"}
+% 	\caption[\gls{gradcam} schematic functioning]{\gls{gradcam} schematic functioning \cite{Selvaraju_2019}}
+% 	\label{fig:gradcam-schema}
+% \end{figure}
 
 \begin{figure}[!htb]
 \centering
 \includegraphics[width=0.9\textwidth]{"contents/images/gradcam/02-gradcam-catdog"}
-\caption[\gls{gradcam} example on dog-cat classification]{\gls{gradcam} example on dog-cat classification \cite{Selvaraju_2019}}
+\caption[\gls{gradcam} example on dog vs. cat classification]{\gls{gradcam} example on dog vs. cat classification \cite{Selvaraju_2019}}
 \label{fig:gradcam-catdog}
 \end{figure}
 
@@ -257,7 +268,7 @@ Sources: \cite{Selvaraju_2019}, \cite{gradcam_medium}
 \section{Network Generalization}
 \label{sec:network-generalization}
 
-\textbf{TODO}
+This section explores common methodologies for improving a neural network's generalization capabilities by reducing overfitting. The explained approaches have been selected for specifically introducing our generalization strategy and alternative solutions discarded during the development of the thesis.
 
 
 
