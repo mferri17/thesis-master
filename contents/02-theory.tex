@@ -3,24 +3,80 @@
 
 \glsresetall
 
-%\lipsum[1]
+This chapter introduces all the fundamental concepts that the reader should be aware of in order to fully understand the thesis. The first section focuses on some fundamentals of \gls{ml} and Robotics, while the others explore the literature related to our work.
+
 
 
 
 \section{Theoretical Foundation}
 
-\subsection{3D Poses in Robotics}
+In this section, we provide some basic theoretical knowledge. We assume that the reader is already familiar with Deep Learning. Otherwise, we suggest this amazing introduction from the \gls{mit}: \url{https://www.youtube.com/watch?v=5tvmMX8r_OM}.
+
+
+\subsection{Robotics Introduction}
 \label{subsec:robot-pose}
 
+A robot is a programmable system that exists in the physical world, can sense its environment, and can act on it to achieve some goals \cite{mataric2007robotics}.
 
-\subsection{Supervised Learning}
-\label{subsec:supervised-learning}
+This formal definition gives a thorough view of what a robot is and does. In this section, we briefly explain some fundamental concepts of Robotics that are assumed to be well known in the next chapters.
+
+\paragraph*{Control}
+A robot must be controlled to perform its task. The procedure is composed of multiple steps: sensing (taking raw inputs from the sensors), perception (extracting useful information from the previous phase), processing (reasoning and planning the actions to be taken), actuation (powering motors to act on the environment). Robots can have different levels of autonomy: teleoperated (fully controlled by humans), assisted (partially controlled by humans), total autonomous (no human control needed). The third category also includes robots capable of fully control themselves in a human-machine cooperation context.
+
+\paragraph*{3D Pose} 
+The position of a robot in space is defined by its pose. In case the robot can move in a 3D environment, the configuration is described by a 6-dimensional vector $(x, y, z, \alpha, \beta, \gamma)$. The first three $(x, y, z)$ coordinates represent the position with respect to a cartesian 3D coordinate system while the others describe the robot's orientation. Coordinates $(\alpha, \beta, \gamma)$ respectively represent the rotations along the axis $x$ (roll), $y$ (pitch), and $z$ (yaw). Figure \ref{fig:roll-pitch-yaw} displays the three rotations relative to an aircraft.
+
+\paragraph*{Reference Frames} 
+Robots' poses have to be defined according to a specific reference coordinate frame. In other words, every pose describes the robot's position and orientation with respect to a given point in space. For example, considering robots moving inside a room, the main (fixed) reference frame can be the center (or a corner) of the room itself. An environment usually include multiple references frames, since each robot or component (e.g., a camera) can define its own reference frame. Mathematical computation allows the composition of poses, to transform coordinates from one reference frame to another. Figure \ref{fig:pose-transform} shows a sequential composition of multiple reference frames.
+
+\begin{figure}[H]
+	\begin{center}
+		\begin{subfigure}[h]{0.52\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/02-roll-pitch-yaw"}
+        	\caption[]{}
+	        \label{fig:roll-pitch-yaw}
+	    \end{subfigure}
+		\hfill
+		\begin{subfigure}[h]{0.42\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{"contents/images/02-pose-transform"}
+        	\caption[]{}
+            \label{fig:pose-transform}
+		\end{subfigure}
+	\end{center}
+	\vspace{-0.5cm}
+	\caption[Robotics 3D pose fundamentals]{Robotics 3D pose fundamentals. On the left, roll, pitch and yaw rotations \cite{roll-pitch-yaw}. On the right, reference frames examples through multiple objects pose composition \cite{pose-transform}.}
+\end{figure}
+
+\subsection{Convolutional and Residual Neural Networks}
+\label{subsec:resnet}
+
+A \gls{cnn} is a \gls{dl} architecture suited for working with images, thus widely used in Computer Vision \cite{Khan_2020}. Like other Neural Networks, \gls{cnn}s are inspired by the human brain and specifically by the visual cortex. Neurons in this area respond to stimuli in sub-regions of the visual field, known as the Receptive Field. A set of these fields is designed to cover the entire visibile area. 
+
+In the same way, a \gls{cnn} starts considering small fractions of an image to find spatial relation between pixels. The network learns local features and iteratively combines them together to progressively acquire a general understanding of the entire image. In a \gls{cnn}, the network neurons are organized in filters of a given size, usually from $3 \times 3$ to $7 \times 7$ pixels. These filters slide over the image (convolution) to apply a matrix operation on the input and produce an output named feature map. Each feature map aims to recognize a particular input pattern. Feature maps from multiple filters constitute the output of a network's layer. During training, an optimization algorithm adjust the weights of the filters over time to achieve the network's intent. A \gls{cnn} is composed of multiple convolutional and pooling layers (to reduce the input size) ending with a set of fully connected layers.
+
+\medskip
+
+In 2015, researchers took inspiration from cerebral pyramidal cells to define an evolution of \gls{cnn}s: \gls{resnet} \cite{he2015deep}. A \gls{resnet} is built from a \gls{cnn} by adding a shortcut connection between a certain layer and another in the architecture, creating a residual block. Typically, \gls{resnet} models use to skip two or three convolutional layers with ReLU activation function \cite{act-relu} and batch normalization \cite{bacthnorm} in between. Sometimes, the shortcut connection must also include a convolutional layer for adapting the input shape for the receiver layer. Figure \ref{fig:resnet-blocks} shows an example of convolutional layers transformed into a \gls{resnet} block.
+
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=0.9\textwidth]{"contents/images/02-resnet-blocks"}
+	\caption[\gls{resnet} formation]{Classic convolutional layers (on the left) becomes a \gls{resnet} block (in the right) \cite{resnet_1}.}
+	\label{fig:resnet-blocks}
+\end{figure}
+
+The reason behind the technique is that adding more layers to an existing \gls{dnn} is not always a solution. After a certain limit, the network starts suffering from accuracy degradation, not because of overfitting, but for the vanishing gradient problem \cite{hochreiter1998vanishing}. 
+
+Very deep networks might not be able to learn simple functions like the identity function. In \cite{he2015deep}, the authors demonstrate that the issue is mitigated when using residual connections. They propagate the input image as-is, acting as an identity map. For this reason, the network's layer which receives the identity is able to make a comparison with the output of the residual block. Doing so, the network not only learns the input features but also the residuals, giving the model more flexibility. For example, a \gls{resnet} is able to learn the identity function by setting the residuals to zero \cite{resnet_2}. The shortcut connections allow the creation of smaller networks, accordingly easier to optimize.
 
 
-\subsection{Metrics for Regression}
+
+\subsection{Regression Metrics}
 \label{subsec:metrics}
 
-The following list presents an overview of all the principal metrics used in regression. These have been used during the model evaluation in chapter \ref{chap:evaluation}.
+The following list presents an overview of the principal metrics used in machine learning for evaluating a regression model. These have been used in chapter \ref{chap:evaluation}.
 
 \begin{itemize}
 	\item \gls{mae} measures the average residuals in the dataset, which means the absolute difference between the actual and predicted values. The lower the \gls{mae}, the better the model. Assuming $y_i$ as the predicted value and $\hat{y_i}$ as the ground truth, the \gls{mae} is defined as follows:
@@ -34,11 +90,7 @@ The following list presents an overview of all the principal metrics used in reg
 \end{itemize}
 
 
-%\subsection{Convolutional Neural Networks (CNN)}
-%\label{subsec:cnn}
 
-\subsection{Residual Neural Networks (ResNet)}
-\label{subsec:resnet}
 
 
 
@@ -47,6 +99,8 @@ The following list presents an overview of all the principal metrics used in reg
 \label{sec:human-drone-interaction}
 
 \gls{uav}, commonly known as drones, attracted a lot of interest in the last years. Their usage is expected to raise due to decreasing costs and emerging applications for personal, commercial, and social use. As the sector grows, many methodologies are under development for the control and coordination of drones. Most of the recent works in the field propose artificial intelligence solutions for a large variety of tasks.
+
+\medskip
 
 In this section, we first present a general overview on recent studies for autonomous flight. Then, we shift our attention on the topic of human-drone interaction and we focus on related works by \gls{idsia}.
 
@@ -57,12 +111,15 @@ In this section, we first present a general overview on recent studies for auton
 
 Autonomous navigation is an important and well-known research area in robotics, which usually requires accomplishing complex and computationally-expensive tasks such as localization, mapping, and path planning. Recent studies have started to approach autonomous driving through imitation learning \cite{imitation_learning_survey}. The approach consist in making a neural network learn a certain task by imitating humans' or robots' behavior on the given assignment.
 
+\medskip
+
 In 2016, a conjoint team from \gls{idsia} and \gls{uzh} proposes a machine learning approach for the problem of perceiving forest or mountain trails \cite{giusti2016machine}. They use a \gls{dnn} as a supervised image classifier for understanding the direction of a trail, viewed from a camera placed on top of a robot following the path itself. The solution outperforms previous alternatives in the task, making the drone able to autonomously drive following a tipical forest trail. Quantitative results show an accuracy which is comparable to the accuracy of humans on the same classification task.
 
 Some years later, researchers from \gls{uzh} have demonstrated that \gls{resnet}s can achieve satisfactory performance for drones' autonomous driving in indoor and outdoor scenarios. They developed DroNet \cite{Loquercio_2018}, a forked \gls{cnn} that predicts a steering angle and a collision probability from given a gray-scale image. The model learns to steer and avoid obstacles from forward-looking videos recorded by cars and bikes while driving in real contexts. DroNet requires very little computational power, allowing real-time performance, even on a CPU. In this case, the predictions run off-drone on a dedicated computer, remotely connected through WiFi.
 
 
 
+\clearpage
 \subsection{The State of the Art of Human–Drone Interaction}
 \label{subsec:human-drone-sota}
 
@@ -81,7 +138,7 @@ Our work is based on the master thesis \cite{mantegazza2018thesis} and paper \ci
 
 \medskip
 
-In his thesis, the author proposes a machine learning technique for teaching a model to control a drone while interacting with a person. In a few words, the goal is to continuously fly the drone to hover in front of a moving user. The problem is approached as a reactive control procedure and addressed with supervised learning. Thus, it provides an interesting starting point for many other robotics applications. Training data is acquired by programmatically flying the drone to face a user frontally. In this phase, the quadrotor is controlled through an omniscient controller that knows both the drone's and the person's pose. Images produced by the front-facing camera of the drone are used as input for a custom-designed \gls{resnet} architecture that infers the relative user's position \gls{wrt} the drone. The neural network performs a regression on the four variables that form the user's pose (X, Y, Z, YAW) and learns to predict their values using spatial information in the input images.
+In his thesis, the author proposes a machine learning technique for teaching a model to control a drone while interacting with a person. In a few words, the goal is to continuously fly the drone to hover in front of a moving user. The problem is approached as a reactive control procedure and addressed with supervised learning. Thus, it provides an interesting starting point for many other robotics applications. Training data is acquired by programmatically flying the drone to face a user frontally. In this phase, the quadrotor is controlled through an omniscient controller that knows both the drone's and the person's positions. Images produced by the front-facing camera of the drone are used as input for a custom-designed \gls{resnet} architecture that infers the relative user's position \gls{wrt} the drone (section \ref{subsec:robot-pose}). The neural network performs a regression on the four variables that form the user's pose (X, Y, Z, YAW) and learns to predict their values using spatial information in the input images.
 
 In the paper, the author compares the mediated approach described above with another end-to-end approach based on imitation learning. This second solution directly learns control signals\footnote{desired pitch, roll, yaw, and vertical velocity} for the drone, instead of the user's pose. A third experiment also considers the task of automatically learning a controller that drives the drone based on the given user's position. All the solutions provide very similar results but, for this thesis, we will only take into consideration the mediated approach. The reason behind our choice is that the learned model can be adapted to other tasks by simply designing a custom controller for the drone. Furthermore, it also provides a more transparent and analyzable solution.
 
@@ -92,29 +149,15 @@ Even though this kind of problem on human recognition and pose estimation could 
 Our entire project makes use of the original network architecture and dataset defined in \cite{mantegazza2019visionbased}, respectively explored in sections \ref{subsec:frontalnet-architecture} and \ref{sec:dataset}. For a better understanding, the original code repository\footnote{\url{https://github.com/idsia-robotics/proximity-quadrotor-learning}} and a descriptive video\footnote{\url{https://drive.switch.ch/index.php/s/MlEDrsuHcSl5Aw5}} are also available. To enhance readability of this thesis, having no official name, the custom \gls{resnet} architecture proposed by the author will be called \textit{FrontalNet}.
 
 
-\subsubsection{FrontalNet Architecture}
-\label{subsec:frontalnet-architecture}
-
-The network comprises a total of 1'332'484 trainable parameters, accepts a single $60 \times 108$ pixels image in input, and outputs 4 regression variables that correspond to the user's pose coordinates. Each \gls{resnet} block is provided with batch normalization, ReLU activations \cite{act-relu} are used for all layers except for the output neurons, which are associated with a linear activation function \cite{act-linear}. Figure \ref{fig:frontalnet-architecture-1} provides an illustration of the mediated architecture we consider for this thesis\footnote{take a look at image \ref{fig:frontalnet-architecture-paper3approaches} for details about the architectures related to the other approaches}. A complete list of all layers is also available in figures \ref{fig:frontalnet-architecture-3a} and \ref{fig:frontalnet-architecture-3a} of the appendix. 
-
-\begin{figure}[!h]
-	\centering
-	\includegraphics[width=0.4\textwidth]{"contents/images/03-frontalnet-1A"}
-	\caption[Schematic FrontalNet architecture]{Schematic FrontalNet architecture \cite{mantegazza2019visionbased}}
-	\label{fig:frontalnet-architecture-1}
-\end{figure}
-
 
 \subsubsection{FrontalNet Performance}
 \label{subsec:frontalnet-performance}
 
 \glsreset{r2}
 
-FrontalNet is trained using the \gls{mae} loss function with the \gls{adam} optimizer \cite{kingma2014adam} and a base learning rate of 0.001, progressively reduced on validation loss plateaus that last more than 5 epochs. A maximum of 200 epochs are run in total, using an early stopping policy with a patience of 10 epochs on the validation loss. 
+The network is trained using the \gls{mae} loss function with the \gls{adam} optimizer \cite{kingma2014adam} and a base learning rate of 0.001, progressively reduced on validation loss plateaus that last more than 5 epochs. A maximum of 200 epochs are run in total, using an early stopping policy with a patience of 10 epochs on the validation loss. 
 
 Performance is evaluated quantitatively and qualitatively on the end-to-end model, rather than the mediated one considered for our work. However, as explained before, both approaches obtain similar results. We can accordingly consider the following evaluation to be valid for the mediated approach too.
-
-\bigskip 
 
 For quantitative evaluation, the chosen metric is \gls{r2}, whose interpretation is described in section \ref{subsec:metrics}. The author also experiments with finding the minimum cardinality of the dataset to obtain acceptable performance. Results are available in figure \ref{fig:frontalnet-r2}, directly taken from the paper. As shown, at least 5,000 samples are required to achieve decent performance, which improves as the size of the training set increases. Specifically, predictions seem more accurate for variables \texttt{Z} and \texttt{W} with an \gls{r2} score of 0.82 and 0.88, respectively. Quite different the results for \texttt{X} and \texttt{Y} which only reach an \gls{r2} of 0.59 and 0.57, respectively.
 
@@ -133,6 +176,21 @@ These considerations on the variables are confirmed by the qualitative evaluatio
 	\caption[FrontalNet qualitative evaluation: GT vs. prediction results \cite{mantegazza2019visionbased}]{FrontalNet qualitative evaluation: GT vs. prediction results \cite{mantegazza2019visionbased}. A1, A2 and A3 in the chart stands for different models, but they anyway achieve almost the same results.}
 	\label{fig:frontalnet-gt-pred}
 \end{figure}
+
+
+
+\subsubsection{FrontalNet Architecture}
+\label{subsec:frontalnet-architecture}
+
+The \gls{resnet} comprises a total of 1'332'484 trainable parameters, accepts a single $60 \times 108$ pixels image in input, and outputs 4 regression variables that correspond to the user's pose coordinates. Each \gls{resnet} block is provided with batch normalization \cite{bacthnorm}. ReLU activations \cite{act-relu} are used for all layers except for the output neurons, which are associated with a linear activation function \cite{act-linear}. Figure \ref{fig:frontalnet-architecture-1} provides an illustration of the mediated architecture we consider for this thesis\footnote{take a look at image \ref{fig:frontalnet-architecture-paper3approaches} for details about the architectures related to the other approaches}. A complete list of all layers is also available in figures \ref{fig:frontalnet-architecture-3a} and \ref{fig:frontalnet-architecture-3a} of the appendix. 
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.4\textwidth]{"contents/images/03-frontalnet-1A"}
+	\caption[Schematic FrontalNet architecture]{Schematic FrontalNet architecture \cite{mantegazza2019visionbased}}
+	\label{fig:frontalnet-architecture-1}
+\end{figure}
+
 
 
 \subsection{Embedded Implementation of Controller for Nano-Drones}
@@ -172,8 +230,6 @@ Feature visualization aims to represent the way a \gls{cnn} encode its underlyin
 %The technique finds its roots in 2009 \cite{erhan2009feature} and slowly evolves thanks to the effort of many researchers in the field. A recent paper from Olah et al. \cite{olah2017feature} provides a clear explanation on the subject, highlighting its main usage and issues.
 
 A common technique for implementing feature visualization is by maximizing the activation functions of the network through an optimization algorithm \cite{erhan2009feature} \cite{nguyen2016multifaceted}. Such method can be applied on many parts of a \gls{cnn} for understanding individual features: neurons, channels, layers, or even class probabilities. As a result, the algorithm finds a set of input images that is able to effectively maximize the network's output. For example, in a classification problem, feature visualization is able to produce extremely positive examples for a certain class. Please also note that the same features can be associated with different examples in the dataset, as shown in figure \ref{fig:feature-visual-1}. Furthermore, through this technique researchers have demonstrated \cite{olah2017feature} that the layers of a \gls{cnn} build their reasoning in a hierarchical organization. Early layers learn basic visual properties such as edges or textures, while final layers respond to more abstract properties such as patterns, parts, or objects.
-
-Despite being an interesting area of research, feature visualization alone is not enough to produce a satisfactory understanding. Instead, the technique is more prone to be effectively used in the field of \gls{xai} when combined with other tools to explain the system as a whole \cite{zurowietz2020intvis} \cite{olah2018the}.
 
 \begin{figure}[!htb]
 	\begin{center}
@@ -221,8 +277,11 @@ Despite being an interesting area of research, feature visualization alone is no
 	\label{fig:feature-visual-1}
 \end{figure}
 
+Despite being an interesting area of research, feature visualization alone is not enough to produce a satisfactory understanding. Instead, the technique is more prone to be effectively used in the field of \gls{xai} when combined with other tools to explain the system as a whole \cite{zurowietz2020intvis} \cite{olah2018the}.
 
 
+
+\clearpage
 \subsection{Spatial Attribution: GradCAM}
 \label{subsec:gradcam-theory}
 
@@ -232,19 +291,17 @@ The methodology is younger yet more powerful than feature visualization. First s
 
 \medskip
 
-We explain the methodology by first focussing on \gls{cam} \cite{zhou2015learning}, which applies on classification tasks. \gls{cam} requires of a specific \gls{cnn} architecture, composed as follows: a \gls{gap} layer\footnote{The \gls{gap} layer is used for dimensionality reduction, by transforming $h \times w \times d$ feature maps to a single-dimension array of $1 \times 1 \times d$ features \cite{gap_layers}} placed after convolution layers outputs the spatial average of the feature maps; the \gls{gap} output goes into a fully-connected layer; this computes the final classification output through a weighted sum of features values.
+We explain the methodology by first focusing on \gls{cam} \cite{zhou2015learning}, which applies on classification tasks. \gls{cam} requires of a specific \gls{cnn} architecture, composed as follows: a \gls{gap} layer\footnote{The \gls{gap} layer is used for dimensionality reduction, by transforming $h \times w \times d$ feature maps to a single-dimension array of $1 \times 1 \times d$ features \cite{gap_layers}} placed after convolution layers outputs the spatial average of the feature maps; the \gls{gap} output goes into a fully-connected layer; this computes the final classification output through a weighted sum of features values.
 
 Taking inspiration from the forward pass, \gls{cam} projects back the weights of the output layer and computes a weighted sum between them and the feature maps of the last convolutional layer. The operation practically combines multiple activations in a single heatmap that identifies the importance of different parts of an input image for a certain classification output. Figure \ref{fig:cam-schema} illustrates the algorithm. 
 
 \medskip
 
-\gls{gradcam} is a generalization of \gls{cam} which works for any network architecture. The main innovation is that \gls{gradcam} projects back to the network, instead of the last layer's weights, the gradients of the score (for a certain class) \gls{wrt} the feature map activations of a convolutional layer. These gradient are averaged pooled - that is why the \gls{gap} layer is not required anymore - and, as before, weighted sum with the convolutional activation maps. If \gls{gradcam} is applied on a \gls{cam}-compatible network architecture, than it reduces to \gls{cam} itself.
+\gls{gradcam} is a generalization of \gls{cam} which works for any network architecture. The main innovation is that \gls{gradcam} projects back to the network, instead of the last layer's weights, the gradients of the score (for a certain class) \gls{wrt} the feature map activations of a convolutional layer. These gradient are averaged pooled - that is why the \gls{gap} layer is not required anymore - and, as before, weighted sum with the convolutional activation maps. If \gls{gradcam} is applied on a \gls{cam}-compatible network architecture, than it reduces to \gls{cam} itself. The result of both the algorithms is a heatmap that overlays the regions of an input image responsible for producing a certain model's output. Figure \ref{fig:gradcam-catdog} clearly show the result on a classifier cats vs. dogs classifier.
 
-The result of both the algorithms is a heatmap that overlays the regions of an input image responsible for producing a certain model's output. Figure \ref{fig:gradcam-catdog} clearly show the result on a classifier which aims to distinguish cats from dogs.
-
-\begin{figure}[!htb]
+\begin{figure}[H]
 	\centering
-	\includegraphics[width=0.9\textwidth]{"contents/images/02-cam"}
+	\includegraphics[width=1\textwidth]{"contents/images/02-cam"}
 	\caption[\gls{cam} schematic functioning]{\gls{cam} schematic functioning \cite{zhou2015learning}}
 	\label{fig:cam-schema}
 \end{figure}
@@ -256,9 +313,9 @@ The result of both the algorithms is a heatmap that overlays the regions of an i
 % 	\label{fig:gradcam-schema}
 % \end{figure}
 
-\begin{figure}[!htb]
+\begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{"contents/images/gradcam/02-gradcam-catdog"}
+    \includegraphics[width=0.6\textwidth]{"contents/images/gradcam/02-gradcam-catdog"}
     \caption[\gls{gradcam} example on dog vs. cat classification]{\gls{gradcam} example on dog vs. cat classification \cite{Selvaraju_2019}}
     \label{fig:gradcam-catdog}
 \end{figure}
@@ -269,24 +326,26 @@ The result of both the algorithms is a heatmap that overlays the regions of an i
 \section{Network Generalization}
 \label{sec:network-generalization}
 
-This section explores common methodologies for improving neural networks' generalization capabilities. The explained approaches have been selected for specifically introducing our generalization strategy and providing alternative solutions, evaluated and discarded during the development of the thesis.
+This section explores various methodologies for improving neural networks' generalization capabilities. We first provide an overview of the most important methods. Then, introduce our generalization strategy and present alternative solutions, evaluated and discarded during the development of the thesis.
 
 
 
 \subsection{Data Augmentation}
 \label{subsec:data-augmentation}
 
-One of the most common approaches for reducing overfitting of a \gls{ml} model is data augmentation. When working with datasets for Computer Vision, we speak about image augmentation. It aims to generate new images from the existing training samples. The technique is ubiquitously used for training \gls{cnn}s, especially when the available data is limited or difficult to obtain. A huge variety of approaches have been proposed by researchers for achieving image augmentation \cite{shorten2019augmentationsurvey}. The most common solutions apply geometric transformations \cite{xie2020unsupervised}, which can be divided in two types:
+One of the most common approaches for reducing overfitting of a \gls{ml} model is data augmentation. When working with datasets for Computer Vision, we speak about image augmentation. It aims to generate new images from the existing training samples. The technique is ubiquitously used for training \gls{cnn}s, especially when the available data is limited or difficult to obtain. A huge variety of approaches have been proposed by researchers for achieving image augmentation \cite{shorten2019augmentationsurvey}.
+
+The most common solutions apply geometric transformations \cite{xie2020unsupervised}, which can be divided in two types:
 \begin{itemize}
 	\item Spatial-level augmentations: also called affine transformations, relocate pixels by cropping, scaling, rotating, translating, mirroring, and shearing the images. These techniques require to accordingly modify additional elements associated with the images, such as ground truth, masks, bounding boxes, or key points.
 	\item Pixel-level augmentations: algorithms that only modify pixels (or group of pixels) without relocating them or changing the image shape. These transformations leave unchanged any other additional element associated with the images, such as ground truth, masks, bounding boxes, or key points.
 \end{itemize}
 
-Another simple technique is inspired by the neural networks' mechanism of dropout regularization. It consists of erasing parts of the training images to contrast samples in which the subject is not totally visible. Also, it makes sure that the model actually looks at the entire image while learning its task \cite{wan2013dropconn} \cite{zhong2017random}. 
+Another simple technique is inspired by the \gls{nn}s mechanism of dropout regularization. The method consists of erasing parts of the training images to contrast samples in which the subject is not totally visible. Also, it makes sure that the model actually looks at the entire image while learning its task \cite{wan2013dropconn} \cite{zhong2017random}. 
 
 Fancier methods consider the possibility of mixing multiple samples to create a new image. In \cite{Takahashi_2020} and \cite{summers2019improved}, training images are created as a collage of other randomly transformed samples. In \cite{Lemley_2017}, the authors propose to create a combination of images from the same classification category; the result is similar to the intermediate outputs obtained during the application of a morphing effect \cite{wiki_morphing}. In the last years, the field is experiencing the development of \gls{ml} approaches for automatically learning image augmentation strategies \cite{zoph2019learning} \cite{cubuk2019autoaugment}.
 
-Recent techniques of image augmentation are used to transfer a learned task from one domain into another. In other words, a model trained on images created or augmented in a simulation environment can be later used for achieving the same task in the real world. These techniques exploit the concept of Domain Randomization.
+Recent techniques of image augmentation are used to transfer a learned task from one domain into another; in other words, a model trained on images created or augmented in a simulation environment can be later used for achieving the same task in the real world. These techniques exploit the concept of Domain Randomization.
 
 
 
@@ -297,7 +356,7 @@ Domain Randomization is a trending technique for enabling domain transfer. It is
 
 Entire tasks, including environment and moving agents, can be simulated through a dedicated graphical engine. Some of the most important are Gazebo\footnote{\url{http://gazebosim.org/}}, Unreal Engine\footnote{\url{https://www.unrealengine.com/en-US/}}, and Unity\footnote{\url{https://unity.com/}}. Regardless of being designed specifically for Robotics or for generic purposes, such as game-development or \gls{vr}, all of them give developers unlimited possibilities. However, a complete and adaptable simulation of a machine learning task with physics engines requires a lot of effort.
 
-For this reason, recent studies consider advanced image augmentation techniques for achieving Domain Randomization. In \cite{yue2019domain}, the authors propose an interesting and powerful approach for augmenting a dataset using artistic style transfer \cite{gatys2015neural}. They modify an input sample by applying the style of an image taken from another database. The results produce curious synthetic images which give to the training model enough variability to learn a generalized self-driving task. Figure \ref{fig:02-domain-artistic} shows an example of this application.
+Recent studies achieves Domain Randomization through advanced image augmentation. In \cite{yue2019domain}, the authors propose an interesting approach for augmenting a dataset using artistic style transfer \cite{gatys2015neural}. They modify an input sample by styling it according to another image taken from a different database. The results produce curious images which give to the training model enough variability to learn a generalized self-driving task. Figure \ref{fig:02-domain-artistic} shows an example of this application.
 
 \begin{figure}[!h]
     \centering
@@ -309,16 +368,15 @@ For this reason, recent studies consider advanced image augmentation techniques 
 
 
 \subsection{Background Replacement: Chroma Key}
+\label{subsec:chromakey}
 
 In chapter \ref{chap:system}, we provide an overview of the system by Mantegazza et al. \cite{mantegazza2019visionbased}, presented in section \ref{subsec:sota-dario}. As previously discussed, the images for training the model have been recorded in a single room. Inspired by Domain Randomization, we focus on designing a custom image augmentation technique to simulate a larger variety of environments. More specifically, we want to replace the background behind each user in the dataset.
-
-\medskip
 
 A known approach for implementing background replacement is the chroma key. Widely used in entertainment, it is a technique that makes use of colors in images and videos for creating a mask that distinguishes between actual content and background. Usually, a chroma key is implemented using a blue or green screen placed behind the subject, making sure that such color is not present in the foreground image. Then, a post-production software takes care of creating the mask of the subject, enabling the background replacement.
 
 Building up a proper chroma key setup can be challenging, especially in large environments. An experiment in this direction has been conducted during the development of \cite{mantegazza2019visionbased}, by placing a green screen on a portion of the drone arena walls. Masking results were actually satisfying but the limited size of the screen was suffering from limitations in terms of user's movements and background coverage. Figure \ref{fig:greenscreen} displays the setup, revealing a non-ignorable portion of the original background still appearing in the images. Besides, assuming the capability of building a well-designed chroma key environment, the resulting solution would be highly dependent on the setup's geographical location.
 
-For this reason, we decide to focus on solutions that only regard software computations. They are much more flexible and open the possibility of extending the same approach for other tasks.
+For these reasons, we decide to focus on solutions that only regard software computations. They are much more flexible and open the possibility of extending the same approach for other tasks.
 
 \begin{figure}[!h]
 	\begin{center}
@@ -354,10 +412,11 @@ For this reason, we decide to focus on solutions that only regard software compu
 
 Mask R-CNN \cite{he2018mask} is a state of the art deep learning framework for object detection and instance segmentation. In other words, it detects and categorizes every single object inside an image and also creates the corresponding mask.
 
-The method extends Faster R-CNN \cite{ren2016faster} by adding a branch in the network for simultaneously predicting the object mask while the existing model cares of bounding box recognition. Faster R-CNN consists of two steps. The first is based on a Region Proposal Network, a Fully Convolutional Network \cite{shelhamer2016fully} which proposes candidate object bounding boxes. The second fundamental stage extract squared features from each candidate to perform classification and bounding-box regression. In Mask R-CNN, the first step remains the same, but the second stage also includes a parallel prediction of a binary mask.
-Results are qualitatively incredible\footnote{\url{https://www.youtube.com/watch?v=OOT3UIXZztE}, \url{https://youtu.be/Dhkd_bAwwMc}} and the method currently outperforms any other study in the field. A practical demo applied to our dataset is available in section \ref{subsec:masking-maskrcnn}.
+The method extends Faster R-CNN \cite{ren2016faster}. R-CNN stays for Regional Convolutional Neural Network, commonly used for achieving object detection. Faster R-CNN consists of two steps. The first is based on a Region Proposal Network, a Fully Convolutional Network \cite{shelhamer2016fully} which proposes candidate object bounding boxes. The second fundamental stage extract squared features from each candidate to perform classification and bounding-box regression. 
 
-Please note that Faster R-CNN is much slower \cite{medium_rcnn} than other object detection algorithms, such as YOLO \cite{redmon2016look}. However, the strength of Mask R-CNN stays in its high-precision in providing both object detection and instance segmentation at once. Furthermore, the framework is easily adaptable for various segmentation and keypoint detection tasks \cite{he2018mask} \cite{MaskRCNN_matterport} \cite{maskrcnn_explanation}, and it destined to become hugely used in many fields of application.
+Mask R-CNN takes the existing model and adds a branch in the network for simultaneously predicting the object mask while the other branch peforms bounding box recognition. Practically, the first step remains the same as Faster R-CNN, but the second stage also includes a parallel prediction for achieving instance segmentation. The creation of a binary mask is of an object is independent from the object classification, since the algorithm does not actually use any information about the type of the objects for computing their masks. According to \cite{he2018mask}, this technique allows Mask R-CNN to be faster and more accurate than other state of the art algorithms for instance segmentation.
+
+Please note that Faster R-CNN is much slower \cite{medium_rcnn} than other object detection algorithms, such as YOLO \cite{redmon2016look}. However, the strength of Mask R-CNN stays in its high-precision in providing both object detection and instance segmentation at once. Results are qualitatively incredible\footnote{\url{https://www.youtube.com/watch?v=OOT3UIXZztE}, \url{https://youtu.be/Dhkd_bAwwMc}} and the method currently outperforms any other study in the field. Furthermore, the framework is easily adaptable for various segmentation and keypoint detection tasks \cite{he2018mask} \cite{MaskRCNN_matterport} \cite{maskrcnn_explanation}, and it destined to become hugely used in many fields of application. A practical demo applied to our dataset is available in section \ref{subsec:masking-maskrcnn}.
 
 
 

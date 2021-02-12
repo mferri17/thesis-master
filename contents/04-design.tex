@@ -760,6 +760,8 @@ Mask R-CNN results on our dataset are incredibly precise, and the method undoubt
 	\label{fig:maskrcnn-dario}
 \end{figure}
 
+\medskip
+
 This high-level of accuracy in detection and segmentation comes with an extremely-high computing power requirement\footnote{according to the original paper, Mask R-CNN runs at 5 \gls{fps} on Nvidia Tesla M40 GPU}. For reference, running Mask R-CNN on the test set - composed of about 11'000 images - requires a total computing time\footnote{we observe, using the \texttt{\%\%time} command for IPython, the following CPU times: user 35min, sys 20min, total 55min; and Wall time: 1h 4min} of approximately 55 minutes on Google Colab using a GPU runtime\footnote{equipped with Nvidia T4 GPU}.
 
 Because of this, the inference on the images must be made offline. Together with each input image, the training procedure will only receive the previously computed user's mask. This will be used to perform background replacement.
