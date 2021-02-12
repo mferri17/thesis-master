@@ -15,6 +15,8 @@ As demonstrated in section \ref{subsec:gradcam-results}, the approach defined by
 
 In section \ref{subsec:masking-maskrcnn}, we anticipated the use of Mask R-CNN to pre-process the dataset. The algorithm detects and creates a mask for all the objects appearing in the input images, labeling each mask with the category to which the object belongs (e.g., person, TV, bike, car, etc.). However, for our purposes, we are only interested in the mask corresponding to the user who is actually facing the drone. Since it is always the nearest person to the drone's camera, its mask must be the one with the largest size among all people's masks found by Mask R-CNN.
 
+\medskip
+
 To perform the background replacement, the training procedure receives, for each sample, also the corresponding user's mask. This is used to distinguish the subject from the rest of the image and accordingly blend the camera's frame with another image, serving as the background. The ground truth remains unchanged, and this is the main advantage of our approach. We can simulate a dataset acquired in different environments without actually collecting it, which would otherwise require a dedicated \gls{mocap} system. Our method is fairly similar to domain randomization (section \ref{subsec:domain-randomization}), a technique widely applied in robotics to train \gls{ml} models in simulated virtual environments.
 
 By providing a considerable amount of images to use as backgrounds, the \gls{ml} model trained on the modified dataset should be able to actually ignore the background. The \gls{cnn}, instead, will hopefully learn the concept of a person to predict its position in any condition.
@@ -46,9 +48,7 @@ For implementing image augmentation, we choose Albumentations \cite{Buslaev_2020
 
 \medskip
 
-In our case, it is not possible to modify the ground truth according to affine transformations because the relationship between the person's position in the image and the ground is not known a priori. For this reason, spatial-level augmentations (see section \ref{subsec:data-augmentation}) are not an option. Instead, we mainly apply pixel-level transformations.
-
-The only exception is horizontal flipping, which only requires inverting the \texttt{Y} coordinate in the ground truth. As explained in section \ref{subsec:dataset-composition}, the \texttt{Y} coordinate represents the horizontal alignment of the user \gls{wrt} the drone. Figure \ref{fig:frontalnet-dataset-distribution-class}, in the previous chapter, shows a propensity for the user to be on the right-part of the images. For this reason, we decide to mirror the camera's frames horizontally with a probability of 50\%.
+In our case, it is not possible to modify the ground truth according to affine transformations because the relationship between the person's position in the image and the ground is not known a priori. For this reason, spatial-level augmentations (see section \ref{subsec:data-augmentation}) are not an option. Instead, we mainly apply pixel-level transformations. The only exception is horizontal flipping, which only requires inverting the \texttt{Y} coordinate in the ground truth. As explained in section \ref{subsec:dataset-composition}, the \texttt{Y} coordinate represents the horizontal alignment of the user \gls{wrt} the drone. Figure \ref{fig:frontalnet-dataset-distribution-class}, in the previous chapter, shows a propensity for the user to be on the right-part of the images. For this reason, we decide to mirror the camera's frames horizontally with a probability of 50\%.
 
 Figure \ref{fig:albumentation-example} provides an example of image augmentation applied both on original and background-augmented samples. Those results combine pixel-level transformations on brightness and contrast, multiplicative noise, channels manipulation, and rectangular dropouts.
 
@@ -125,14 +125,15 @@ Furthermore, adding noise to images can greatly help \gls{cnn}s on avoiding over
 
 
 
+\clearpage
 \section{Models Definition}
 \label{sec:model-variants}
 
-We have defined the methodologies to perform background replacement and data augmentation on the original images. According to our work's objective, we are interested in the beneficial effects on generalization caused by background replacement.  These effects can be amplified when background replacement is combined with image augmentation. For this reason, we define three model alternatives to evaluate the validity of our solution.
+We have defined the methodologies to perform background replacement and data augmentation on the original images. According to our work's objective, we are interested in the beneficial effects on generalization caused by background replacement.  These effects can be amplified when background replacement is combined with image augmentation. For this reason, we define three model alternatives to evaluate the validity of our solution. 
 
 \begin{itemize}
     \item A baseline model, which is trained on the original dataset as-is (section \ref{sec:dataset}), and corresponds to the exact approach proposed by Mantegazza et al. \cite{mantegazza2019visionbased}. Since it is trained with data coming directly from the drone arena, we call it the \texttt{Arena} model.
-    \item A first variant of the above model, defined by enabling only background replacement (not image augmentation). In this case, we replace original backgrounds (i.e., the drone arena) with randomly chosen images. For this purpose, we use the CVPR dataset presented in section \ref{sec:implementation-bgreplace}, therefore we call this model \texttt{CVPR}.
+    \item A first variant of the model is defined by enabling background replacement only, without any other type of image augmentation. In this case, we replace original backgrounds (i.e., the drone arena) with randomly chosen images. For this purpose, we use the CVPR dataset presented in section \ref{sec:implementation-bgreplace}, therefore we call this model \texttt{CVPR}.
     \item A second variant of the model includes both background replacement and image augmentation. This combination constitutes the most advanced model proposed in our thesis. For simplicity, it is called \texttt{CVPR Aug}.
 \end{itemize}
 
@@ -199,6 +200,8 @@ The following list provides a complete overview of the strategies adopted to red
 
 
 
+
+\clearpage
 \subsection{Source Code}
 \label{subsec:data-generator-code}
 
@@ -281,22 +284,19 @@ Table \ref{tab:data-generator-profiling} reports the performance summary for our
 	\end{tabular}
 \end{table}
 
-For a better understanding, we also display TensorBoard visualizations for standard and optimized versions of the \texttt{CVPR Aug} model. 
+For a better understanding, we also display TensorBoard visualizations for standard and optimized versions of the \texttt{CVPR Aug} model. Figure \ref{fig:profiling-cvpraug-summary} presents an overview of the performance over 35 training steps. The two charts clearly show how the non-optimized version is highly input-bound (46.9\%).
 
-Figure \ref{fig:profiling-cvpraug-summary} presents an overview of the performance over 35 training steps. The two charts clearly show how the non-optimized version is highly input-bound (46.9\%).
-
-Figure \ref{fig:profiling-cvpraug-gpu} shows the main tasks for which GPU and CPU are used during training. On GPU, the main difference regards the IDLE time. On the other hand, CPU computation of the optimized version mainly focuses on Albumentations while spreads over different tasks when no parallelization is used. This behavior is probably due to sequential non-prefetched operations that need a greater number of context switches between GPU and CPU, resulting in a waste of time.
-
+Also, figure \ref{fig:profiling-cvpraug-gpu} shows the main tasks for which GPU and CPU are used during training. On GPU, the main difference regards the IDLE time. On the other hand, CPU computation of the optimized version mainly focuses on Albumentations while spreads over different tasks when no parallelization is used. This behavior is probably due to sequential non-prefetched operations that need a greater number of context switches between GPU and CPU, resulting in a waste of time.
 
 \begin{figure}[!h]
 	\begin{center}
-		\begin{subfigure}[h]{0.49\textwidth}
+		\begin{subfigure}[h]{0.47\textwidth}
 			\centering
 			\includegraphics[width=1\textwidth]{"contents/images/05-profiling-CVPRaug-std-summary"}
 			\caption[]{Standard version}
 		\end{subfigure}
 		\hfill
-		\begin{subfigure}[h]{0.49\textwidth}
+		\begin{subfigure}[h]{0.47\textwidth}
 			\centering
 			\includegraphics[width=1\textwidth]{"contents/images/05-profiling-CVPRaug-opt-summary"}
 			\caption[]{Optimized version}
@@ -341,8 +341,6 @@ Figure \ref{fig:profiling-cvpraug-gpu} shows the main tasks for which GPU and CP
 
 
 
-
-
 \section{Training}
 \label{sec:implementation-training}
 
@@ -358,12 +356,11 @@ This section illustrates technical details about the training procedure. We firs
 
 As in the original paper from Mantegazza et al. \cite{mantegazza2019visionbased}, we use the \gls{mae} loss function and the \gls{adam} optimizer \cite{kingma2014adam} with the default learning rate of $0.001$ and automatic reducer on plateaus (4 epochs patience). The batch size is $64$, and the last 30\% of the training data (not shuffled) is used as a validation set.
 
-The training runs for 60 epochs, without early stopping. The dataset is shuffled and repeated three times for each epoch. This approach imitates an oversampling strategy, especially suited for the \texttt{CVPR} and the \texttt{CVPR Aug} models. The latter is trained with a prior augmentation probability of 95\%, as detailed in section \ref{sec:implementation-imgaug}.
-
-Prefetching and parallelization \texttt{tf.data} parameters are automatically tuned by TensorFlow.
+The training runs for 60 epochs, without early stopping. The dataset is shuffled and repeated three times for each epoch to simulate an oversampling strategy, especially suited for the \texttt{CVPR} and the \texttt{CVPR Aug} models. The latter is trained with a prior augmentation probability of 95\%, as detailed in section \ref{sec:implementation-imgaug}. Prefetching and parallelization \texttt{tf.data} parameters are automatically tuned by TensorFlow.
 
 
 
+\clearpage
 \subsection{Timing}
 \label{subsec:training-timing}
 

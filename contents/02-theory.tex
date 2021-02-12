@@ -114,8 +114,9 @@ FrontalNet is trained using the \gls{mae} loss function with the \gls{adam} opti
 
 Performance is evaluated quantitatively and qualitatively on the end-to-end model, rather than the mediated one considered for our work. However, as explained before, both approaches obtain similar results. We can accordingly consider the following evaluation to be valid for the mediated approach too.
 
-\medskip 
-For quantitative evaluation, the chosen metric is \gls{r2}, already explained in section \ref{subsec:metrics}. The author also experiments with finding the minimum cardinality of the dataset to obtain acceptable performance. Results are available in figure \ref{fig:frontalnet-r2}, directly taken from the paper. As shown, at least 5,000 samples are required to achieve decent performance, which improves as the size of the training set increases. Specifically, predictions seem more accurate for variables \texttt{Z} and \texttt{W} with an \gls{r2} score of 0.82 and 0.88, respectively. Quite different the results for \texttt{X} and \texttt{Y} which only reach an \gls{r2} of 0.59 and 0.57, respectively.
+\bigskip 
+
+For quantitative evaluation, the chosen metric is \gls{r2}, whose interpretation is described in section \ref{subsec:metrics}. The author also experiments with finding the minimum cardinality of the dataset to obtain acceptable performance. Results are available in figure \ref{fig:frontalnet-r2}, directly taken from the paper. As shown, at least 5,000 samples are required to achieve decent performance, which improves as the size of the training set increases. Specifically, predictions seem more accurate for variables \texttt{Z} and \texttt{W} with an \gls{r2} score of 0.82 and 0.88, respectively. Quite different the results for \texttt{X} and \texttt{Y} which only reach an \gls{r2} of 0.59 and 0.57, respectively.
 
 These considerations on the variables are confirmed by the qualitative evaluation, obtained by comparing ground truth and predictions during a short simulation. Figure \ref{fig:frontalnet-gt-pred} shows that \texttt{X} and \texttt{Y} predictions are considerably worse than results achieved by \texttt{Z} and \texttt{W} when compared with the ground truth.
 
@@ -268,16 +269,16 @@ The result of both the algorithms is a heatmap that overlays the regions of an i
 \section{Network Generalization}
 \label{sec:network-generalization}
 
-This section explores common methodologies for improving a neural network's generalization capabilities. The explained approaches have been selected for specifically introducing our generalization strategy and providing alternative solutions discarded during the development of the thesis.
+This section explores common methodologies for improving neural networks' generalization capabilities. The explained approaches have been selected for specifically introducing our generalization strategy and providing alternative solutions, evaluated and discarded during the development of the thesis.
 
 
 
 \subsection{Data Augmentation}
 \label{subsec:data-augmentation}
 
-One of the most common approaches for reducing overfitting of a \gls{ml} model is data augmentation. When working with datasets for Computer Vision, we speak about image augmentation. It aims to generate new images from the existing training samples. The technique is ubiquitous use for training \gls{cnn}s, especially when the available data is limited or difficult to obtain. A huge variety of approaches has been proposed by researchers for achieving image augmentation \cite{shorten2019augmentationsurvey}. The most common solutions apply geometric transformations \cite{xie2020unsupervised}, which can be divided into two types:
+One of the most common approaches for reducing overfitting of a \gls{ml} model is data augmentation. When working with datasets for Computer Vision, we speak about image augmentation. It aims to generate new images from the existing training samples. The technique is ubiquitously used for training \gls{cnn}s, especially when the available data is limited or difficult to obtain. A huge variety of approaches have been proposed by researchers for achieving image augmentation \cite{shorten2019augmentationsurvey}. The most common solutions apply geometric transformations \cite{xie2020unsupervised}, which can be divided in two types:
 \begin{itemize}
-	\item Spatial-level augmentations: also called affine transformations, they relocate pixels by cropping, scaling, rotating, translating, mirroring, and shearing the images. These transformations also have to accordingly modify additional elements associated with the images, such as ground truth, masks, bounding boxes, or key points.
+	\item Spatial-level augmentations: also called affine transformations, relocate pixels by cropping, scaling, rotating, translating, mirroring, and shearing the images. These techniques require to accordingly modify additional elements associated with the images, such as ground truth, masks, bounding boxes, or key points.
 	\item Pixel-level augmentations: algorithms that only modify pixels (or group of pixels) without relocating them or changing the image shape. These transformations leave unchanged any other additional element associated with the images, such as ground truth, masks, bounding boxes, or key points.
 \end{itemize}
 
@@ -294,7 +295,7 @@ Recent techniques of image augmentation are used to transfer a learned task from
 
 Domain Randomization is a trending technique for enabling domain transfer. It is useful when the real-world data is not easy to access and collect \cite{mehta2019active}. The main implementations make use of a simulated environment for representing a virtual world in which the \gls{ml} is trained. If the simulator is good enough in providing a good variety of realistic data, then the real world may appear to the model as just another variation of the training environment. The approach is particularly used for reinforcement learning \cite{imitation_learning_3d_navigation} and object recognition \cite{weng2019DR} \cite{tobin2017domain}.
 
-Entire tasks, including environment and moving agents, can be simulated through a dedicated graphical engine. Some of the most important are Gazebo\footnote{\url{http://gazebosim.org/}}, Unreal Engine\footnote{\url{https://www.unrealengine.com/en-US/}}, and Unity\footnote{\url{https://unity.com/}}. Regardless of being designed specifically for Robotics or for generic purposes, such as game-development or \gls{vr}, all of them give developers unlimited possibilities. However, a complete and adaptable simulation of a \gls{ml} task with a physics engine requires a lot of effort.
+Entire tasks, including environment and moving agents, can be simulated through a dedicated graphical engine. Some of the most important are Gazebo\footnote{\url{http://gazebosim.org/}}, Unreal Engine\footnote{\url{https://www.unrealengine.com/en-US/}}, and Unity\footnote{\url{https://unity.com/}}. Regardless of being designed specifically for Robotics or for generic purposes, such as game-development or \gls{vr}, all of them give developers unlimited possibilities. However, a complete and adaptable simulation of a machine learning task with physics engines requires a lot of effort.
 
 For this reason, recent studies consider advanced image augmentation techniques for achieving Domain Randomization. In \cite{yue2019domain}, the authors propose an interesting and powerful approach for augmenting a dataset using artistic style transfer \cite{gatys2015neural}. They modify an input sample by applying the style of an image taken from another database. The results produce curious synthetic images which give to the training model enough variability to learn a generalized self-driving task. Figure \ref{fig:02-domain-artistic} shows an example of this application.
 
@@ -351,9 +352,12 @@ For this reason, we decide to focus on solutions that only regard software compu
 \subsection{Human Detection and Segmentation: Mask R-CNN}
 \label{subsec:sota-maskrcnn}
 
-\textbf{TODO}
+Mask R-CNN \cite{he2018mask} is a state of the art deep learning framework for object detection and instance segmentation. In other words, it detects and categorizes every single object inside an image and also creates the corresponding mask.
 
-MaskRCNN: \cite{he2018mask}, \cite{maskrcnn_explanation}, \cite{maskrcnn_arcgis}
+The method extends Faster R-CNN \cite{ren2016faster} by adding a branch in the network for simultaneously predicting the object mask while the existing model cares of bounding box recognition. Faster R-CNN consists of two steps. The first is based on a Region Proposal Network, a Fully Convolutional Network \cite{shelhamer2016fully} which proposes candidate object bounding boxes. The second fundamental stage extract squared features from each candidate to perform classification and bounding-box regression. In Mask R-CNN, the first step remains the same, but the second stage also includes a parallel prediction of a binary mask.
+Results are qualitatively incredible\footnote{\url{https://www.youtube.com/watch?v=OOT3UIXZztE}, \url{https://youtu.be/Dhkd_bAwwMc}} and the method currently outperforms any other study in the field. A practical demo applied to our dataset is available in section \ref{subsec:masking-maskrcnn}.
+
+Please note that Faster R-CNN is much slower \cite{medium_rcnn} than other object detection algorithms, such as YOLO \cite{redmon2016look}. However, the strength of Mask R-CNN stays in its high-precision in providing both object detection and instance segmentation at once. Furthermore, the framework is easily adaptable for various segmentation and keypoint detection tasks \cite{he2018mask} \cite{MaskRCNN_matterport} \cite{maskrcnn_explanation}, and it destined to become hugely used in many fields of application.
 
 
 
