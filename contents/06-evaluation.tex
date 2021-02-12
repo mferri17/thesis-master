@@ -7,7 +7,7 @@
 \glsreset{r2}
 % \glsresetall
 
-This chapter thoroughly illustrates the evaluation of our generalization strategy by comparing the three model variants proposed in section \ref{sec:model-variants}. The measurement includes both quantitative and qualitative evaluations. On one side, a quantitative valuation provides numerical results, which are crucial for scientifically assessing the network's capabilities through a set of chosen metrics. On the other side, qualitative observations rely on human interpretation to evaluate models' possible behaviors in some real contexts.
+This chapter illustrates the evaluation of our generalization strategy by comparing the model variants proposed in section \ref{sec:model-variants}. The measurement includes quantitative and qualitative evaluations. On one side, a quantitative valuation provides numerical results, which are crucial for scientifically assessing the network's capabilities through a set of chosen metrics. On the other side, qualitative observations rely on human interpretation to evaluate models' possible behaviors in some real contexts.
 
 
 
@@ -16,7 +16,7 @@ This chapter thoroughly illustrates the evaluation of our generalization strateg
 
 This section considers the models' performance during the training procedure presented in section \ref{sec:implementation-training}. In this phase, the loss function (\gls{mae}) and the \gls{r2} score are taken into consideration, both for the train and the validation set. Figures \ref{fig:training-metrics-arena}, \ref{fig:training-metrics-cvpr} and \ref{fig:training-metrics-cvpraug} show metrics evolution over the 60 training epochs. Overall, least 30 epochs are needed to reach convergence, after which the performance stabilizes. Even though the \texttt{CVPR Aug} model appears to improve by further increasing the number of epochs, experiments with 200 epochs have substantially the same results as 60.
 
-\texttt{Arena}, \texttt{CVPR}, and \texttt{CVPR Aug} achieve a validation loss of 0.07, 0.13 and 0.20, respectively. As the model complexity increases, the loss does. On the other hand, data augmentation seems to cause a significant decrease in the gap between training and validation loss, as shown in figure \ref{fig:training-metrics-cvpraug}. This effect may be a symptom of better generalization capabilities, driven by the possibly learned task of actually recognizing a human in the image. However, we do not yet have enough information to draw a conclusion on the subject.
+\texttt{Arena}, \texttt{CVPR}, and \texttt{CVPR Aug} achieve a validation loss of 0.07, 0.13 and 0.20, respectively. As the model complexity increases, the loss does. On the other hand, data augmentation seems to cause a significant decrease in the gap between training and validation loss, as shown in figure \ref{fig:training-metrics-cvpraug}. Even tough further inspection is needed, this effect may be a symptom of better generalization capabilities, driven by the possibly learned task of actually recognizing a human in the image. 
 
 The \texttt{Arena} model registers an \gls{r2} of 0.99, which can be attributable to overfitting. In fact, such a score would be obtained by an optimal model, but we already know that the original FrontalNet by \cite{mantegazza2019visionbased} could not properly operate outside of the drone arena. In the next sections, we will examine models \texttt{CVPR} and \texttt{CVPR Aug} on various test sets to certify their robustness against the \texttt{Arena} one.
 
@@ -142,9 +142,7 @@ For the evaluation, we take into consideration the three test sets presented in 
 
 \paragraph*{Test set \texttt{arena} (figure \ref{fig:ql-gtpred-arena})}
 
-All the models achieve good results on the original test set. As in quantitative evaluation, there is no significant difference between the three models. For all variables, the predictions follow the \gls{gt} reasonably accurately. It sometimes happen that one of the models registers slightly better results than the others, but this is a non-systematic behavior.
-
-Performance is very similar to the ones presented in figure \ref{fig:frontalnet-gt-pred}, obtained by the original FrontalNet model according to Mantegazza et al. \cite{mantegazza2019visionbased}.
+All the models achieve good results on the original test set. As in quantitative evaluation, there is no significant difference between the three models. For all variables, the predictions follow the \gls{gt} reasonably accurately. It sometimes happen that one of the models registers slightly better results than the others, but this is a non-systematic behavior. Performance is very similar to the ones presented in figure \ref{fig:frontalnet-gt-pred}, obtained by the original FrontalNet model according to Mantegazza et al. \cite{mantegazza2019visionbased}.
 
 \begin{figure}[!h]
 	\centering
@@ -195,7 +193,9 @@ Conversely, the models trained on background-replaced training sets can perform 
 
 According to the previous charts, the \texttt{CVPR} and the \texttt{CVPR Aug} models should be able to predict the user's pose in unknown environments. However, the predictions present much more oscillations than the ground truth, even on the \texttt{arena} test set. This phenomenon can lead to undesired consequences when using the model to control the real drone. Strong oscillation can cause the controller to produce unfeasible movements. For this reason, we want to ensure that the variance of our predictions is not much greater than the variance of the ground truth.
 
-We consider different time windows for computing the variance and each of them bring to the same conclusion. For simplicity, in this thesis we focus on a four seconds window, meaning that we compute the variance every 120 frames. The visualization is done through a timeline, shown in figure \ref{fig:ql-variance} for the \texttt{arena} and the \texttt{mixed} test sets. From the charts, we observe that the variances over time of both \texttt{CVPR} and \texttt{CVPR Aug} are aligned with the variance of the \gls{gt}. For this reason, we conclude that such models can most likely be used to control the real drone.
+\bigskip
+
+We consider different time windows for computing the variance. Each of them bring to the same conclusion. For simplicity, in this thesis we focus on a four seconds window, meaning that we compute the variance every 120 frames. The visualization is done through a timeline, shown in figure \ref{fig:ql-variance} for the \texttt{arena} and the \texttt{mixed} test sets. From the charts, we observe that the variances over time of both \texttt{CVPR} and \texttt{CVPR Aug} are aligned with the variance of the \gls{gt}. For this reason, we conclude that such models can most likely be used to control the real drone.
 
 \begin{figure}[!h]
 	\begin{center}
