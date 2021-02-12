@@ -13,11 +13,11 @@ This chapter explores the existing model's issues, proposes a solution, and pres
 \section{Problem Summary}
 \label{sec:frontalnet-generalization}
 
-In section \ref{subsec:sota-dario}, we introduce the original paper we are working on and present its architecture and basic performance. Chapter \ref{chap:system} illustrates environment composition and presents the dataset used to train the machine learning model, as declared in Mantegazza et al. \cite{mantegazza2019visionbased}.
+In Section \ref{subsec:sota-dario}, we introduce the original paper we are working on and present its architecture and basic performance. Chapter \ref{chap:system} illustrates environment composition and presents the dataset used to train the machine learning model, as declared in Mantegazza et al. \cite{mantegazza2019visionbased}.
 
 \medskip
 
-As explained in section \ref{subsec:frontalnet-performance}, FrontalNet achieved quite good performance on the test set. Nevertheless, its behavior must be proven on the real drone to certify the model's usability. \cite{mantegazza2019visionbased} reports experiments conducted inside the arena by flying the drone without the \gls{mocap} system, only relying on the learned model for computing the user's pose. The outcome is excellent, with the drone actually performing its task without any issues\footnote{see figure \ref{fig:frontalnet-trajectories} in the appendix for further details}.
+As explained in Section \ref{subsec:frontalnet-performance}, FrontalNet achieves quite good performance on the test set. Nevertheless, its behavior must be proven on the real drone to certify the model's usability. \cite{mantegazza2019visionbased} reports experiments conducted inside the arena by flying the drone without the \gls{mocap} system, only relying on the learned model for computing the user's pose. The outcome is excellent, with the drone actually performing its task without any issues\footnote{see Figure \ref{fig:frontalnet-trajectories} in the appendix for further details}.
 
 However, both quantitative and qualitative evaluations have been carried out using a set of images similar to the training one. Even though the model predictions were good with unknown users, they still move in the same drone arena where the training data have been collected. For a complete analysis, we must consider model performance in unknown environments.
 
@@ -42,9 +42,9 @@ In the previous section, we discussed insufficient experimental results obtained
 
 Convolutional Neural Networks (CNN) are suited for computer vision because of their ability to extract spatial-related insights from images. As any other \gls{nn}, even \gls{cnn}s are "black-boxes". This means that their internal behavior is particularly challenging for humans to understand.
 
-Among network interpretability techniques introduced in section \ref{sec:network-interpretability}, we choose \gls{gradcam}. The algorithm is indeed the most understandable way of visualizing what a \gls{cnn} is actually seeing.
+Among network interpretability techniques introduced in Section \ref{sec:network-interpretability}, we choose \gls{gradcam}. The algorithm is indeed the most understandable way of visualizing what a \gls{cnn} is actually seeing.
 
-As explained in section \ref{subsec:gradcam-theory}, \gls{gradcam} is able to effectively visualize the parts of an input image which are actually responsible for predicting a certain output\footnote{for an easy understandable \gls{gradcam} example, please refer to the figure \ref{fig:gradcam-catdog} which regards a simple dogs VS cats classifier}.
+As explained in Section \ref{subsec:gradcam-theory}, \gls{gradcam} is able to effectively visualize the parts of an input image which are actually responsible for predicting a certain output\footnote{for an easy understandable \gls{gradcam} example, please refer to the Figure \ref{fig:gradcam-catdog} which regards a simple dogs VS cats classifier}.
 
 \medskip
 
@@ -68,7 +68,7 @@ We decide to split continuous values into three different classes, which account
 	\item \texttt{W} values are splitted at $-0.20$ and $+0.20$
 \end{itemize}
 
-So, for example, \texttt{X} values greater than $1.6$ will be classified as \texttt{high}, while \texttt{Z} values between $-0.05$ and $+0.05$ will be classified as \texttt{medium}. These intervals have been defined to have a uniform class distribution over the training set (figure \ref{fig:frontalnet-dataset-distribution-class}).
+So, for example, \texttt{X} values greater than $1.6$ will be classified as \texttt{high}, while \texttt{Z} values between $-0.05$ and $+0.05$ will be classified as \texttt{medium}. These intervals have been defined to have a uniform class distribution over the training set (Figure \ref{fig:frontalnet-dataset-distribution-class}).
 
 \begin{figure}[!h]
 	\begin{center}
@@ -104,7 +104,7 @@ So, for example, \texttt{X} values greater than $1.6$ will be classified as \tex
 
 Considering the new ground truth, we define a new model architecture by replacing regression outputs with classification ones. We completely re-train the new model, by using the \texttt{categorical\_crossentropy} loss and the \texttt{accuracy} metric, both suited for multi-class problems. As the original FrontalNet model, we opt for an \gls{adam} optimizer and a base learning rate of $0.001$, progressively reduced on validation loss plateaus. 
 
-Results are shown in figure \ref{fig:gradcam-retrain-simple}. After 30 epochs, the charts report a loss slightly smaller than 1, both for training and validation, and accuracy over the 80\% for all the variables. These values are not ideal for drawing a conclusion but have instead been used for comparing different training experiments conducted on the new classification model.
+Results are shown in Figure \ref{fig:gradcam-retrain-simple}. After 30 epochs, the charts report a loss slightly smaller than 1, both for training and validation, and accuracy over the 80\% for all the variables. These values are not ideal for drawing a conclusion but have instead been used for comparing different training experiments conducted on the new classification model.
 
 \begin{figure}[!h]
 	\centering
@@ -122,7 +122,7 @@ A proper understanding of \gls{gradcam} results requires a thorough ability on r
  
 \medskip
 
-To run \gls{gradcam}, it is required to specify a class for which to compute the respective activation mapping. In our case, the class would be one of the three defined in section \ref{subsec:gradcam-regrtoclass}: \texttt{low}, \texttt{medium} or \texttt{high}. 
+To run \gls{gradcam}, it is required to specify a class for which to compute the respective activation mapping. In our case, the class would be one of the three defined in Section \ref{subsec:gradcam-regrtoclass}: \texttt{low}, \texttt{medium} or \texttt{high}. 
 
 When working on standard classification problems, things are pretty easy. If we classify animals, we indicate \gls{gradcam} a specific animal class (e.g., \texttt{lion}) and the algorithm will provide a heatmap that overlays the portion of the image which is mainly associated with that animal (e.g., hopefully, the lion will be highlighted).
 
@@ -152,11 +152,11 @@ Figure \ref{fig:gradcam-example-1} displays a typical example on \gls{gradcam} a
 
 Heatmaps are not easy to interpret due to a large variety of parameters to consider. As a guideline, it is possible to only consider, for each variable, the column which corresponds to the predicted class (or the actual, if it differs). Actual and predicted values are available in the right-most parenthesis, as "GT" and "PR" respectively. Rows define variables, while columns stand for the classes. It is clearly visible how no specific correlation in \gls{gradcam} results is available between variables, classes, and computed predictions.
 
-By calling \gls{gradcam} without specifying a particular class, it is also possible to obtain an average result on all classes, shown in the last column. Applying similar reasoning also on variables, we can produce a single meaningful image. This represents a \gls{gradcam} global average, which is computed on every variable and class at once (figure \ref{fig:gradcam-example-2}).
+By calling \gls{gradcam} without specifying a particular class, it is also possible to obtain an average result on all classes, shown in the last column. Applying similar reasoning also on variables, we can produce a single meaningful image. This represents a \gls{gradcam} global average, which is computed on every variable and class at once (Figure \ref{fig:gradcam-example-2}).
 
 \begin{figure}[!h]
 	\centering
-	\includegraphics[width=0.5\textwidth]{"contents/images/gradcam/04-gradcam-example-2"}
+	\includegraphics[width=0.4\textwidth]{"contents/images/gradcam/04-gradcam-example-2"}
 	\caption[\gls{gradcam}: example of application on a global average]{\gls{gradcam}: example of application on a global average}
 	\label{fig:gradcam-example-2}
 \end{figure}
@@ -166,13 +166,15 @@ By calling \gls{gradcam} without specifying a particular class, it is also possi
 \subsection{Results}
 \label{subsec:gradcam-results}
 
-As already shown in figure \ref{fig:gradcam-example-1}, it seems that the network is not only considering the person in the frame for computing its output but instead relies on the whole image with particular attention on some spots.
+As already shown in Figure \ref{fig:gradcam-example-1}, it seems that the network is not only considering the person in the frame for computing its output but instead relies on the whole image with particular attention on some spots.
 
-From the previous section, we understand that reasoning with \gls{gradcam} heatmaps is not trivial, and separating visualization by variables and classes is not totally convenient when we can plot the global average \gls{gradcam} instead. For simplicity, this section will only focus on single-image results. However, full \gls{gradcam} visualizations are available in the appendix \ref{sec:extra-gradcam} for further inspection.
+From the previous section, we understand that reasoning with \gls{gradcam} heatmaps is not trivial, and separating visualization by variables and classes is not totally convenient when we can plot the global average \gls{gradcam} instead. For simplicity, this section will only focus on single-image results. However, full \gls{gradcam} visualizations are available in the Appendix \ref{sec:extra-gradcam} for further inspection.
 
 \subsubsection*{Reasonable detections}
 
 Figure \ref{fig:gradcam-ok} displays examples of correctly working scenarios in which the person is well-detected by \gls{gradcam}. In these situations, it often happens that the entire user is highlighted, but sometimes only the body or the head gets proper attention.
+
+Such precise results are not the standard. In many cases, the network focus is unstable, and the heatmaps frequently go in and out of the target person. The two sequences of frames shown in Figures \ref{fig:gradcam-seq-dario} and \ref{fig:gradcam-seq-beard} fairly describe the usual behavior of the model seen by \gls{gradcam}.
 
 \begin{figure}[!h]
 	\begin{center}
@@ -200,8 +202,6 @@ Figure \ref{fig:gradcam-ok} displays examples of correctly working scenarios in 
 	\caption[\gls{gradcam}: Correctly detected people]{\gls{gradcam}: Correctly detected people}
 	\label{fig:gradcam-ok}
 \end{figure}
-
-Such precise results are not the standard. In many cases, the network focus is unstable, and the heatmaps frequently go in and out of the target person. The two sequences of frames shown in figures \ref{fig:gradcam-seq-dario} and \ref{fig:gradcam-seq-beard} fairly describe the usual behavior of the model seen by \gls{gradcam}.
 
 \begin{figure}[!h]
 	\begin{center}
@@ -302,11 +302,11 @@ Such precise results are not the standard. In many cases, the network focus is u
 The examples presented above mostly reflect the model expected behavior. However, our network interpretation also reveals many flaws in the prediction task. \gls{gradcam} exhibits several situations in which the model output is affected by recurrent elements in the dataset.
 
 \begin{itemize}
-	\item Objects in the background are prone to be considered important (figure \ref{fig:gradcam-background})
-	\item Curtains seem often particularly attractive (figure \ref{fig:gradcam-curtains})
-	\item Many parts of the room can easily distract the model, such as borders and baseboards or even blank spots on the walls (figure \ref{fig:gradcam-random})
-	\item When dealing with multiple people in front of the camera, sometimes not only the nearest person is considered (figure \ref{fig:gradcam-double})
-	\item Artificial glitches, caused by connection issues, are sometimes correctly ignored, and other times a source of distraction (figure \ref{fig:gradcam-glitch})
+	\item Objects in the background are prone to be considered important (Figure \ref{fig:gradcam-background})
+	\item Curtains seem often particularly attractive (Figure \ref{fig:gradcam-curtains})
+	\item Many parts of the room can easily distract the model, such as borders and baseboards or even blank spots on the walls (Figure \ref{fig:gradcam-random})
+	\item When dealing with multiple people in front of the camera, sometimes not only the nearest person is considered (Figure \ref{fig:gradcam-double})
+	\item Artificial glitches, caused by connection issues, are sometimes correctly ignored, and other times a source of distraction (Figure \ref{fig:gradcam-glitch})
 \end{itemize}
 
 \begin{figure}[!h]
@@ -453,7 +453,7 @@ The examples presented above mostly reflect the model expected behavior. However
 
 In light of this, we can reasonably assume that the \gls{resnet} has undesirably learned some details about the drone arena in which the dataset has been collected. The issue is common with supervised learning, and it is called overfitting. It happens when a \gls{ml} model learns much information that only belongs to the training set, being not able to properly work later on previously unseen data.
 
-This is most likely the reason why the model is unable to control the drone outside of the arena, as previously discussed in section \ref{sec:frontalnet-generalization}.
+This is most likely the reason why the model is unable to control the drone outside of the arena, as previously discussed in Section \ref{sec:frontalnet-generalization}.
 
 
 
@@ -463,7 +463,7 @@ This is most likely the reason why the model is unable to control the drone outs
 
 From \gls{gradcam} results presented in the previous section, we conclude that the model is not capable of generalization. We have demonstrated that the main cause of the problem is inherent in the drone arena; thus, we would like to remove this factor (i.e., the room itself) from the equation.
 
-We propose a solution, inspired by domain randomization, that consists of performing advanced data augmentation on the training data. Considering the images that compose our dataset, we only keep the user facing the drone and remove the background by randomly replacing it with something else. This section explores various algorithms for creating the mask of a person in an image. After several experiments, the solution we have decided to adopt is Mask R-CNN (section \ref{subsec:masking-maskrcnn}).
+We propose a solution, inspired by domain randomization, that consists of performing advanced data augmentation on the training data. Considering the images that compose our dataset, we only keep the user facing the drone and remove the background by randomly replacing it with something else. This section explores various algorithms for creating the mask of a person in an image. After several experiments, the solution we have decided to adopt is Mask R-CNN (Section \ref{subsec:masking-maskrcnn}).
 
 
 
@@ -525,13 +525,13 @@ OpenCV GrabCut implementation has two initialization modalities. It is possible 
 
 \medskip
 
-Both approaches require previous knowledge about the subject position in the image. Our initial experiments assume that such information is given. In section \ref{subsec:masking-yolo}, we will consider an automatic human detection algorithm.
+Both approaches require previous knowledge about the subject position in the image. Our initial experiments assume that such information is given. In Section \ref{subsec:masking-yolo}, we will consider an automatic human detection algorithm.
 
 
 \subsubsection{Rectangle initialization}
 \label{subsec:masking-grabcut-rect}
 
-This approach requires that a rectangle, entirely containing the subject, is given in input to the function (figure \ref{fig:grabcut-rect-explain-1}). GrabCut proceeds as follows. Area inside the rectangle is marked as \textit{probable-background} (green), while the pixels outside are \textit{sure-background} (blue). As the algorithm keeps going, it finds pixels inside the rectangle which can be foreground, marking them as \textit{probable-foreground} (yellow) (figure \ref{fig:grabcut-rect-explain-2}). Later, we binarize and smooth the mask (figure \ref{fig:grabcut-rect-explain-3}) for finally removing the background from the original image.
+This approach requires that a rectangle, entirely containing the subject, is given in input to the function (Figure \ref{fig:grabcut-rect-explain-1}). GrabCut proceeds as follows. Area inside the rectangle is marked as \textit{probable-background} (green), while the pixels outside are \textit{sure-background} (blue). As the algorithm keeps going, it finds pixels inside the rectangle which can be foreground, marking them as \textit{probable-foreground} (yellow) (Figure \ref{fig:grabcut-rect-explain-2}). Later, we binarize and smooth the mask (Figure \ref{fig:grabcut-rect-explain-3}) for finally removing the background from the original image.
 
 \begin{figure}[!h]
 	\begin{center}
@@ -561,7 +561,7 @@ This approach requires that a rectangle, entirely containing the subject, is giv
 	\label{fig:grabcut-rect-explain}
 \end{figure}
 
-Performance obtained by the algorithm is available in figure \ref{fig:grabcut-rect-example}. Results seem better than the ones produced by Canny Edge Detection. However, it happens that the face or the entire person is filtered out of the image.
+Performance obtained by the algorithm is available in Figure \ref{fig:grabcut-rect-example}. Results seem better than the ones produced by Canny Edge Detection. However, it happens that the face or the entire person is filtered out of the image.
 
 \begin{figure}[!h]
 	\begin{center}
@@ -586,7 +586,7 @@ Performance obtained by the algorithm is available in figure \ref{fig:grabcut-re
 
 For advanced purposes, OpenCV also gives the possibility to initially classify the pixels with a mask. We choose this methodology for setting the face and part of the body as \textit{sure-foreground} from the beginning.
 
-For demonstration, we consider an image for which the rectangle initialization above was completely missing the person in the result. Procedure is shown in figure \ref{fig:grabcut-mask-explain}. We start by specifying \textit{sure-foreground} pixels (blue), then GrabCut automatically infers \textit{probable-foreground} (yellow) and \textit{probable-background} (green) areas. Results are undoubtedly better, but we notice that the left-most background has been kept in the final image. However, this part of the image could have been easily identified as \textit{sure-background} by using the person pose we assume as known, as we did for rectangle initialization.
+For demonstration, we consider an image for which the rectangle initialization above was completely missing the person in the result. Procedure is shown in Figure \ref{fig:grabcut-mask-explain}. We start by specifying \textit{sure-foreground} pixels (blue), then GrabCut automatically infers \textit{probable-foreground} (yellow) and \textit{probable-background} (green) areas. Results are undoubtedly better, but we notice that the left-most background has been kept in the final image. However, this part of the image could have been easily identified as \textit{sure-background} by using the person pose we assume as known, as we did for rectangle initialization.
 
 \begin{figure}[!h]
 	\begin{center}
@@ -630,9 +630,9 @@ For demonstration, we consider an image for which the rectangle initialization a
 
 Finally, a mixed approach between rectangle and mask initializations has been tried. It allows to specify both the person and the face positions in the image, by initially setting \textit{sure-background}, \textit{probable-background}, and \textit{sure-foreground} pixels. Only \textit{probable-foreground} pixels have to be found by the GrabCut algorithm. 
 
-In figure \ref{fig:grabcut-hybrid-explain} is available a step-by-step explanation like the ones presented above. In there, \textit{sure-background} is dark blue, \textit{probable-background} is green, \textit{probable-foreground} is yellow and \textit{sure-foreground} is light blue.
+In Figure \ref{fig:grabcut-hybrid-explain} is available a step-by-step explanation like the ones presented above. In there, \textit{sure-background} is dark blue, \textit{probable-background} is green, \textit{probable-foreground} is yellow and \textit{sure-foreground} is light blue.
 
-Image \ref{fig:grabcut-hybrid-example} shows the results of hybrid initialization applied to the same samples introduced in figure \ref{fig:grabcut-rect-example}. The segmentation is very precise, and the approach reveals to be almost optimal.
+Figure \ref{fig:grabcut-hybrid-example} shows the results of hybrid initialization applied to the same samples introduced in Figure \ref{fig:grabcut-rect-example}. The segmentation is very precise, and the approach reveals to be almost optimal.
 
 \begin{figure}[!h]
 	\begin{center}
@@ -689,7 +689,7 @@ Given the available data, the mapping between the user's pose (the \gls{gt}) and
 
 For detecting the user we try YOLO \cite{redmon2016look}, a state of the art technique for object detection. We decide to adopt the \texttt{cvlib} library \cite{cvlib}, which underneath uses the OpenCV dnn module \cite{opencv_dnn} for implementing a YOLOv3 model trained on the Microsoft COCO dataset \cite{lin2015microsoft}.
 
-A demo on our dataset is shown in figure \ref{fig:yolo}, where we notice that YOLO overall provides quite good results. However, in 10-20\% of the cases, it does not detect any object in the image, most probably because of their low resolution.
+A demo on our dataset is shown in Figure \ref{fig:yolo}, where we notice that YOLO overall provides quite good results. However, in 10-20\% of the cases, it does not detect any object in the image, most probably because of their low resolution.
 
 \begin{figure}[!h]
 	\centering
@@ -709,7 +709,7 @@ The same problem also affects face detection, which is needed for providing the 
 \subsection{Mask R-CNN}
 \label{subsec:masking-maskrcnn}
 
-Mask R-CNN \cite{he2018mask} is a state of the art deep learning framework for object detection and instance segmentation, whose technical details have been illustrated in section \ref{subsec:sota-maskrcnn}. Initially developed by Facebook researchers in PyTorch \cite{pytorch}, the algorithm has been ported on TensorFlow 1 \cite{MaskRCNN_matterport} and later adapted for TensorFlow 2 \cite{MaskRCNN_akTwelve}.
+Mask R-CNN \cite{he2018mask} is a state of the art deep learning framework for object detection and instance segmentation, whose technical details have been illustrated in Section \ref{subsec:sota-maskrcnn}. Initially developed by Facebook researchers in PyTorch \cite{pytorch}, the algorithm has been ported on TensorFlow 1 \cite{MaskRCNN_matterport} and later adapted for TensorFlow 2 \cite{MaskRCNN_akTwelve}.
 
 \medskip
 

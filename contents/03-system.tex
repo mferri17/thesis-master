@@ -3,7 +3,7 @@
 
 \glsresetall
 
-We focus on improving the original work from Mantegazza et al. \cite{mantegazza2019visionbased}, introduced in section \ref{subsec:sota-dario}. This chapter aims to provide a generic view of the system, starting from its main components and how they interact for flying and controlling the drone. Then, we present tools, libraries, and dataset we are working with to enhance the model generalization capabilities.
+We focus on improving the original work from Mantegazza et al. \cite{mantegazza2019visionbased}, introduced in Section \ref{subsec:sota-dario}. This chapter aims to provide a generic view of the system, starting from its main components and how they interact for flying and controlling the drone. Then, we present tools, libraries, and dataset we are working with to enhance the model generalization capabilities.
 
 
 
@@ -25,7 +25,7 @@ Working from a machine learning perspective, our task does not require interacti
 	\label{fig:bebop}
 \end{figure}
 
-The entire work is built around the Parrot Bebop 2 \cite{bebop} (figure \ref{fig:bebop}), a lightweight drone (500 grams) with a size of $382 \times 328 \times 89$ millimeters. A 2700 mAh swappable battery gives power to four brushless motors and a dual-core processor with a quad-core GPU, for a maximum flight time of 25 minutes. Connectivity is provided through 2.4 GHz 802.11a/b/n/ac WiFi that enables remote control via mobile app or Parrot Skycontroller (up to a distance of 2km).
+The entire work is built around the Parrot Bebop 2 \cite{bebop} (Figure \ref{fig:bebop}), a lightweight drone (500 grams) with a size of $382 \times 328 \times 89$ millimeters. A 2700 mAh swappable battery gives power to four brushless motors and a dual-core processor with a quad-core GPU, for a maximum flight time of 25 minutes. Connectivity is provided through 2.4 GHz 802.11a/b/n/ac WiFi that enables remote control via mobile app or Parrot Skycontroller (up to a distance of 2km).
 
 The drone is equipped with many simultaneous sensors to compute velocities, orientation, altitude, and GPS coordinates to ensure maximum stability during the whole flight. For this project, we mainly focus on its camera, which can shoot 14 \gls{mp} photos and record Full HD 1080p videos at 30 \gls{fps}. Even though the original \gls{fov} is 180°, raw camera images pass through a software stabilization that produces 16:9 images with a horizontal \gls{fov} of about 80°. Parrot's 3-axis digital stabilization technique is able to compensate for the drone's pitch and roll to provide correct-oriented horizontal images and stable videos regardless of the drone's movements.
 
@@ -45,7 +45,7 @@ To monitor the drone and the user's movement, we require a \gls{mocap} system to
 \subsection{Drone Arena}
 \label{subsec:drone-arena}
 
-At \gls{idsia}, a dedicated room has been equipped with a \gls{mocap} system composed of 12 OptiTrack Prime$^x$13 \gls{ir} cameras\footnote{1.3 \gls{mp}, 240 \gls{fps}, $\pm0.20$ mm 3D accuracy in a $9 \times 9$ meters area with 14mm markers} for medium-sized areas (figure \ref{fig:optitrack-camera}). They track passive markers' movements, placed both on the person's head facing the drone and on the drone itself. Schematic and actual representation of the arena are shown in figures \ref{fig:optitrack-schema} and \ref{fig:drone-arena}. Such composition can track a theoretical number of 18 drones inside an available area of $6 \times 6$ meters (here surrounded by a safety net). A virtual fence of $4.8 \times 4.8$ meters virtually constraints the total area in which the drone is allowed to fly.
+At \gls{idsia}, a dedicated room has been equipped with a \gls{mocap} system composed of 12 OptiTrack Prime$^x$13 \gls{ir} cameras\footnote{1.3 \gls{mp}, 240 \gls{fps}, $\pm0.20$ mm 3D accuracy in a $9 \times 9$ meters area with 14mm markers} for medium-sized areas (Figure \ref{fig:optitrack-camera}). They track passive markers' movements, placed both on the person's head facing the drone and on the drone itself. Schematic and actual representation of the arena are shown in Figures \ref{fig:optitrack-schema} and \ref{fig:drone-arena}. Such composition can track a theoretical number of 18 drones inside an available area of $6 \times 6$ meters (here surrounded by a safety net). A virtual fence of $4.8 \times 4.8$ meters virtually constraints the total area in which the drone is allowed to fly.
 
 \begin{figure}[!htb]
 	\centering
@@ -85,13 +85,13 @@ This section refers to the dataset defined in Mantegazza et al. \cite{mantegazza
 \subsection{Collection}
 \label{subsec:control}
 
-Data have been entirely collected in the dedicated drone arena, presented in section \ref{subsec:drone-arena}. A good dataset should ideally provide images from various scenarios, but such a kind of data is not easy to record. The ground truth must be acquired by a complex and expensive \gls{mocap} system, particularly difficult to be moved and reassembled outdoor.
+Data have been entirely collected in the dedicated drone arena, presented in Section \ref{subsec:drone-arena}. A good dataset should ideally provide images from various scenarios, but such a kind of data is not easy to record. The ground truth must be acquired by a complex and expensive \gls{mocap} system, particularly difficult to be moved and reassembled outdoor.
 
 \medskip
 
 The drone is controlled by a \gls{ros} script, running on a dedicated computer remotely connected through WiFi. It relies on the known user's pose - from now on, the \textit{target pose} (i.e., the pose of the user seen by the drone reference frame) - to compute acceleration commands for the drone. The script is responsible for making the drone hovering in front of the person, facing the head orientation at a predefined 1.5 meters distance.
 
-During data collection, both user's and drone's poses are captured by the OptiTrack using proper markers placed on the drone and the person's head (picture \ref{fig:drone-facing}). The target poses over time\footnote{mathematically computed by a script from \cite{mantegazza2018thesis}}, are synchronized with the video stream coming from the camera and saved into \texttt{rosbag} files. Figure \ref{fig:drone-demo-2} shows an illustration of the system from a bird-eye view.
+During data collection, both user's and drone's poses are captured by the OptiTrack using proper markers placed on the drone and the person's head (Figure \ref{fig:drone-facing}). The target poses over time\footnote{mathematically computed by a script from \cite{mantegazza2018thesis}}, are synchronized with the video stream coming from the camera and saved into \texttt{rosbag} files. Figure \ref{fig:drone-demo-2} shows an illustration of the system from a bird-eye view.
 
 \begin{figure}[!h]
 	\centering
@@ -116,7 +116,7 @@ Data collected inside the arena have been used to build the dataset for training
 
 The dataset contains thirteen different people, which differ in physical characteristics and outfit, moving in different ways under various (artificial) light conditions. Many objects are present in the background of recorded images, and some experiments involve more than one person in front of the drone\footnote{anyway, the drone always had to follow the nearest user (equipped with OptiTrack markers)}. In total, 45 minutes of videos were used to compose the dataset, which counts about 63'000 and 11'000 frames for training and testing sets, respectively.
 
-A complete overview of images composing the training set is shown in figure \ref{fig:frontalnet-dataset-overview}. Please notice that a few frames in the dataset are affected by digital artifacts, mainly caused by connection issues during video recording (figure \ref{fig:frontalnet-dataset-glitch}); moreover, in some frames, no person is present because of particular movements sequences during which the drone actually lose the user (figure \ref{fig:frontalnet-dataset-missing}).
+A complete overview of images composing the training set is shown in Figure \ref{fig:frontalnet-dataset-overview}. Please notice that a few frames in the dataset are affected by digital artifacts, mainly caused by connection issues during video recording (Figure \ref{fig:frontalnet-dataset-glitch}); moreover, in some frames, no person is present because of particular movements sequences during which the drone actually loses the user (Figure \ref{fig:frontalnet-dataset-missing}).
 
 \begin{figure}[!htb]
 	\centering
@@ -151,7 +151,7 @@ The ground truth is represented by four variables associated with each captured 
 	\item \texttt{W} represents the angle created between the head's pointing direction and the drone position, is influenced by head orientation, and affects the yaw (angular velocity around the Z-axis). If the user is perfectly facing the drone, this variable will be equal to 0.
 \end{itemize}
 
-From the distribution of the variables in the training set, shown in figure \ref{fig:frontalnet-dataset-distribution-regr}, we notice that most of the time, the user is somehow centered in the image. This is an effect caused by the \gls{ros} controller based on known poses. The variation of the variables is affected by the user's movements in space; the more sudden they are, the greater the deviation.
+From the distribution of the variables in the training set, shown in Figure \ref{fig:frontalnet-dataset-distribution-regr}, we notice that, most of the time, the user is somehow centered in the image. This is an effect caused by the \gls{ros} controller based on known poses. The variation of the variables is affected by the user's movements in space; the more sudden they are, the greater the deviation.
 
 \begin{figure}[!h]
 	\begin{center}
@@ -186,12 +186,10 @@ From the distribution of the variables in the training set, shown in figure \ref
 \section{Frameworks}
 \label{sec:software}
 
-This section presents tools and software used to conduct our research and improve the existing system. Our first experiments were carried out with Jupyter Notebooks via Google Colab on a GPU-accelerated runtime, while the final code is provided as Python scripts. Specific details about the hardware used for training the model are available in section \ref{subsec:training-timing}. 
-
-The original work is written in Python 3 and based on ROS, TensorFlow 1, and Keras. We adapt the code for working with TensorFlow 2. Here is a list of the main libraries which compose our software.
+This section presents tools and software used to conduct our research and improve the existing system. Our first experiments were carried out with Jupyter Notebooks via Google Colab, while the final code is provided as Python scripts. Specific details about the hardware used for training the model are available in Section \ref{subsec:training-timing}. The original work is written in Python 3 and based on ROS, TensorFlow 1, and Keras. We adapt the code for working with TensorFlow 2. Here is a list of the main libraries which compose our software.
 
 \paragraph*{\texttt{\gls{ros}}}
-Even though not used in our work, it is crucial in Mantegazza et al. \cite{mantegazza2019visionbased} to actually control the drone during flight. It will be used in the future for testing our model improvements on the real drone. ROS \cite{ROS} is an open-source robotics middleware suite\footnote{available for C++, Python, and Lisp} for building robot applications, providing hardware abstraction, implementation of commonly-used functionality, message-passing between processes, and package management. It also integrates with additional tools for real-time 3D visualizations and simulations.
+Even though not used in our work, it is crucial in Mantegazza et al. \cite{mantegazza2019visionbased} to actually control the drone during flight. It will be used in the future for testing our model improvements on the real drone. ROS \cite{ROS} is an open-source robotics middleware suite for building robot applications, providing hardware abstraction, implementation of commonly-used functionality, message-passing between processes, and package management. It also integrates with additional tools for real-time 3D visualizations and simulations.
 
 \paragraph*{\texttt{Numpy}}
 Largely used in the whole project for computation on arrays. Numpy is the fundamental package for scientific computing in Python that provides a multidimensional array object, various derived objects (such as masked arrays and matrices), and an assortment of routines for fast operations on arrays. 
@@ -206,7 +204,7 @@ The first choice for building charts, visualize images or various kinds of figur
 Mainly used for efficient image/video manipulation and visualization, together with Matplotlib. OpenCV is an open-source library that includes several hundreds of computer vision algorithms.
 
 \paragraph*{\texttt{TensorFlow 2}}
-The entire project strongly relies on TensorFlow \cite{tensorflow} (TF) from start to end: network interpretation, person masking, training, and evaluation. Created by the Google Brain team, TensorFlow is an open-source library for numerical computation and large-scale machine learning. It can be used across a range of tasks but has a particular focus on training and inference of deep neural networks. In version 2, it introduces many comforts for easier development with a less steep learning curve.
+The entire project strongly relies on TensorFlow \cite{tensorflow} (TF) from start to end: network interpretation, person masking, training, and evaluation. Created by the Google Brain team, TensorFlow is an open-source library for numerical computation and large-scale machine learning. It can be used across a range of tasks but has a particular focus on training and inference of deep neural networks. In version 2, TensorFlow introduces many comforts for easier development with a less steep learning curve.
 
 \paragraph*{\texttt{Keras}}
 Used for defining the network architecture, training, and evaluating the model. Keras  \cite{keras} is the high-level API of TensorFlow 2: an approachable, highly-productive interface for solving machine learning problems, focusing on modern deep learning. It provides essential abstractions and building blocks for developing and shipping machine learning solutions with high iteration velocity.

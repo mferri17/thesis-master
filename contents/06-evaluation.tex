@@ -7,16 +7,16 @@
 \glsreset{r2}
 % \glsresetall
 
-This chapter illustrates the evaluation of our generalization strategy by comparing the model variants proposed in section \ref{sec:model-variants}. The measurement includes quantitative and qualitative evaluations. On one side, a quantitative valuation provides numerical results, which are crucial for scientifically assessing the network's capabilities through a set of chosen metrics. On the other side, qualitative observations rely on human interpretation to evaluate models' possible behaviors in some real contexts.
+This chapter illustrates the evaluation of our generalization strategy by comparing the model variants proposed in Section \ref{sec:model-variants}. The measurement includes quantitative and qualitative evaluations. On one side, a quantitative valuation provides numerical results, which are crucial for scientifically assessing the network's capabilities through a set of chosen metrics. On the other side, qualitative observations rely on human interpretation to evaluate models' possible behaviors in some real contexts.
 
 
 
 \section{Training Results}
 \label{sec:evaluation-training}
 
-This section considers the models' performance during the training procedure presented in section \ref{sec:implementation-training}. In this phase, the loss function (\gls{mae}) and the \gls{r2} score are taken into consideration, both for the train and the validation set. Figures \ref{fig:training-metrics-arena}, \ref{fig:training-metrics-cvpr} and \ref{fig:training-metrics-cvpraug} show metrics evolution over the 60 training epochs. Overall, least 30 epochs are needed to reach convergence, after which the performance stabilizes. Even though the \texttt{CVPR Aug} model appears to improve by further increasing the number of epochs, experiments with 200 epochs have substantially the same results as 60.
+This section considers the models' performance during the training procedure presented in Section \ref{sec:implementation-training}. In this phase, the loss function (\gls{mae}) and the \gls{r2} score are taken into consideration, both for the train and the validation set. Figures \ref{fig:training-metrics-arena}, \ref{fig:training-metrics-cvpr} and \ref{fig:training-metrics-cvpraug} show metrics evolution over the 60 training epochs. Overall, least 30 epochs are needed to reach convergence, after which the performance stabilizes. Even though the \texttt{CVPR Aug} model appears to improve by further increasing the number of epochs, experiments with 200 epochs have substantially the same results as 60.
 
-\texttt{Arena}, \texttt{CVPR}, and \texttt{CVPR Aug} achieve a validation loss of 0.07, 0.13 and 0.20, respectively. As the model complexity increases, the loss does. On the other hand, data augmentation seems to cause a significant decrease in the gap between training and validation loss, as shown in figure \ref{fig:training-metrics-cvpraug}. Even tough further inspection is needed, this effect may be a symptom of better generalization capabilities, driven by the possibly learned task of actually recognizing a human in the image. 
+\texttt{Arena}, \texttt{CVPR}, and \texttt{CVPR Aug} achieve a validation loss of 0.07, 0.13 and 0.20, respectively. As the model complexity increases, the loss does. On the other hand, data augmentation seems to cause a significant decrease in the gap between training and validation loss, as shown in Figure \ref{fig:training-metrics-cvpraug}. Even tough further inspection is needed, this effect may be a symptom of better generalization capabilities, driven by the possibly learned task of actually recognizing a human in the image. 
 
 The \texttt{Arena} model registers an \gls{r2} of 0.99, which can be attributable to overfitting. In fact, such a score would be obtained by an optimal model, but we already know that the original FrontalNet by \cite{mantegazza2019visionbased} could not properly operate outside of the drone arena. In the next sections, we will examine models \texttt{CVPR} and \texttt{CVPR Aug} on various test sets to certify their robustness against the \texttt{Arena} one.
 
@@ -47,7 +47,7 @@ The \texttt{Arena} model registers an \gls{r2} of 0.99, which can be attributabl
 \section{Quantitative Evaluation}
 \label{sec:evaluation-quantitative}
 
-Performance reported during training is not sufficient to evaluate the model. Its strengths must be measured on previously unseen data, but the validation set is very similar to the training one. For testing, we first rely on the official test set \cite{mantegazza2019visionbased}. Then, we expand it through background replacement, choosing the two indoor scenarios shown in figure \ref{fig:test-indoor}. They do not belong to the CVPR dataset and have been accurately selected to be challenging enough for the model while somehow allowing a person in them to be easily recognized. The respective datasets, created by replacing all the test images backgrounds, are called \texttt{indoor1} and \texttt{indoor2}. Instead, we call \texttt{arena} the original test set.
+Performance reported during training is not sufficient to evaluate the model. Its strengths must be measured on previously unseen data, but the validation set is very similar to the training one. For testing, we first rely on the official test set \cite{mantegazza2019visionbased}. Then, we expand it through background replacement, choosing the two indoor scenarios shown in Figure \ref{fig:test-indoor}. They do not belong to the CVPR dataset and have been accurately selected to be challenging enough for the model while somehow allowing a person in them to be easily recognized. The respective datasets, created by replacing all the test images backgrounds, are called \texttt{indoor1} and \texttt{indoor2}. Instead, we call \texttt{arena} the original test set.
 
 \begin{figure}[!h]
 	\begin{center}
@@ -66,9 +66,9 @@ Performance reported during training is not sufficient to evaluate the model. It
 	\label{fig:test-indoor}
 \end{figure}
 
-For a complete analysis, we test our three model variants (section \ref{sec:model-variants}) on the three test sets defined above. Again, we choose to compare the loss (\gls{mae}) and the \gls{r2} score. As previously explained in section \ref{subsec:metrics}, \gls{r2} represents the proportion of variance in the target (i.e., the user's pose) that is explained by the model features (i.e., the input image). As such variance is dataset dependent, \gls{r2} may not be meaningfully comparable across different datasets. Thus, the metric can only be compared among different models for the same dataset, but not on different data for the same model. Unlike for training, during testing, we evaluate the \gls{r2} score separately on each variable, allowing us to inspect models' behavior further. Besides, we compute \gls{rmse}, particularly useful for understanding the errors' magnitude.
+For a complete analysis, we test our three model variants (Section \ref{sec:model-variants}) on the three test sets defined above. Again, we choose to compare the loss (\gls{mae}) and the \gls{r2} score. As previously explained in Section \ref{subsec:metrics}, \gls{r2} represents the proportion of variance in the target (i.e., the user's pose) that is explained by the model features (i.e., the input image). As such variance is dataset dependent, \gls{r2} may not be meaningfully comparable across different datasets. Thus, the metric can only be compared among different models for the same dataset, but not on different data for the same model. Unlike for training, during testing, we evaluate the \gls{r2} score separately on each variable, allowing us to inspect models' behavior further. Besides, we compute \gls{rmse}, particularly useful for understanding the errors' magnitude.
 
-Results are shown in table \ref{tab:qt-summary} and summarized below. The table is completed with colorful annotations to improve general understanding. For \gls{r2}, higher is better. For loss (\gls{mae}) and \gls{rmse}, lower is better.
+Results are shown in Table \ref{tab:qt-summary} and summarized below. The table is completed with colorful annotations to improve general understanding. For \gls{r2}, higher is better. For loss (\gls{mae}) and \gls{rmse}, lower is better.
 
 \paragraph*{Arena model}
 
@@ -102,16 +102,16 @@ According to the resulting metrics, our strategy undoubtedly improves the origin
 
 In this section, we do not consider precise metrics for assessing the model's fitness. Instead, we extend the reasoning over numbers and rely on simulations to create various visualizations. These are used to produce a behavioral evaluation of the results. In practice, we confront the models' predictions with the ground truth from a qualitative point of view.
 
-A first evaluation, detailed in section \ref{subsec:ql-timeline}, presents a comparison with timeline charts. They investigate the general trend of each model on different test sets. Next, in section \ref{subsec:ql-interactive}, we make use of interactive visualizations to interpret the models' results from a human perspective.
+A first evaluation, detailed in Section \ref{subsec:ql-timeline}, presents a comparison with timeline charts. They investigate the general trend of each model on different test sets. Next, in Section \ref{subsec:ql-interactive}, we make use of interactive visualizations to interpret the models' results from a human perspective.
 
 
 
-\subsection{Timeline analysis}
+\subsection{Timeline Analysis}
 \label{subsec:ql-timeline}
 
 In this section we carefully analyze our three models' behavior on different test sets. This is done through a simulation of about 19 seconds\footnote{the dataset is considered to be collected at 30 \gls{fps}} for comparing the ground truth and the values predicted by each considered model.
 
-For the evaluation, we take into consideration the three test sets presented in the previous section (\texttt{arena}, \texttt{indoor1} and \texttt{indoor2}). Moreover, we add another test set created again through background replacement, as the other two. The difference is that this new test set is composed of a set of multiple backgrounds, rather than a single one. Thus, we call it the \texttt{mixed} test set, composed of a total of 27 backgrounds, which include the 2 indoor scenes of before (figure \ref{fig:test-indoor}), 3 pictures from the drone arena, 5 textures, and 17 outdoor photos coming from diverse scenarios. Most of the backgrounds in the \texttt{mixed} test set (some are shown in figure \ref{fig:ql-mixedset}) represent real-world scenes. Hence, we expect them to be particularly challenging for the \texttt{Arena} model. Note that consecutive images in the dataset are randomly assigned to one of the available backgrounds, hence there is no relation between a certain part of the test set and its background.
+For the evaluation, we take into consideration the three test sets presented in the previous section (\texttt{arena}, \texttt{indoor1} and \texttt{indoor2}). Moreover, we add another test set created again through background replacement, as the other two. The difference is that this new test set is composed of a set of multiple backgrounds, rather than a single one. Thus, we call it the \texttt{mixed} test set, composed of a total of 27 backgrounds, which include the 2 indoor scenes of before (Figure \ref{fig:test-indoor}), 3 pictures from the drone arena, 5 textures, and 17 outdoor photos coming from diverse scenarios. Most of the backgrounds in the \texttt{mixed} test set (some are shown in Figure \ref{fig:ql-mixedset}) represent real-world scenes. Hence, we expect them to be particularly challenging for the \texttt{Arena} model. Note that consecutive images in the dataset are randomly assigned to one of the available backgrounds, hence there is no relation between a certain part of the test set and its background.
 
 \begin{figure}[!h]
 	\begin{center}
@@ -140,9 +140,9 @@ For the evaluation, we take into consideration the three test sets presented in 
 	\label{fig:ql-mixedset}
 \end{figure}
 
-\paragraph*{Test set \texttt{arena} (figure \ref{fig:ql-gtpred-arena})}
+\paragraph*{Test set \texttt{arena} (Figure \ref{fig:ql-gtpred-arena})}
 
-All the models achieve good results on the original test set. As in quantitative evaluation, there is no significant difference between the three models. For all variables, the predictions follow the \gls{gt} reasonably accurately. It sometimes happen that one of the models registers slightly better results than the others, but this is a non-systematic behavior. Performance is very similar to the ones presented in figure \ref{fig:frontalnet-gt-pred}, obtained by the original FrontalNet model according to Mantegazza et al. \cite{mantegazza2019visionbased}.
+All the models achieve good results on the original test set. As in quantitative evaluation, there is no significant difference between the three models. For all variables, the predictions follow the \gls{gt} reasonably accurately. It sometimes happen that one of the models registers slightly better results than the others, but this is a non-systematic behavior. Performance is very similar to the ones presented in Figure \ref{fig:frontalnet-gt-pred}, obtained by the original FrontalNet model according to Mantegazza et al. \cite{mantegazza2019visionbased}.
 
 \begin{figure}[!h]
 	\centering
@@ -152,7 +152,7 @@ All the models achieve good results on the original test set. As in quantitative
 \end{figure}
 
 
-\paragraph*{Test sets \texttt{indoor1} and \texttt{indoor2} (figures \ref{fig:ql-gtpred-indoor1} and \ref{fig:ql-gtpred-indoor2})}
+\paragraph*{Test sets \texttt{indoor1} and \texttt{indoor2} (Figures \ref{fig:ql-gtpred-indoor1} and \ref{fig:ql-gtpred-indoor2})}
 
 With artificial test sets, things start to change. None of the networks already know the respective backgrounds\footnote{which means that the three models have not been trained on these new backgrounds}, but severe differences arise between the models. 
 
@@ -175,9 +175,9 @@ On the contrary, the \texttt{Arena} model only follows the ground truth during a
 \end{figure}
 
 
-\paragraph*{Test set \texttt{mixed} (figure \ref{fig:ql-gtpred-mixed})}
+\paragraph*{Test set \texttt{mixed} (Figure \ref{fig:ql-gtpred-mixed})}
 
-Evaluation on the \texttt{mixed} test set further provides evidence that the \texttt{Arena} model is not properly able to predict the user's pose in an unseen scenario. Even worse than before, here the model predictions seem random since they continuously go up and down arbitrarily. This effect, not observed for previous test sets, is due to the composition of the dataset. The \texttt{mixed} test set has different backgrounds for subsequent samples. Thus, the oscillations occur as a symptom of the model sensitivity to the background, as demonstrated through Grad-CAM in section \ref{sec:model-interpretration}.
+Evaluation on the \texttt{mixed} test set further provides evidence that the \texttt{Arena} model is not properly able to predict the user's pose in an unseen scenario. Even worse than before, here the model predictions seem random since they continuously go up and down arbitrarily. This effect, not observed for previous test sets, is due to the composition of the dataset. The \texttt{mixed} test set has different backgrounds for subsequent samples. Thus, the oscillations occur as a symptom of the model sensitivity to the background, as demonstrated through Grad-CAM in Section \ref{sec:model-interpretration}.
 
 Conversely, the models trained on background-replaced training sets can perform their task as they did on the original test set, reasonably following the \gls{gt}.
 
@@ -195,7 +195,7 @@ According to the previous charts, the \texttt{CVPR} and the \texttt{CVPR Aug} mo
 
 \bigskip
 
-We consider different time windows for computing the variance. Each of them bring to the same conclusion. For simplicity, in this thesis we focus on a four seconds window, meaning that we compute the variance every 120 frames. The visualization is done through a timeline, shown in figure \ref{fig:ql-variance} for the \texttt{arena} and the \texttt{mixed} test sets. From the charts, we observe that the variances over time of both \texttt{CVPR} and \texttt{CVPR Aug} are aligned with the variance of the \gls{gt}. For this reason, we conclude that such models can most likely be used to control the real drone.
+We consider different time windows for computing the variance. Each of them bring to the same conclusion. For simplicity, in this thesis we focus on a four seconds window, meaning that we compute the variance every 120 frames. The visualization is done through a timeline, shown in Figure \ref{fig:ql-variance} for the \texttt{arena} and the \texttt{mixed} test sets. From the charts, we observe that the variances over time of both \texttt{CVPR} and \texttt{CVPR Aug} are aligned with the variance of the \gls{gt}. For this reason, we conclude that such models can most likely be used to control the real drone.
 
 \begin{figure}[!h]
 	\begin{center}
@@ -216,7 +216,7 @@ We consider different time windows for computing the variance. Each of them brin
 
 
 
-\subsection{Per-frame analysis}
+\subsection{Per-frame Analysis}
 \label{subsec:ql-interactive}
 
 To complete the evaluation, we test the model on new images. Being not able to experiment with a \gls{mocap} system in an unknown environment, we collect new data without having the corresponding ground truth. For this reason, the following assessment is only based on human interpretation.
@@ -238,9 +238,9 @@ Figure \ref{fig:ql-sim-intro} presents a complete overview of the models' behavi
 
 \medskip
 
-The main differences between the three models are observed for the \texttt{X} and the \texttt{Z} variables, coherently with the metrics reported in table \ref{tab:qt-summary}. This is especially visible when considering tough situations, such as people jumping (figure \ref{fig:ql-sim-jump}) or running (figure \ref{fig:ql-sim-run}). The last case also demonstrate that the \texttt{CVPR Aug} model can surprisingly work with a person who is not actually facing the camera.
+The main differences between the three models are observed for the \texttt{X} and the \texttt{Z} variables, coherently with the metrics reported in Table \ref{tab:qt-summary}. This is especially visible when considering tough situations, such as people jumping (Figure \ref{fig:ql-sim-jump}) or running (Figure \ref{fig:ql-sim-run}). The last case also demonstrate that the \texttt{CVPR Aug} model can surprisingly work with a person who is not actually facing the camera.
 
-Some experiments also consider multiple people in the camera's frame. In such situations, \texttt{CVPR Aug} sometimes correctly tracks the foreground person (figure \ref{fig:ql-sim-double-foreground}) while other times does not explicitly choose one to follow (figure \ref{fig:ql-sim-double-uncertain}). Variables \texttt{X} and \texttt{Y} are the most suited to be considered in such situations, as easily understandable by humans. Many reasons can be the cause of this problem, and further investigation is still needed. We also notice, from figure \ref{fig:ql-sim-double-change}, that if multiple people are present in the image and one of them moves out of the scene, then the model instantly gives its attention on the remaining person.
+Some experiments also consider multiple people in the camera's frame. In such situations, \texttt{CVPR Aug} sometimes correctly tracks the foreground person (figure \ref{fig:ql-sim-double-foreground}) while other times does not explicitly choose one to follow (Figure \ref{fig:ql-sim-double-uncertain}). Variables \texttt{X} and \texttt{Y} are the most suited to be considered in such situations, as easily understandable by humans. Many reasons can be the cause of this problem, and further investigation is still needed. We also notice, from Figure \ref{fig:ql-sim-double-change}, that if multiple people are present in the image and one of them moves out of the scene, then the model instantly gives its attention on the remaining person.
 
 % \paragraph*{Head orientation}
 % \label{subsec:ql-issue-w}
