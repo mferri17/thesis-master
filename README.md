@@ -1,8 +1,8 @@
 
-# Master Thesis | Interpretation of neural networks and advanced image augmentation for visual end-to-end control of drones
+# Master Thesis | Interpretation of Neural Networks and Advanced Image Augmentation for Visual Control of Drones in Human Proximity
 
 - Master of Science in Computer Science at Università della Svizzera Italiana (USI)
-- Double Degree with  and University of Milano-Bicocca, Academic Year 2019/2020
+- Double Degree with University of Milano-Bicocca, Academic Year 2019/2020
 
 Collaboration with the Robotics team at [IDSIA](http://www.idsia.ch/) for the application of Deep Learning Interpretability and Advanced Image Augmentation techniques to improve an existing Convolutional Neural Network (CNN) for Visual Control of Drones.
 
